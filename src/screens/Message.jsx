@@ -1,0 +1,86 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-native/no-inline-styles */
+import React, { useEffect, useState } from 'react';
+import { Animated, StyleSheet, View } from 'react-native';
+import Background from '../utils/Background';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import Br from '../components/Br';
+import { H6, Small } from '../utils/Text';
+import { Color } from '../utils/Colors';
+import Btn from '../utils/Btn';
+import { TickCircle } from 'iconsax-react-native';
+import BackBtn from '../components/BackBtn';
+import { isIOS } from '../utils/global';
+
+const Message = ({ navigation, route }) => {
+    const theme = route?.params?.theme;
+    const title = route?.params?.title;
+    const message = route?.params?.message;
+    const screen = route?.params?.screen;
+    const isLightTheme = theme && theme === 'light';
+    const [popUpAnimation] = useState(new Animated.Value(0.8));
+
+    useEffect(() => {
+        Animated.timing(popUpAnimation, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+        }).start();
+    }, []);
+
+    const onContinue = () => {
+        Animated.timing(popUpAnimation, {
+            toValue: 0.8,
+            duration: 1000,
+            useNativeDriver: true,
+        }).start(() => {
+            navigation.navigate(screen || 'Home');
+        });
+    };
+
+    return (
+        <>
+            {isLightTheme && <BackBtn navigation={navigation} translucent />}
+            <Background translucent={true} noBackground={isLightTheme} barStyle={isLightTheme ? 'dark-content' : 'light-content'}>
+                <View style={{ height: isIOS ? hp('90%') : hp('95%'), alignItems: 'center', justifyContent: 'center' }}>
+                    <Animated.View style={{ transform: [{ scale: popUpAnimation }] }}>
+                        <View style={[styles.card, { backgroundColor: isLightTheme ? Color('homeBg') : Color('drawerBg') }]}>
+                            <TickCircle
+                                size={hp('8%')}
+                                color={Color('text')}
+                                variant={isLightTheme ? 'Bold' : 'Outline'}
+                            />
+                            <Br space={2} />
+                            <H6 style={{textAlign: 'center'}} heading font="bold">{title || 'All Done'}</H6>
+                            <Small color={Color('lightText')}>{message || 'You’re all set and ready to start!'}</Small>
+                            <Br space={2} />
+                            <Btn textStyle={{color: Color(isLightTheme ? 'homeBg' : 'text')}} onPress={onContinue} label="Continue" btnStyle={{paddingHorizontal: wp('15%'), backgroundColor: Color(isLightTheme ? 'text' : 'btnColor')}} />
+                        </View>
+                    </Animated.View>
+                </View>
+            </Background>
+        </>
+    );
+};
+
+export default Message;
+
+const styles = StyleSheet.create({
+    card: {
+        alignItems: 'center',
+        paddingVertical: hp('3%'),
+        width: wp('90%'),
+        borderRadius: hp('3%'),
+        borderWidth: 1,
+        borderColor: Color('text'),
+        shadowColor: Color('shadow'),
+        shadowOffset: {
+            width: 0,
+            height: 8,
+        },
+        shadowOpacity: 0.46,
+        shadowRadius: 11.14,
+
+        elevation: 17,
+    },
+});
