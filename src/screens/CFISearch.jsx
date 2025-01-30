@@ -71,7 +71,6 @@ const CFISearch = ({ navigation }) => {
             const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`);
             const data = response.data;
             const locationName = data.results[0].formatted_address;
-
             setLocation({
                 latitude: crd.latitude,
                 longitude: crd.longitude,

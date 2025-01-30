@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TextInput,
   View,
+  Text,
 } from 'react-native';
 import Background from '../utils/Background';
 import {
@@ -22,6 +23,7 @@ import {isIOS} from '../utils/global';
 import {api, errHandler, note, storageUrl} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import * as Yup from 'yup';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 const validationSchema = Yup.object().shape({
   rating: Yup.number()
@@ -34,6 +36,13 @@ const validationSchema = Yup.object().shape({
     'Please select atleast one option from service speed section.',
   ),
   restaurant_id: Yup.string().required('Invalid Restaurant id'),
+  imageUri: Yup.string()
+    .required('Please upload an image.')
+    .test(
+      'is-valid-uri',
+      'Please upload a valid image.',
+      (value) => value && value.startsWith('file://') || value.startsWith('http')
+    ),
 });
 
 const Feedback = ({navigation}) => {
@@ -50,7 +59,10 @@ const Feedback = ({navigation}) => {
   const [overallSatisfaction, setOverallSatisfaction] = useState('');
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState(initialImages);
+  const [imageUri,setImageUri] = useState(null)
   const {context} = useContext(DataContext);
+
+  console.log(imageUri)
 
   const starCount = images?.filter(img => img.id === '8ggStxqyboK5').length;
 
@@ -67,19 +79,42 @@ const Feedback = ({navigation}) => {
   const SendFeedback = async () => {
     try {
       setLoading(true);
+
+  
       const obj = {
         rating: star,
         quality,
         service_speed: serviceSpeed,
         overall_satisfaction: overallSatisfaction,
-        restaurant_id: context?.restuarent?.id || 'default_restaurant_id', // Fallback value
+        restaurant_id: context?.restuarent?.id || 'default_restaurant_id', 
+        imageUri: imageUri || '', 
       };
-      await validationSchema.validate(obj, {abortEarly: false});
-      const res = await api.post('/review/store', obj, {
-        headers: {Authorization: `Bearer ${context?.token}`},
+
+      const formData = new FormData();
+      formData.append('rating', star);
+      formData.append('quality', quality);
+      formData.append('service_speed', serviceSpeed);
+      formData.append('overall_satisfaction', overallSatisfaction);
+      formData.append('restaurant_id', context?.restuarent?.id || 'default_restaurant_id'); // Fallback value
+  
+      // Add the image file to the form data
+      if (imageUri) {
+        formData.append('image_path', {
+          uri: imageUri,
+          type: 'image/jpeg',  // or the correct MIME type of the image
+          name: 'feedback_image.jpg', // or dynamic name
+        });
+      }
+  
+      
+      await validationSchema.validate(obj, { abortEarly: false });
+  
+      const res = await api.post('/review/store', formData, {
+        headers: { Authorization: `Bearer ${context?.token}` },
       });
+      
       note('Feedback send successful', res?.data?.message, [
-        {text: 'Okay', onPress: () => navigation.goBack()},
+        { text: 'Okay', onPress: () => navigation.goBack() },
       ]);
     } catch (err) {
       await errHandler(err, null, navigation);
@@ -87,6 +122,7 @@ const Feedback = ({navigation}) => {
       setLoading(false);
     }
   };
+  
   const toggleId = selectedIndex => {
     setImages(prevImages =>
       prevImages.map((img, index) => ({
@@ -98,6 +134,27 @@ const Feedback = ({navigation}) => {
       })),
     );
   };
+
+  const onSelectImage = async () => {
+    await launchImageLibrary(
+      {
+        mediaType: 'photo',
+        maxWidth: 800,
+        maxHeight: 800,
+        quality: 0.7,
+      },
+      (response) => {
+        if (response.didCancel) {
+          console.log('User canceled image picker');
+        } else if (response.errorCode) {
+          console.log('Image picker error: ', response.errorMessage);
+        } else {
+          // Set the selected image URI
+          setImageUri(response.assets[0].uri);
+        }
+      }
+    );
+  }
 
   return (
     <>
@@ -249,7 +306,30 @@ const Feedback = ({navigation}) => {
                 onChangeText={setOverallSatisfaction}
               />
             </View>
-
+            <Br space={3} />
+            <TouchableOpacity
+              style={{
+                borderWidth: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderColor: Color('homeBg'),
+                borderRadius: hp('2%'),
+                height: hp(15)
+              }}
+              onPress={() => onSelectImage()}
+              >
+              {imageUri ?  
+                  <Image borderRadius={hp('2%')} source={{uri: imageUri}} style={{height: hp(15),width: wp(90)}} />
+                :
+                <>
+                <Image source={require('../assets/images/upload.png')} style={{height: hp(5),width: hp(5)}} />
+                <Text style={{
+                  color: Color(''),
+                  fontSize: hp(2)
+                }}>Select an image</Text>
+                </>
+              }
+              </TouchableOpacity>
             <Br space={3} />
             <Btn
               onPress={SendFeedback}

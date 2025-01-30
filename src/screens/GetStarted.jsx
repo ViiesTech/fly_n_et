@@ -23,9 +23,9 @@ const GetStarted = ({ navigation }) => {
                     <H1 size={hp('6%')} style={{lineHeight}} heading font="extraBold">WELCOME TO</H1>
                     <H1 size={hp('6%')} style={{lineHeight}} heading font="extraBold">FLY-N-EAT</H1>
                     <Br space={2} />
-                    <Pera font="light">
+                    {/* <Pera font="light">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut.
-                    </Pera>
+                    </Pera> */}
                     <Br space={3} />
                 </Wrapper>
             </Background>

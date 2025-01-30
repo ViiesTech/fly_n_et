@@ -41,6 +41,8 @@ import CFIDetail from './src/screens/CFIDetail';
 import UserType from './src/screens/UserType';
 import CreateProProfile from './src/screens/CreateProProfile';
 import SelectLocation from './src/screens/SelectLocation';
+import PointToPoint from './src/screens/PointToPoint';
+import Map2 from './src/screens/Map2';
 
 const Stack = createNativeStackNavigator();
 
@@ -67,6 +69,9 @@ function App() {
           }}>
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="Logout" component={Logout} />
+            <Stack.Screen name="PointToPoint">
+              {props => <Sus component={<PointToPoint {...props} />} />}
+            </Stack.Screen>
             <Stack.Screen name="SelectLocation">
               {props => <Sus component={<SelectLocation {...props} />} />}
             </Stack.Screen>
@@ -106,6 +111,9 @@ function App() {
             <Stack.Screen name="Map">
               {props => <Sus component={<Map {...props} />} />}
             </Stack.Screen>
+             <Stack.Screen name="Map2">
+              {props => <Sus component={<Map2 {...props} />} />}
+            </Stack.Screen> 
             <Stack.Screen name="RestuarantDetails">
               {props => <Sus component={<RestuarantDetails {...props} />} />}
             </Stack.Screen>

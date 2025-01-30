@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import { Animated, Image, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
+import { Animated, Image, Keyboard, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { Color } from '../utils/Colors';
 import { H5, Small } from '../utils/Text';
@@ -122,6 +122,7 @@ const Login = ({ navigation }) => {
                 return;
             }
             setLoading(true);
+            Keyboard.dismiss();
             const obj = {
                 email,
                 password,
@@ -130,6 +131,7 @@ const Login = ({ navigation }) => {
                 // longitude: 0,
                 ...location,
             };
+
             await validationSchema.validate(obj, { abortEarly: false });
             const res = await api.post('/user/login', obj);
 

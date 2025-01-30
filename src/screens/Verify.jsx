@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useContext, useState } from 'react';
-import { Animated, Image, View } from 'react-native';
+import { Animated, Image, Keyboard, View } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { H5, Small } from '../utils/Text';
 import Br from '../components/Br';
@@ -57,6 +57,7 @@ const Verify = ({ navigation }) => {
   const onOtpVerify = async () => {
     try {
       setLoading(true);
+      Keyboard.dismiss();
       const obj = {
         code,
       };

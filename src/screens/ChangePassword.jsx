@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useState } from 'react';
-import { View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import Background from '../utils/Background';
 import Br from '../components/Br';
 import { Pera } from '../utils/Text';
@@ -39,6 +39,7 @@ const ChangePassword = ({ navigation }) => {
     const onChangePassword = async () => {
         try {
             setLoading(true);
+            Keyboard.dismiss();
             const obj = {
                 old_password: password,
                 new_password: newPassword,

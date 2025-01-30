@@ -5,6 +5,7 @@ import {
   Alert,
   Animated,
   Image,
+  Keyboard,
   ScrollView,
   TouchableOpacity,
   View,
@@ -55,9 +56,6 @@ const validationSchema = Yup.object().shape({
     'Please select the aircraft type from the dropdown.',
   ),
   profile_image: Yup.object().required('Please upload your profile image.'),
-  banner_image: Yup.object().required(
-    'Banner Image is required by the application.',
-  ),
 });
 
 const CreateProfile = ({navigation}) => {
@@ -205,6 +203,7 @@ const CreateProfile = ({navigation}) => {
         return false;
       }
       setLoading(true);
+      Keyboard.dismiss();
       const date_of_birth = moment(dob).format('YYYY-MM-DD');
       const obj = {
         age: age,
@@ -213,6 +212,7 @@ const CreateProfile = ({navigation}) => {
         profile_image: profile,
         banner_image: banner,
       };
+
       const formData = new FormData();
       formData.append('age', age);
       formData.append('dob', date_of_birth);
@@ -222,11 +222,11 @@ const CreateProfile = ({navigation}) => {
         type: profile.type,
         name: profile.fileName,
       });
-      formData.append('banner_image', {
-        uri: banner.uri,
-        type: banner.type,
-        name: banner.fileName,
-      });
+      formData.append('banner_image', banner ? {
+        uri: banner?.uri,
+        type: banner?.type,
+        name: banner?.fileName,
+      } : null);
       await validationSchema.validate(obj, {abortEarly: false});
       const res = await api.post('/user/user-info', formData, {
         headers: {

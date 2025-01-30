@@ -15,38 +15,38 @@ const Navigation = ({ label, navigation, ...props }) => {
                         resizeMode="contain"
                         source={require('../assets/images/1.png')}
                         style={{
-                            width: hp('3%'),
-                            height: hp('3%'),
+                            width: hp('3.5%'),
+                            height: hp('3.5%'),
                         }}
                     />
                     <Br space={0.5} />
-                    <Small font="light">Fly-Eat-Back</Small>
+                    <Small size={hp(1.8)} font="Bold">Fly-Eat-Back</Small>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Bookmark')}>
+                <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('PointToPoint')}>
                     <Image
                         resizeMode="contain"
                         source={require('../assets/images/2.png')}
                         style={{
-                            width: hp('3%'),
-                            height: hp('3%'),
+                            width: hp('3.5%'),
+                            height: hp('3.5%'),
                         }}
                     />
                     <Br space={0.5} />
-                    <Small font="light">Bookmark</Small>
+                    <Small size={hp(1.8)} font="Bold">Point To Point</Small>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('CFISearch')}>
                     <Image
                         resizeMode="contain"
                         source={require('../assets/images/3.png')}
                         style={{
-                            width: hp('3%'),
-                            height: hp('3%'),
+                            width: hp('3.5%'),
+                            height: hp('3.5%'),
                         }}
                     />
                     <Br space={0.5} />
-                    <Small font="light">Database</Small>
+                    <Small size={hp(1.8)} font="Bold">CFI/CFII</Small>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Settings')}>
+                {/* <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Settings')}>
                     <Image
                         resizeMode="contain"
                         source={require('../assets/images/4.png')}
@@ -56,8 +56,8 @@ const Navigation = ({ label, navigation, ...props }) => {
                         }}
                     />
                     <Br space={0.5} />
-                    <Small font="light">Setting</Small>
-                </TouchableOpacity>
+                    <Small font="Bold">Setting</Small>
+                </TouchableOpacity> */}
             </View>
         </>
     );
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        paddingVertical: hp('1.5%'),
+        paddingVertical: hp('2.5%'),
         borderTopLeftRadius: hp('3%'),
         borderTopRightRadius: hp('3%'),
     },

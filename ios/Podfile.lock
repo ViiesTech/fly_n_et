@@ -1288,6 +1288,27 @@ PODS:
   - react-native-simple-toast (3.3.1):
     - React-Core
     - Toast (~> 4)
+  - react-native-webview (13.13.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - React-nativeconfig (0.75.4)
   - React-NativeModulesApple (0.75.4):
     - glog
@@ -1622,6 +1643,7 @@ DEPENDENCIES:
   - react-native-orientation-locker (from `../node_modules/react-native-orientation-locker`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-simple-toast (from `../node_modules/react-native-simple-toast`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -1742,6 +1764,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-simple-toast:
     :path: "../node_modules/react-native-simple-toast"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   React-nativeconfig:
     :path: "../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -1845,6 +1869,7 @@ SPEC CHECKSUMS:
   react-native-orientation-locker: 5819fd23ca89cbac0d736fb4314745f62716d517
   react-native-safe-area-context: 4532f1a0c5d34a46b9324ccaaedcb5582a302b7d
   react-native-simple-toast: 1f1cc551d419bc0ab05dcb0136554006c274789d
+  react-native-webview: 24d0f951d301c59fe8ac760b4a9c0a20731dff45
   React-nativeconfig: 8c83d992b9cc7d75b5abe262069eaeea4349f794
   React-NativeModulesApple: 9f7920224a3b0c7d04d77990067ded14cee3c614
   React-perflogger: 59e1a3182dca2cee7b9f1f7aab204018d46d1914

@@ -20,7 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 
-const Home = ({ navigation }) => {
+const PointToPoint = ({ navigation }) => {
     const { context } = useContext(DataContext);
     const [location, setLocation] = useState();
 
@@ -31,11 +31,20 @@ const Home = ({ navigation }) => {
     const getLocation = async (place_id) => {
         const BASE_URL = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${API_KEY}&fields=geometry`;
         const response = await axios.get(BASE_URL);
-        await AsyncStorage.setItem('locationDetails', JSON.stringify(response.data?.result?.geometry?.location));
+        await AsyncStorage.setItem('p2p_locationDetails', JSON.stringify(response.data?.result?.geometry?.location));
+    };
+    const getLocation2 = async (place_id) => {
+        const BASE_URL = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${API_KEY}&fields=geometry`;
+        const response = await axios.get(BASE_URL);
+        await AsyncStorage.setItem('p2p_locationDetails2', JSON.stringify(response.data?.result?.geometry?.location));
     };
     const onSelectLocation = async (value) => {
-        await AsyncStorage.setItem('selectLocation', JSON.stringify(value));
+        await AsyncStorage.setItem('p2p_selectLocation', JSON.stringify(value));
         getLocation(value?.place_id);
+    };
+    const onSelectLocation2 = async (value) => {
+        await AsyncStorage.setItem('p2p_selectLocation2', JSON.stringify(value));
+        getLocation2(value?.place_id);
     };
     async function requestLocationPermission() {
         try {
@@ -155,8 +164,76 @@ const Home = ({ navigation }) => {
             <>
                 <View style={{position: 'relative', overflow: 'visible', zIndex: 1}}>
                     <View style={styles.input}>
-                        <TextInput ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
+                        <TextInput numberOfLines={1} ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
                     </View>
+                    {
+                        predictions && predictions?.length > 0 && (
+                            <View
+                                style={{
+                                    position: 'absolute', top: '100%', width: wp('70%'), backgroundColor: Color('text'),
+                                    shadowColor: Color('shadow'),
+                                    shadowOffset: {
+                                        width: 0,
+                                        height: 2,
+                                    },
+                                    shadowOpacity: 0.25,
+                                    shadowRadius: 3.84,
+                                    borderRadius: hp('0.5%'),
+                                    elevation: 5,
+                                    zIndex: 3,
+                                    height: hp('10%'),
+                                }}
+                            >
+                                <ScrollView>
+                                    {predictions?.map((val, index) => {
+                                        return (
+                                            <Pressable onPress={() => onClick(val)}>
+                                                <Small numberOfLines={1} key={index} color={Color('homeBg')} style={{ padding: hp('0.5%') }}>{val?.structured_formatting?.main_text}</Small>
+                                            </Pressable>
+                                        );
+                                    })}
+                                </ScrollView>
+                            </View>
+                        )
+                    }
+                </View>
+            </>
+        );
+    };
+    const HomeInput2 = ({ placeholder }) => {
+        const inputRef = useRef(null);
+        const [predictions, setPredictions] = useState();
+        const [selection, setSelection] = useState('');
+        const searchAirports = async (searchKey) => {
+            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk&types=airport`;
+            const response = await axios.get(BASE_URL, {
+              params: {
+                key: API_KEY,
+                input: 'Restaurants',
+                inputtype: 'textquery',
+                radius: 5000,
+              },
+            });
+            setPredictions(response?.data?.predictions);
+        };
+
+        const onClick = (val) => {
+            onSelectLocation2(val);
+            setPredictions();
+            setSelection(val?.structured_formatting?.main_text);
+            if (inputRef.current) {
+                inputRef.current.setNativeProps({ text: val?.structured_formatting?.main_text });
+            }
+        };
+
+        return (
+            <>
+                <View style={{position: 'relative', overflow: 'visible', zIndex: 1}}>
+                    <View style={styles.input}>
+                        <TextInput numberOfLines={1} ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
+                    </View>
+
+                    
                     {
                         predictions && predictions?.length > 0 && (
                             <View
@@ -193,42 +270,58 @@ const Home = ({ navigation }) => {
     };
     const HomeInput = ({ placeholder }) => {
         const setDistance = async (text) => {
-            await AsyncStorage.setItem('distance', text);
+            await AsyncStorage.setItem('p2p_distance', text);
         };
         return (
             <View style={styles.input}>
-                <TextInput onChangeText={(text) => setDistance(text)} keyboardType="numeric" style={[styles.inputField]} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
+                <TextInput numberOfLines={1} onChangeText={(text) => setDistance(text)} keyboardType="numeric" style={[styles.inputField]} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
             </View>
         );
     };
+
     const Button = () => {
         const [loading, setLoading] = useState(false);
         const onSearch = async () => {
             try {
                 setLoading(true);
-                const locationDetails = await AsyncStorage.getItem('locationDetails');
-                const distance = await AsyncStorage.getItem('distance');
-                const selectLocation = await AsyncStorage.getItem('selectLocation');
+                const locationDetails = await AsyncStorage.getItem('p2p_locationDetails');
+                const locationDetails2 = await AsyncStorage.getItem('p2p_locationDetails2');
+                const distance = await AsyncStorage.getItem('p2p_distance');
+                const selectLocation = await AsyncStorage.getItem('p2p_selectLocation');
+                const selectLocation2 = await AsyncStorage.getItem('p2p_selectLocation2');
 
-                if (!locationDetails || !distance) {
+                if (!locationDetails || !locationDetails2 || !distance) {
                     note('Validation Error', 'Location and max distance is required');
                     return false;
                 }
 
-                const json = JSON.parse(locationDetails);
+                const json = JSON.parse(locationDetails)
+                const json2 = JSON.parse(locationDetails2);
+                // return console.log(`${json2?.lat},${json2?.lng}`)
                 const res = await api.post('/restaurant/search', {
                     starting_from: `${json?.lat},${json?.lng}`,
+                    destination: `${json2?.lat},${json2?.lng}`,
                     max_distance: distance,
                 }, {
                     headers: { Authorization: `Bearer ${context?.token}` },
                 });
-
+                console.log('api response',res)
                 if (res.data?.restaurant?.length > 0) {
-                    navigation.navigate('Map', { distance: distance, restaurants: res.data?.restaurant, location: location, airport: JSON.parse(locationDetails), airportDetails: JSON.parse(selectLocation) });
+                    navigation.navigate('Map', {
+                        distance: distance,
+                        restaurants: res.data?.restaurant,
+                        location: location,
+                        airport: JSON.parse(locationDetails),
+                        airportDetails: JSON.parse(selectLocation),
+                        airport2: JSON.parse(locationDetails2),
+                        airportDetails2: JSON.parse(selectLocation2),
+                        p2p: true,
+                    });
                 }else {
                     note('No Result Found', "Couldn't find any restaurant according to the given parameters");
                 }
             } catch (err) {
+                console.log('error',err)
                 await errHandler(err, null, navigation);
             } finally {
                 setLoading(false);
@@ -241,9 +334,13 @@ const Home = ({ navigation }) => {
             <Background translucent={false} statusBarColor={Color('homeBg')} noBackground>
                 <TopBar />
                 <View style={{ height: hp('70%'), alignItems: 'center', justifyContent: 'center' }}>
-                    <Pera size={hp(2.2)} color={Color('homeBg')} heading font="bold">Starting From</Pera>
+                    <Pera size={hp(2.2)} color={Color('homeBg')} heading font="bold">Starting Airport</Pera>
                     <Br space={2} />
                     <HomeInput1 placeholder="Type Here" />
+                    <Br space={5} />
+                    <Pera size={hp(2.2)} color={Color('homeBg')} heading font="bold">Destination</Pera>
+                    <Br space={2} />
+                    <HomeInput2 placeholder="Type Here" />
                     <Br space={5} />
                     <Pera size={hp(2.2)} color={Color('homeBg')} heading font="bold">Max Distance (NM)</Pera>
                     <Br space={2} />
@@ -257,7 +354,7 @@ const Home = ({ navigation }) => {
     );
 };
 
-export default Home;
+export default PointToPoint;
 
 const styles = StyleSheet.create({
     topbar: {
@@ -273,18 +370,18 @@ const styles = StyleSheet.create({
         borderColor: Color('lightText'),
         borderRadius: hp('50%'),
         width: wp('70%'),
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems:'center',
+        justifyContent:'center',
         height: hp('5%'),
     },
     inputField: {
         borderRadius: hp('50%'),
         paddingHorizontal: wp('5%'),
-        // paddingVertical: 0,
         color: Color('homeBg'),
         fontFamily: 'Montserrat-Regular',
         textAlign: 'center',
-        fontSize: hp(2),
         fontWeight: '600',
+        fontSize: hp(2)
+        
     },
 });

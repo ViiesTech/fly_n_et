@@ -8,7 +8,7 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-nat
 import Br from '../components/Br';
 import { Pera, Small } from '../utils/Text';
 import { Color } from '../utils/Colors';
-import { AirplaneSquare, ArrowRight, Bookmark, Home, LogoutCurve, Notification, User } from 'iconsax-react-native';
+import { AirplaneSquare, ArrowRight, Bookmark, Home, LogoutCurve, Notification, Setting, User } from 'iconsax-react-native';
 import BackBtn from '../components/BackBtn';
 
 import Wrapper from '../components/Wrapper';
@@ -73,13 +73,14 @@ const SideMenu = ({ navigation }) => {
                         color={Color('lightText')}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('CFISearch')}>
+                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Settings')}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
-                        <AirplaneSquare
+                        {/* <AirplaneSquare
                             size={hp('3%')}
                             color={Color('drawerBg')}
-                        />
-                        <Small color={Color('drawerBg')} heading font="bold">CFI</Small>
+                        /> */}
+                        <Setting size={hp('3%')} color={Color('drawerBg')} />
+                        <Small color={Color('drawerBg')} heading font="bold">Settings</Small>
                     </View>
                     <ArrowRight
                         size={hp('3%')}

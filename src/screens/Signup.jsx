@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import { Animated, Image, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
+import { Animated, Image, Keyboard, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { H5, Small } from '../utils/Text';
 import Br from '../components/Br';
@@ -129,6 +129,7 @@ const Signup = ({ navigation }) => {
                 note('Location is Required', 'You need to allow the app to get your location in order to use fly n eat!', [{ text: 'Request Again', onPress: async () => await requestLocationPermission() }]);
                 return;
             }
+            Keyboard.dismiss();
             setLoading(true);
             const obj = {
                 name,

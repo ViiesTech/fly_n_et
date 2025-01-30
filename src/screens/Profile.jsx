@@ -29,8 +29,10 @@ import Toast from 'react-native-simple-toast';
 import Background from '../utils/Background';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Model from '../components/Model';
+import { useIsFocused } from '@react-navigation/native';
 
 const Profile = ({ navigation }) => {
+  const focused = useIsFocused();
   const { context, setContext } = useContext(DataContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +45,7 @@ const Profile = ({ navigation }) => {
   useEffect(() => {
     getRestuarents();
     getUploadedImages();
-  }, []);
+  }, [focused]);
 
   useEffect(() => {
     setImages(context?.serviceImages);
@@ -156,12 +158,12 @@ const Profile = ({ navigation }) => {
               width: wp('100%'),
             }}
             source={{
-              uri: `${storageUrl}${context?.user?.user_info?.banner_image}`,
+              uri: context?.user?.user_info?.banner_image ? `${storageUrl}${context?.user?.user_info?.banner_image}` : 'https://picsum.photos/500/300',
             }}>
             <View
               style={{
                 flexDirection: 'row',
-                paddingTop: isIOS ? hp('5%') : hp('3%'),
+                paddingTop: hp('3%'),
                 height: hp('20%'),
                 marginTop: hp('2%'),
               }}>
@@ -437,9 +439,9 @@ const Profile = ({ navigation }) => {
         <View style={{ backgroundColor: Color('text') }}>
           <TopBar />
           <Wrapper>
-            <Pera color={Color('homeBg')} heading font="bold">
+            {/* <Pera color={Color('homeBg')} heading font="bold">
               Tim Recent Views
-            </Pera>
+            </Pera> */}
             <Br space={1} />
             {context?.restuarents?.length === 0 && (
               <Pera style={{ textAlign: 'center' }} color={Color('shadow')}>
