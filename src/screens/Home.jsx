@@ -130,7 +130,7 @@ const Home = ({ navigation }) => {
         const [predictions, setPredictions] = useState();
         const [selection, setSelection] = useState('');
         const searchAirports = async (searchKey) => {
-            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk&types=airport`;
+            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk&types=airport&components=country:us`;
             const response = await axios.get(BASE_URL, {
               params: {
                 key: API_KEY,
@@ -147,7 +147,7 @@ const Home = ({ navigation }) => {
             setPredictions();
             setSelection(val?.structured_formatting?.main_text);
             if (inputRef.current) {
-                inputRef.current.setNativeProps({ text: val?.structured_formatting?.main_text });
+                inputRef.current.setNativeProps({ text: val?.structured_formatting?.main_text?.toUpperCase() });
             }
         };
 
@@ -155,7 +155,7 @@ const Home = ({ navigation }) => {
             <>
                 <View style={{position: 'relative', overflow: 'visible', zIndex: 1}}>
                     <View style={styles.input}>
-                        <TextInput ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
+                        <TextInput autoCapitalize='characters' ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
                     </View>
                     {
                         predictions && predictions?.length > 0 && (
@@ -179,7 +179,7 @@ const Home = ({ navigation }) => {
                                     {predictions?.map((val, index) => {
                                         return (
                                             <Pressable onPress={() => onClick(val)}>
-                                                <Small numberOfLines={1} key={index} color={Color('homeBg')} style={{ padding: hp('0.5%') }}>{val?.structured_formatting?.main_text}</Small>
+                                                <Small numberOfLines={1} key={index} color={Color('homeBg')} size={hp(2.6)} style={{ padding: hp('0.5%') }}>{val?.structured_formatting?.main_text?.toUpperCase()}</Small>
                                             </Pressable>
                                         );
                                     })}
@@ -197,7 +197,7 @@ const Home = ({ navigation }) => {
         };
         return (
             <View style={styles.input}>
-                <TextInput onChangeText={(text) => setDistance(text)} keyboardType="numeric" style={[styles.inputField]} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
+                <TextInput autoCapitalize='characters' onChangeText={(text) => setDistance(text.toUpperCase())} keyboardType="numeric" style={[styles.inputField]} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
             </View>
         );
     };
@@ -222,7 +222,7 @@ const Home = ({ navigation }) => {
                 }, {
                     headers: { Authorization: `Bearer ${context?.token}` },
                 });
-
+                console.log('restauratns responsne',res.data?.restaurant)
                 if (res.data?.restaurant?.length > 0) {
                     navigation.navigate('Map', { distance: distance, restaurants: res.data?.restaurant, location: location, airport: JSON.parse(locationDetails), airportDetails: JSON.parse(selectLocation) });
                 }else {

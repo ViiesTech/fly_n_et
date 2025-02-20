@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
+  widthPercentageToDP,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import Br from '../components/Br';
@@ -28,7 +29,10 @@ import {DataContext} from '../utils/Context';
 import moment from 'moment';
 import {capitalize, isIOS} from '../utils/global';
 import {useIsFocused} from '@react-navigation/native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, {Marker} from 'react-native-maps';
+import Swiper from 'react-native-swiper';
+import FastImage from 'react-native-fast-image';
+import SwiperFlatList from 'react-native-swiper-flatlist';
 
 const RestuarantDetails = ({navigation, route}) => {
   const IsFocused = useIsFocused();
@@ -43,8 +47,8 @@ const RestuarantDetails = ({navigation, route}) => {
 
   // console.log('restaurat detail ===>', navigation.getState());
   const routes = navigation.getState()?.routes;
-  const previousScreen = routes[routes.length - 2]?.name; 
-  console.log('Navigated from:',previousScreen);
+  const previousScreen = routes[routes.length - 2]?.name;
+  console.log('Navigated from:', context?.restuarent);
 
   const getRestuarentDetails = async () => {
     try {
@@ -103,9 +107,19 @@ const RestuarantDetails = ({navigation, route}) => {
       </View>
     );
   };
-  const Review = ({url, name, rating, description, created_at}) => {
+  const Review = ({
+    url,
+    name,
+    rating,
+    description,
+    created_at,
+    onReviewPress,
+  }) => {
     return (
-      <View style={{flexDirection: 'row', gap: wp('3%'), alignItems: 'center'}}>
+      <TouchableOpacity
+        onPress={onReviewPress}
+        activeOpacity={0.5}
+        style={{flexDirection: 'row', gap: wp('3%'), alignItems: 'center'}}>
         {/* Profile Image Section */}
         <View>
           <View
@@ -170,9 +184,14 @@ const RestuarantDetails = ({navigation, route}) => {
             {description || 'No feedback.'}
           </Small>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
+
+  const onVisitWebsite = async () => {
+    // return console.log('hhello',context?.restuarent?.website)
+    await Linking.openURL(context?.restuarent?.website)
+  }
 
   // const onSpecificRestaurant = () => {
   //   setContext({
@@ -180,6 +199,8 @@ const RestuarantDetails = ({navigation, route}) => {
   //     specific_restaurant: context?.restuarent
   //   })
   // }
+
+  // return console.log('hhhh',context?.restuarent)
 
   return (
     <>
@@ -208,13 +229,52 @@ const RestuarantDetails = ({navigation, route}) => {
         </View>
       ) : (
         <ScrollView style={{backgroundColor: Color('text')}}>
-          <Image
-            source={{
-              uri: `${storageUrl}${context?.restuarent?.image_path}`,
-            }}
-            resizeMode="cover"
-            style={{height: hp('40%'), width: wp('100%')}}
-          />
+          {context?.restuarent?.images?.length < 1 ? (
+            <Image
+              source={{
+                uri: `${storageUrl}${context?.restuarent?.image.path}`,
+              }}
+              resizeMode="cover"
+              style={{height: hp('40%'), width: wp('100%')}}
+            />
+          ) : (
+            <View style={{}}>
+              <SwiperFlatList
+                // autoplay
+                // autoplayDelay={2}
+                // autoplayLoop
+                index={2}
+                showPagination
+                paginationDefaultColor={Color('text')}
+                paginationActiveColor={Color('drawerBg')}
+                data={context?.restuarent?.images}
+                renderItem={({item}) => (
+                  <FastImage
+                    style={{width: wp('100%'), height: hp('40%')}}
+                    source={{
+                      uri: `${storageUrl}${item.path}`,
+                      priority: FastImage.priority.normal,
+                    }}
+                    resizeMode={FastImage.resizeMode.cover}
+                  />
+                )}
+              />
+              {/* <Swiper>
+            {context?.restuarent?.images.map((item) => {
+              return (
+                <FastImage
+                style={{ width: wp('100%'), height: hp('40%') }}
+                source={{
+                    uri: `${storageUrl}${item.path}`,
+                    priority: FastImage.priority.normal,
+                }}
+                resizeMode={FastImage.resizeMode.contain}
+            />
+              )
+            })}
+          </Swiper> */}
+            </View>
+          )}
           <Br space={3} />
           <Wrapper>
             <Tabs />
@@ -228,14 +288,22 @@ const RestuarantDetails = ({navigation, route}) => {
                   style={{
                     flexDirection: 'row',
                     gap: hp('.5%'),
-                    alignItems: 'center',
+                    marginTop: hp(0.4),
+                    // alignItems: 'center',
                   }}>
-                  <Small color={Color('homeBg')} heading font="bold">
+                  <Small size={hp(1.6)} color={Color('homeBg')} heading font="bold">
                     Location
                   </Small>
-                  <Location size={hp('2%')} color={Color('homeBg')} />
-                  <Small color={Color('lightText')} heading font="medium">
-                    {context?.restuarent?.address}
+                  <Location size={hp('2.5%')} color={Color('homeBg')} />
+                  <Small
+                    style={{width: widthPercentageToDP('70%')}}
+                    color={Color('lightText')}
+                    heading
+                    size={hp(1.9)}
+                    font="medium">
+                    {context?.restuarent?.address +
+                      ' ' +
+                      context?.restuarent?.city + '-' + '-' + context?.restuarent?.state + '-' + context?.restuarent?.zip_code}
                   </Small>
                 </View>
                 <Br space={2} />
@@ -243,7 +311,7 @@ const RestuarantDetails = ({navigation, route}) => {
                   Opening Hours
                 </Pera>
                 <Br space={0.5} />
-                <Small color={Color('lightText')} heading font="medium">
+                <Small size={hp(1.9)} color={Color('lightText')} heading font="medium">
                   {context?.restuarent?.operation_hours}
                   {/* {moment(context?.restuarent?.start_time, 'HH:mm').format(
                     'hh:mm A',
@@ -261,82 +329,85 @@ const RestuarantDetails = ({navigation, route}) => {
                   Airport
                 </Pera>
                 <Br space={0.5} />
-                <Small color={Color('lightText')} heading font="medium">
-                  {context?.restuarent?.airport}
+                <Small size={hp(1.9)} color={Color('lightText')} heading font="medium">
+                  {context?.restuarent?.airport +
+                    '-' +
+                    context?.restuarent?.airport_name}
                 </Small>
                 <Br space={2} />
                 <Pera color={Color('homeBg')} heading font="bold">
                   Description
                 </Pera>
                 <Br space={0.5} />
-                <Small color={Color('lightText')} heading font="medium">
+                <Small size={hp(1.9)} color={Color('lightText')} heading font="medium">
                   {context?.restuarent?.description}
                 </Small>
                 <Br space={2} />
-                {previousScreen === 'Map' && 
-                <>
-                <Pera color={Color('homeBg')} heading font="bold">
-                  Location
-                </Pera>
-                <Br space={0.5} />
-                <TouchableOpacity
-                  onPress={() => {
-                    setContext({
-                      ...context,
-                      returnFromDetail: true
-                    })
-                    navigation.navigate('Map2')
-                  }}
-                  style={{
-                    width: wp('90%'),
-                    height: hp('22%'),
-                    borderWidth: 1,
-                    borderColor: Color('lightText'),
-                    // backgroundColor: Color('sidebarBg'),
-                  }}>
-                  {/* {
+                {previousScreen === 'Map' && (
+                  <>
+                    <Pera color={Color('homeBg')} heading font="bold">
+                      Location
+                    </Pera>
+                    <Br space={0.5} />
+                    <TouchableOpacity
+                      onPress={() => {
+                        setContext({
+                          ...context,
+                          returnFromDetail: true,
+                        });
+                        navigation.navigate('Map2');
+                      }}
+                      style={{
+                        width: wp('90%'),
+                        height: hp('22%'),
+                        borderWidth: 1,
+                        borderColor: Color('lightText'),
+                        // backgroundColor: Color('sidebarBg'),
+                      }}>
+                      {/* {
                     console.log(context?.restuarent.latitude)
                   }   */}
-                  <MapView
-                    initialRegion={{
-                      latitude: parseFloat(context?.restuarent?.latitude),
-                      longitude: parseFloat(context?.restuarent?.longitude),
-                      latitudeDelta: 0.015,
-                      longitudeDelta: 0.015,
-                    }}
-                    style={{...StyleSheet.absoluteFillObject, flex: 1}}
-                    // zoomLevel={12}
-                    mapType="standard">
-                    <Marker
-                      coordinate={{
-                        latitude: parseFloat(context?.restuarent?.latitude),
-                        longitude: parseFloat(context?.restuarent?.longitude),
-                      }}
-                      title={context?.restuarent?.title}
-                      description={context?.restuarent?.description}
-                      >
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        <Image
-                          source={{
-                            uri: `https://praetorstestnet.com/flyneat/${context?.restuarent?.image_path}`,
+                      <MapView
+                        initialRegion={{
+                          latitude: parseFloat(context?.restuarent?.latitude),
+                          longitude: parseFloat(context?.restuarent?.longitude),
+                          latitudeDelta: 0.015,
+                          longitudeDelta: 0.015,
+                        }}
+                        style={{...StyleSheet.absoluteFillObject, flex: 1}}
+                        // zoomLevel={12}
+                        mapType="standard">
+                        <Marker
+                          coordinate={{
+                            latitude: parseFloat(context?.restuarent?.latitude),
+                            longitude: parseFloat(
+                              context?.restuarent?.longitude,
+                            ),
                           }}
-                          style={{
-                            height: 50,
-                            width: 50,
-                            borderRadius: 100,
-                          }}
-                        />
-                      </View>
-                    </Marker>
-                  </MapView>
-                </TouchableOpacity>
-                <Br space={2} />
-                </>
-              }
+                          title={context?.restuarent?.title}
+                          description={context?.restuarent?.description}>
+                          <View
+                            style={{
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}>
+                            <Image
+                              source={{
+                                uri: `https://praetorstestnet.com/flyneat/${context?.restuarent?.image_path}`,
+                              }}
+                              style={{
+                                height: 50,
+                                width: 50,
+                                borderRadius: 100,
+                              }}
+                            />
+                          </View>
+                        </Marker>
+                      </MapView>
+                    </TouchableOpacity>
+                    <Br space={2} />
+                  </>
+                )}
                 <View
                   style={{
                     flexDirection: 'row',
@@ -380,9 +451,15 @@ const RestuarantDetails = ({navigation, route}) => {
                 </View>
                 <Br space={2} />
                 {displayedReviews.map(review => {
+                  console.log('hhh====>', review);
                   return (
                     <View key={review.id}>
                       <Review
+                        onReviewPress={() =>
+                          navigation.navigate('Feedback', {
+                            feedbackData: review,
+                          })
+                        }
                         name={capitalize(review?.user?.name) || 'Anonymous'}
                         url={
                           `${storageUrl}${review?.user?.user_info?.profile_image}` ||
@@ -446,6 +523,12 @@ const RestuarantDetails = ({navigation, route}) => {
                   onPress={() => navigation.navigate('Feedback')}
                   btnStyle={{backgroundColor: Color('homeBg')}}
                   label="Send Feedback"
+                />
+                <Br space={2} />
+                 <Btn
+                  onPress={() => onVisitWebsite()}
+                  btnStyle={{backgroundColor: Color('homeBg')}}
+                  label="View Website"
                 />
               </>
             )}

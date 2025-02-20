@@ -134,7 +134,7 @@ const Login = ({ navigation }) => {
 
             await validationSchema.validate(obj, { abortEarly: false });
             const res = await api.post('/user/login', obj);
-
+            console.log('login responsne',res?.data?.token)
             if (true) {
                 await AsyncStorage.setItem('token', res?.data?.token);
                 await AsyncStorage.setItem('isVerified', res?.data?.verified);

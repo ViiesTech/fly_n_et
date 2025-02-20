@@ -45,26 +45,42 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
-const Feedback = ({navigation}) => {
+const Feedback = ({navigation,route}) => {
   const initialImages = Array(5).fill({
     id: '16101',
     uri: 'https://img.icons8.com/?size=100&id=16101&format=png&color=000000',
   });
   const options = ['Great', 'Average', 'Bad'];
   const options2 = ['Very Fast', 'Average', 'Slow', 'Very Slow'];
+  
+    const data = route?.params?.feedbackData;
 
   const [star, setStar] = useState(0);
-  const [quality, setQuality] = useState('');
-  const [serviceSpeed, setServiceSpeed] = useState('');
-  const [overallSatisfaction, setOverallSatisfaction] = useState('');
+  const [quality, setQuality] = useState(data?.quality ? data?.quality : '');
+  const [serviceSpeed, setServiceSpeed] = useState(data?.service_speed ? data?.service_speed : '');
+  const [overallSatisfaction, setOverallSatisfaction] = useState(data?.overall_satisfaction ? data?.overall_satisfaction : '');
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState(initialImages);
-  const [imageUri,setImageUri] = useState(null)
+  const [imageUri, setImageUri] = useState(data?.image_path ? `${storageUrl}${data.image_path}` : null);
   const {context} = useContext(DataContext);
 
-  console.log(imageUri)
+  console.log('data of feedback fields ====>',imageUri)
 
   const starCount = images?.filter(img => img.id === '8ggStxqyboK5').length;
+
+  useEffect(() => {
+    if (data?.rating) {
+      setStar(data.rating); 
+  
+      setImages(images.map((img, index) => ({
+        ...img,
+        id: index < data.rating ? '8ggStxqyboK5' : '16101', 
+        uri: `https://img.icons8.com/?size=100&id=${
+          index < data.rating ? '8ggStxqyboK5' : '16101'
+        }&format=png&color=000000`,
+      })));
+    }
+  }, [data?.rating]);
 
   useEffect(() => {
     setStar(starCount);
@@ -77,16 +93,16 @@ const Feedback = ({navigation}) => {
     setServiceSpeed(service_speed); // Update the selected quality
   };
   const SendFeedback = async () => {
+    
     try {
       setLoading(true);
 
-  
       const obj = {
         rating: star,
         quality,
         service_speed: serviceSpeed,
         overall_satisfaction: overallSatisfaction,
-        restaurant_id: context?.restuarent?.id || 'default_restaurant_id', 
+        restaurant_id: data?.restaurant_id ? data?.restaurant_id : context?.restuarent?.id || 'default_restaurant_id', 
         imageUri: imageUri || '', 
       };
 
@@ -95,20 +111,32 @@ const Feedback = ({navigation}) => {
       formData.append('quality', quality);
       formData.append('service_speed', serviceSpeed);
       formData.append('overall_satisfaction', overallSatisfaction);
-      formData.append('restaurant_id', context?.restuarent?.id || 'default_restaurant_id'); // Fallback value
-  
-      // Add the image file to the form data
+      formData.append('restaurant_id', data?.restaurant_id ? data?.restaurant_id : context?.restuarent?.id || 'default_restaurant_id'); // Fallback value
       if (imageUri) {
-        formData.append('image_path', {
-          uri: imageUri,
-          type: 'image/jpeg',  // or the correct MIME type of the image
-          name: 'feedback_image.jpg', // or dynamic name
-        });
+        // const isStorageUrl = imageUri.startsWith(storageUrl);
+        // const isSameAsExisting = isStorageUrl && imageUri === data?.image_path;
+        const isLocalFile = imageUri.startsWith('file://');
+      
+        if (isLocalFile) {
+          formData.append('image_path', {
+            uri: imageUri,
+            type: 'image/jpeg',
+            name: 'feedback_image.jpg',
+          });
+        } 
       }
+      // if (imageUri) {
+      //   formData.append('image_path', {
+      //     uri: imageUri,
+      //     type: 'image/jpeg',  
+      //     name: 'feedback_image.jpg', 
+      //   });
+      // }
   
       
       await validationSchema.validate(obj, { abortEarly: false });
-  
+
+     if(!data) { 
       const res = await api.post('/review/store', formData, {
         headers: { Authorization: `Bearer ${context?.token}` },
       });
@@ -116,6 +144,16 @@ const Feedback = ({navigation}) => {
       note('Feedback send successful', res?.data?.message, [
         { text: 'Okay', onPress: () => navigation.goBack() },
       ]);
+    } else {
+    //  return console.log('hello world',formData)
+      const res = await api.post(`/review/${data?.id}`, formData,{
+        headers: { Authorization: `Bearer ${context?.token}`}
+      });
+      // return console.log('response',res.data);
+      note('Feedback updated successfully!',res?.data?.message,[
+        {text: 'Okay', onPress: () => navigation.goBack()}
+      ]);
+    }
     } catch (err) {
       await errHandler(err, null, navigation);
     } finally {
@@ -155,6 +193,10 @@ const Feedback = ({navigation}) => {
       }
     );
   }
+
+  console.log('hello world',imageUri)
+
+
 
   return (
     <>
@@ -335,7 +377,7 @@ const Feedback = ({navigation}) => {
               onPress={SendFeedback}
               loading={loading}
               btnStyle={{backgroundColor: Color('homeBg')}}
-              label="Send Feedback"
+              label={data ? "Update Feedback" : "Send Feedback"}
             />
           </Wrapper>
         </View>

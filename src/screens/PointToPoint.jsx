@@ -17,6 +17,7 @@ import { DataContext } from '../utils/Context';
 import { api, errHandler, note } from '../utils/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { calculateDistance, nauticalMilesToMeters } from '../utils/global';
 
 const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 
@@ -139,7 +140,7 @@ const PointToPoint = ({ navigation }) => {
         const [predictions, setPredictions] = useState();
         const [selection, setSelection] = useState('');
         const searchAirports = async (searchKey) => {
-            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk&types=airport`;
+            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk&types=airport&components=country:us`;
             const response = await axios.get(BASE_URL, {
               params: {
                 key: API_KEY,
@@ -156,7 +157,7 @@ const PointToPoint = ({ navigation }) => {
             setPredictions();
             setSelection(val?.structured_formatting?.main_text);
             if (inputRef.current) {
-                inputRef.current.setNativeProps({ text: val?.structured_formatting?.main_text });
+                inputRef.current.setNativeProps({ text: val?.structured_formatting?.main_text.toUpperCase() });
             }
         };
 
@@ -164,7 +165,7 @@ const PointToPoint = ({ navigation }) => {
             <>
                 <View style={{position: 'relative', overflow: 'visible', zIndex: 1}}>
                     <View style={styles.input}>
-                        <TextInput numberOfLines={1} ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
+                        <TextInput autoCapitalize='characters' numberOfLines={1} ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
                     </View>
                     {
                         predictions && predictions?.length > 0 && (
@@ -188,7 +189,7 @@ const PointToPoint = ({ navigation }) => {
                                     {predictions?.map((val, index) => {
                                         return (
                                             <Pressable onPress={() => onClick(val)}>
-                                                <Small numberOfLines={1} key={index} color={Color('homeBg')} style={{ padding: hp('0.5%') }}>{val?.structured_formatting?.main_text}</Small>
+                                                <Small size={hp(2.6)} numberOfLines={1} key={index} color={Color('homeBg')} style={{ padding: hp('0.5%') }}>{val?.structured_formatting?.main_text.toUpperCase()}</Small>
                                             </Pressable>
                                         );
                                     })}
@@ -205,7 +206,7 @@ const PointToPoint = ({ navigation }) => {
         const [predictions, setPredictions] = useState();
         const [selection, setSelection] = useState('');
         const searchAirports = async (searchKey) => {
-            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk&types=airport`;
+            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk&types=airport&components=country:us`;
             const response = await axios.get(BASE_URL, {
               params: {
                 key: API_KEY,
@@ -222,7 +223,7 @@ const PointToPoint = ({ navigation }) => {
             setPredictions();
             setSelection(val?.structured_formatting?.main_text);
             if (inputRef.current) {
-                inputRef.current.setNativeProps({ text: val?.structured_formatting?.main_text });
+                inputRef.current.setNativeProps({ text: val?.structured_formatting?.main_text.toUpperCase() });
             }
         };
 
@@ -230,7 +231,7 @@ const PointToPoint = ({ navigation }) => {
             <>
                 <View style={{position: 'relative', overflow: 'visible', zIndex: 1}}>
                     <View style={styles.input}>
-                        <TextInput numberOfLines={1} ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
+                        <TextInput autoCapitalize='characters' numberOfLines={1} ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
                     </View>
 
                     
@@ -256,7 +257,7 @@ const PointToPoint = ({ navigation }) => {
                                     {predictions?.map((val, index) => {
                                         return (
                                             <Pressable onPress={() => onClick(val)}>
-                                                <Small numberOfLines={1} key={index} color={Color('homeBg')} style={{ padding: hp('0.5%') }}>{val?.structured_formatting?.main_text}</Small>
+                                                <Small size={hp(2.6)} numberOfLines={1} key={index} color={Color('homeBg')} style={{ padding: hp('0.5%') }}>{val?.structured_formatting?.main_text.toUpperCase()}</Small>
                                             </Pressable>
                                         );
                                     })}
@@ -274,7 +275,7 @@ const PointToPoint = ({ navigation }) => {
         };
         return (
             <View style={styles.input}>
-                <TextInput numberOfLines={1} onChangeText={(text) => setDistance(text)} keyboardType="numeric" style={[styles.inputField]} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
+                <TextInput autoCapitalize='characters' numberOfLines={1} onChangeText={(text) => setDistance(text.toUpperCase())} keyboardType="numeric" style={[styles.inputField]} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
             </View>
         );
     };
@@ -282,6 +283,8 @@ const PointToPoint = ({ navigation }) => {
     const Button = () => {
         const [loading, setLoading] = useState(false);
         const onSearch = async () => {
+              
+
             try {
                 setLoading(true);
                 const locationDetails = await AsyncStorage.getItem('p2p_locationDetails');
@@ -290,22 +293,85 @@ const PointToPoint = ({ navigation }) => {
                 const selectLocation = await AsyncStorage.getItem('p2p_selectLocation');
                 const selectLocation2 = await AsyncStorage.getItem('p2p_selectLocation2');
 
-                if (!locationDetails || !locationDetails2 || !distance) {
-                    note('Validation Error', 'Location and max distance is required');
-                    return false;
-                }
+                // if (!locationDetails || !locationDetails2 || !distance) {
+                //     note('Validation Error', 'Location and max distance is required');
+                //     return false;
+                // }
 
-                const json = JSON.parse(locationDetails)
+                // const calculateNewCircle = (circle1, circle2, radius1, radius2) => {
+                //     // return console.log('value from function',circle1,circle2,radius1,radius2)
+                //     const distanceBetweenCenters = calculateDistance(circle1, circle2);
+                
+                //     // The new radius should cover both circles fully
+                //     const newRadius = distanceBetweenCenters / 2 + Math.max(radius1, radius2);
+                //     // console.log('new radius from function',distanceBetweenCenters)
+                
+                //     // Calculate the center point of the new circle
+                //     const newCircleCenter = {
+                //       latitude: (circle1.lat + circle2.lat) / 2,
+                //       longitude: (circle1.lng + circle2.lng) / 2,
+                //     };
+                
+                //     return {newCircleCenter, newRadius};
+                //   };
+
+                  
+                //   const userRadiusMeters = nauticalMilesToMeters(distance);
+                  
+                // //   console.log('distance',userRadiusMeters)
+                //     // console.log(JSON.parse(locationDetails))
+                
+                // // Define the centers of the two existing circles
+                const circle1Center = JSON.parse(locationDetails)
+                const circle2Center = JSON.parse(locationDetails2)
+
+                const getPolylineCoordinates = (origin, destination, steps = 100) => {
+                    // console.log('result from functionn,',origin,destination)
+                  
+                    const lat1 = origin.lat;
+                    const lon1 = origin.lng;
+                    const lat2 = destination.lat;
+                    const lon2 = destination.lng;
+                    const latDiff = lat2 - lat1;
+                    const lonDiff = lon2 - lon1;
+                    const coordinates = [];
+                    for (let i = 0; i <= steps; i++) {
+                      const lat = lat1 + (latDiff * i) / steps;
+                      const lon = lon1 + (lonDiff * i) / steps;
+                      coordinates.push({ lat: lat, lng: lon });
+                    }
+                    return coordinates;
+                  };
+                  
+                  const coords = getPolylineCoordinates(circle1Center, circle2Center);
+                //   return console.log('hhh',coords)
+
+              
+                // // Get the new circle details
+                // const {newCircleCenter, newRadius} = calculateNewCircle(
+                //   circle1Center,
+                //   circle2Center,
+                //   userRadiusMeters,
+                //   userRadiusMeters,
+                // );
+
+                // return console.log('new data',newCircleCenter,newRadius) 
+
+                const json = JSON.parse(locationDetails);
                 const json2 = JSON.parse(locationDetails2);
                 // return console.log(`${json2?.lat},${json2?.lng}`)
-                const res = await api.post('/restaurant/search', {
+                const res = await api.post('/restaurant/pintopin', {
+                    // starting_from : `${31.6732571152},${-81.82698821}`,
+                    // destination: `${3.14961209},${-8.43934117}`,
                     starting_from: `${json?.lat},${json?.lng}`,
                     destination: `${json2?.lat},${json2?.lng}`,
                     max_distance: distance,
+                    latlng_array: coords
+                    // radius: 1490758.868626875,
                 }, {
                     headers: { Authorization: `Bearer ${context?.token}` },
                 });
-                console.log('api response',res)
+                console.log('api response',res?.data?.restaurant);
                 if (res.data?.restaurant?.length > 0) {
                     navigation.navigate('Map', {
                         distance: distance,
