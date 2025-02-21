@@ -206,14 +206,14 @@ const CreateProfile = ({navigation}) => {
       setLoading(true);
       const date_of_birth = moment(dob).format('YYYY-MM-DD');
       const obj = {
-        age: age,
+        // age: age,
         dob: date_of_birth,
         aircraft_type: type,
         profile_image: profile,
         banner_image: banner,
       };
       const formData = new FormData();
-      formData.append('age', age);
+      // formData.append('age', age);
       formData.append('dob', date_of_birth);
       formData.append('aircraft_type', type);
       formData.append('user_type', 'cfii');
@@ -326,14 +326,14 @@ const CreateProfile = ({navigation}) => {
                 </Small>
                 <Br space={5} />
                 <DOB dob={dob} setDob={setDob} />
-                <Br space={2} />
-                <Input
+                {/* <Br space={2} /> */}
+                {/* <Input
                   value={age.toString()}
                   keyboardType="numeric"
                   label="Enter Age"
                   style={{borderRadius: hp('5%')}}
                   readOnly
-                />
+                /> */}
                 <Br space={1.5} />
                 <Pera heading font="bold">
                   Aircraft Type

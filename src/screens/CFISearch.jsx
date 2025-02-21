@@ -4,13 +4,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Background from '../utils/Background';
 import { Color } from '../utils/Colors';
-import { ActivityIndicator, Image, Pressable, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import BackBtn from '../components/BackBtn';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import { Pera, Small } from '../utils/Text';
-import { Location, Notification, SearchNormal, Star1 } from 'iconsax-react-native';
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
+import { ArrowLeft, Location, Notification, SearchNormal, Star1, TextalignLeft } from 'iconsax-react-native';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Navigation from '../components/Navigation';
 import Wrapper from '../components/Wrapper';
 import Br from '../components/Br';
@@ -82,10 +82,54 @@ const CFISearch = ({ navigation }) => {
             console.log(err);
         });
     };
+
+     const TopBar = () => {
+            return (
+                <View style={styles.topbar}>
+                    <View style={{ width: wp('20%'), alignItems: 'center' }}>
+                        <TouchableOpacity style={{
+                            backgroundColor: Color('btnColor'),
+                            width: hp('5%'),
+                            height: hp('5%'),
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: hp('50%'),
+                        }} onPress={() => navigation.goBack()}>
+                            <ArrowLeft
+                                size={hp('2.5%')}
+                                color={Color('text')}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ width: wp('60%'), alignItems: 'center' }}>
+                        <Small heading font="medium">Current Location</Small>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>
+                            <Location size={hp('2%')} color={Color('text')} />
+                            <Small heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address}</Small>
+                        </View>
+                    </View>
+                    <View style={{ width: wp('20%'), alignItems: 'center' }}>
+                        <TouchableOpacity style={{
+                            backgroundColor: Color('btnColor'),
+                            width: hp('5%'),
+                            height: hp('5%'),
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: hp('50%'),
+                        }} onPress={() => navigation.navigate('Notifications')}>
+                            <Notification
+                                size={hp('2.5%')}
+                                color={Color('text')}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            );
+        };
+
     return (
         <>
-            <BackBtn navigation={navigation} />
-            <Background translucent={false} statusBarColor={Color('homeBg')} noBackground
+         <Background translucent={false} statusBarColor={Color('homeBg')} noBackground
                 detectScrollEnd
                 onScrollEnd={() => {
                     if (!isLoading && hasMore) {
@@ -93,34 +137,36 @@ const CFISearch = ({ navigation }) => {
                     }
                 }}
             >
+        <TopBar />
+            {/* <BackBtn navigation={navigation} /> */}
                 <Wrapper>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: heightPercentageToDP('8%') }}>
-                        <View style={{ flexDirection: 'row', gap: heightPercentageToDP('1%'), alignItems: 'center', width: widthPercentageToDP('75%') }}>
+                    {/* <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: hp('8%') }}> */}
+                        {/* <View style={{ flexDirection: 'row', gap: heightPercentageToDP('1%'), alignItems: 'center', width: widthPercentageToDP('75%') }}>
                             <Location size={heightPercentageToDP('2.5%')} color={Color('btnColor')} />
                             <View>
                                 <Small heading font="medium" color={Color('shadow')}>Current Location</Small>
                                 <Small color={Color('shadow')} heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address}</Small>
                             </View>
-                        </View>
-                        <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
+                        </View> */}
+                        {/* <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
                             <Notification
-                                size={heightPercentageToDP('3%')}
+                                size={hp('3%')}
                                 color={Color('shadow')}
                             />
-                        </TouchableOpacity>
-                    </View>
-                    <Br space={1.5} />
-                    <View style={{ flexDirection: 'row', borderRadius: heightPercentageToDP('1%'), alignItems: 'center', gap: heightPercentageToDP('1%'), padding: heightPercentageToDP('1%'), backgroundColor: Color('inputSearch') }}>
+                        </TouchableOpacity> */}
+                    {/* </View> */}
+                    {/* <Br space={1.5} /> */}
+                    <View style={{ flexDirection: 'row', borderRadius: hp('1%'), alignItems: 'center', gap: hp('1%'), padding: hp('1%'), backgroundColor: Color('inputSearch'),paddingTop: hp(6) }}>
                         <SearchNormal
-                            size={heightPercentageToDP('3%')}
+                            size={hp('3%')}
                             color={Color('modelDark')}
                         />
-                        <TextInput onChangeText={((text) => setFilter(text))} value={filter} placeholder="Enter address or city name" placeholderTextColor={Color('modelDark')} style={{ padding: 0, height: heightPercentageToDP('3%'), width: widthPercentageToDP('75%'), color: Color('shadow') }} />
+                        <TextInput onChangeText={((text) => setFilter(text))} value={filter} placeholder="Enter address or city name" placeholderTextColor={Color('modelDark')} style={{ padding: 0, height: hp('3%'), width: wp('75%'), color: Color('shadow') }} />
                     </View>
                     <Br space={3} />
-                    <View style={{ flexDirection: 'row', borderRadius: heightPercentageToDP('1%'), alignItems: 'center', justifyContent: 'center', gap: heightPercentageToDP('1%') }}>
-                        <Btn onPress={() => setMode('cfi')} loading={false} label="CFI" textStyle={{ fontSize: heightPercentageToDP('1.5%') }} btnStyle={{ backgroundColor: Color(mode !== 'cfi' ? 'homeBg' : 'btnColor'), paddingHorizontal: heightPercentageToDP('4%') }} />
-                        <Btn onPress={() => setMode('cfii')} loading={false} label="CFII" textStyle={{ fontSize: heightPercentageToDP('1.5%') }} btnStyle={{ backgroundColor: Color(mode !== 'cfii' ? 'homeBg' : 'btnColor'), paddingHorizontal: heightPercentageToDP('4%') }} />
+                    <View style={{ flexDirection: 'row', borderRadius: hp('1%'), alignItems: 'center', justifyContent: 'center', gap: hp('1%') }}>
+                        <Btn onPress={() => setMode('cfi')} loading={false} label="CFI" textStyle={{ fontSize: hp('1.5%') }} btnStyle={{ backgroundColor: Color(mode !== 'cfi' ? 'homeBg' : 'btnColor'), paddingHorizontal: hp('4%') }} />
+                        <Btn onPress={() => setMode('cfii')} loading={false} label="CFII" textStyle={{ fontSize: hp('1.5%') }} btnStyle={{ backgroundColor: Color(mode !== 'cfii' ? 'homeBg' : 'btnColor'), paddingHorizontal: hp('4%') }} />
                     </View>
                     <Br space={3} />
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -136,7 +182,7 @@ const CFISearch = ({ navigation }) => {
                     {
                         !context?.pro_users && (
                             <View style={{ alignItems: 'center' }}>
-                                <ActivityIndicator size={heightPercentageToDP('5%')} color={Color('shadow')} />
+                                <ActivityIndicator size={hp('5%')} color={Color('shadow')} />
                             </View>
                         )
                     }
@@ -145,24 +191,24 @@ const CFISearch = ({ navigation }) => {
                             const distance = calcCrow(parseFloat(context?.user?.latitude), parseFloat(context?.user?.longitude), parseFloat(val?.latitude), parseFloat(val?.longitude));
                             return (
                                 <View key={index}>
-                                    <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: heightPercentageToDP('1%'), shadowColor: Color('lightGray'), marginBottom: heightPercentageToDP('2%') }} onPress={() => navigation.navigate('CFIDetail', { id: val?.id })}>
+                                    <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1%'), shadowColor: Color('lightGray'), marginBottom: hp('2%') }} onPress={() => navigation.navigate('CFIDetail', { id: val?.id })}>
                                         <Image
                                             source={{ uri: `${storageUrl}${val?.user_info?.profile_image}` }}
-                                            style={{ width: widthPercentageToDP('25%'), height: widthPercentageToDP('25%'), borderRadius: heightPercentageToDP('2%') }}
+                                            style={{ width: wp('25%'), height: wp('25%'), borderRadius: hp('2%') }}
                                         />
-                                        <View style={{ width: widthPercentageToDP('50%') }}>
+                                        <View style={{ width: wp('50%') }}>
                                             <Pera color={Color('shadow')}>
                                                 {capitalize(val?.name)}
                                             </Pera>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: heightPercentageToDP('0.5%') }}>
-                                                <Location size={heightPercentageToDP('2%')} color={Color('modelDark')} />
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('0.5%') }}>
+                                                <Location size={hp('2%')} color={Color('modelDark')} />
                                                 <Small color={Color('modelDark')} numberOfLines={1}>
                                                     {val?.user_info?.address || 'No Location Found'}
                                                 </Small>
                                             </View>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: heightPercentageToDP('0.5%') }}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('0.5%') }}>
                                                 <Star1
-                                                    size={heightPercentageToDP('2.5%')}
+                                                    size={hp('2.5%')}
                                                     color={'#FFC000'}
                                                     variant="Bold"
                                                 />
@@ -187,3 +233,14 @@ const CFISearch = ({ navigation }) => {
 };
 
 export default CFISearch;
+
+const styles = StyleSheet.create({
+    topbar: {
+        backgroundColor: Color('homeBg'),
+        paddingVertical: hp('2%'),
+        width: wp('100%'),
+        flexDirection: 'row',
+        borderBottomLeftRadius: hp('4%'),
+        borderBottomRightRadius: hp('4%'),
+    },
+})

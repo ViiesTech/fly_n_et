@@ -4,7 +4,7 @@ import { Color } from '../utils/Colors';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { Small } from '../utils/Text';
 
-const Input = ({ mode, label, style, inputStyle, ...props }) => {
+const Input = ({ mode, label, style, inputStyle,textAlign,multiline, ...props }) => {
     const lightModeStyle = mode === 'light' ? {
         borderColor: Color('lightText'),
     } : {};
@@ -12,7 +12,7 @@ const Input = ({ mode, label, style, inputStyle, ...props }) => {
         <>
             <View style={[styles.input, lightModeStyle, style]}>
                 {label && <Small font="regular" style={styles.label} color={mode === 'light' ? Color('shadow') : Color('text')}>{label}</Small>}
-                <TextInput style={[styles.inputField, inputStyle, {color: mode === 'light' ? Color('shadow') : Color('text')}]} {...props} />
+                <TextInput multiline={multiline} textAlignVertical={textAlign} style={[styles.inputField, inputStyle, {color: mode === 'light' ? Color('shadow') : Color('text')}]} {...props} />
             </View>
         </>
     );

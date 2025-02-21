@@ -243,7 +243,7 @@ const RestuarantDetails = ({navigation, route}) => {
                 // autoplay
                 // autoplayDelay={2}
                 // autoplayLoop
-                index={2}
+                index={1}
                 showPagination
                 paginationDefaultColor={Color('text')}
                 paginationActiveColor={Color('drawerBg')}
@@ -393,7 +393,7 @@ const RestuarantDetails = ({navigation, route}) => {
                             }}>
                             <Image
                               source={{
-                                uri: `https://praetorstestnet.com/flyneat/${context?.restuarent?.image_path}`,
+                                uri: `https://praetorstestnet.com/flyneat/${context?.restuarent?.image.path}`,
                               }}
                               style={{
                                 height: 50,

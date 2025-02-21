@@ -552,8 +552,10 @@ const Map = ({navigation, route}) => {
                   />
                 </View>
                 <Callout
-                  onPress={() =>
+                  onPress={() => {
+                    // return console.log('hello world',val)
                     navigation.navigate('RestuarantDetails', {id: val?.id})
+                  }
                   }
                   tooltip>
                   <View

@@ -78,7 +78,7 @@ const Map2 = ({navigation, route}) => {
             }}>
             <Image
               source={{
-                uri: `https://praetorstestnet.com/flyneat/${context?.restuarent?.image_path}`,
+                uri: `https://praetorstestnet.com/flyneat/${context?.restuarent?.image.path}`,
               }}
               style={{
                 height: 50,
@@ -95,7 +95,7 @@ const Map2 = ({navigation, route}) => {
             description="This is your current location"
           />
         )}
-        {currentLocation && (
+        {/* {currentLocation && (
           <MapViewDirections
             origin={currentLocation}
             destination={restaurantLocation}
@@ -110,7 +110,7 @@ const Map2 = ({navigation, route}) => {
               console.error('Directions Error:', error);
             }}
           />
-        )}
+        )} */}
         {/* {currentLocation && (
           <Polyline
             coordinates={[currentLocation, restaurantLocation]}

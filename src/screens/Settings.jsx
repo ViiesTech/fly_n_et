@@ -21,7 +21,7 @@ const Settings = ({ navigation }) => {
                     <Wrapper>
                         <Pera color={Color('homeBg')} heading font="bold">Settings</Pera>
                         <Br space={1.2} />
-                        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Notifications')}>
+                        {/* <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Notifications')}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
                                 <Notification
                                     size={hp('3%')}
@@ -29,7 +29,7 @@ const Settings = ({ navigation }) => {
                                 />
                                 <Small color={Color('drawerBg')} heading font="bold">Notification</Small>
                             </View>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <Br space={1.2} />
                         <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('AccountSettings')}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
