@@ -155,7 +155,7 @@ const Home = ({ navigation }) => {
             <>
                 <View style={{position: 'relative', overflow: 'visible', zIndex: 1}}>
                     <View style={styles.input}>
-                        <TextInput autoCapitalize='characters' ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} />
+                        <TextInput autoCapitalize='characters' ref={inputRef} onChangeText={searchAirports} style={styles.inputField} placeholderTextColor={Color('lightText')} placeholder={placeholder} autoCorrect={false} />
                     </View>
                     {
                         predictions && predictions?.length > 0 && (
@@ -216,6 +216,7 @@ const Home = ({ navigation }) => {
                 }
 
                 const json = JSON.parse(locationDetails);
+                console.log("json..........", json)
                 const res = await api.post('/restaurant/search', {
                     starting_from: `${json?.lat},${json?.lng}`,
                     max_distance: distance,

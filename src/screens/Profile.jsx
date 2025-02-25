@@ -234,6 +234,26 @@ const Profile = ({ navigation }) => {
             font="medium">
             {context?.user?.email}
           </Small>
+          <Small
+            style={{
+              textAlign: 'center',
+              transform: [{ translateY: translate + hp('1%') }],
+            }}
+            color={Color('homeBg')}
+            heading
+            font="medium">
+            {context?.user?.user_info?.bio}   
+          </Small>
+          <Small
+            style={{
+              textAlign: 'center',
+              transform: [{ translateY: translate + hp('1%') }],
+            }}
+            color={Color('homeBg')}
+            heading
+            font="medium">
+            {context?.user?.user_info?.experience}
+          </Small>
         </View>
       </>
     );
@@ -435,6 +455,8 @@ const Profile = ({ navigation }) => {
             getRestuarents(currentPage + 1);
           }
         }}
+        statusBarColor={Color('homeBg')}
+        noBackground={true}
       >
         <View style={{ backgroundColor: Color('text') }}>
           <TopBar />
@@ -457,7 +479,7 @@ const Profile = ({ navigation }) => {
                     columnGap: wp('5%'),
                     rowGap: hp('2%'),
                   }}>
-                  {context?.restuarents?.map((val, index) => {
+                  {/* {context?.restuarents?.map((val, index) => {
                     return (
                       <Pressable
                         key={index}
@@ -498,7 +520,7 @@ const Profile = ({ navigation }) => {
                         </TouchableOpacity>
                       </Pressable>
                     );
-                  })}
+                  })} */}
                   <View style={{ marginVertical: '0', marginHorizontal: 'auto' }} >
                     {isLoading && <ActivityIndicator size={hp('5%')} color={Color('shadow')} />}
                   </View>

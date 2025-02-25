@@ -13,7 +13,6 @@ import {isIOS} from '../utils/global';
 import {DataContext} from '../utils/Context';
 import * as Yup from 'yup';
 import {api, errHandler, note} from '../utils/api';
-import { heightPercentageToDP } from 'react-native-responsive-screen';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -36,9 +35,11 @@ const AccountSettings = ({navigation}) => {
   const [email, setEmail] = useState(context?.user?.email || '');
   const [name, setName] = useState(context?.user?.name || '');
   const [phone, setPhone] = useState(context?.user?.phone || '');
-  const [experience, setExperience] = useState(context?.user?.experience || '');
-  const [bio, setBio] = useState(context?.user?.bio || '');
+  const [experience, setExperience] = useState(context?.user?.user_info?.experience || '');
+  const [bio, setBio] = useState(context?.user?.user_info?.bio || '');
   const [loading, setLoading] = useState(false);
+
+  console.log('hh',context?.user);
 
   const onSaveChanges = async () => {
     try {
@@ -104,6 +105,14 @@ const AccountSettings = ({navigation}) => {
               label="Full Name"
             />
             <Br space={1.2} />
+             <Input
+              value={phone}
+              onChangeText={text => setPhone(text)}
+              mode="light"
+              keyboardType={'numeric'}
+              label="Phone Number"
+            />
+            <Br space={1.2} />
             <Input
               value={experience}
               onChangeText={text => setExperience(text)}
@@ -129,7 +138,6 @@ const AccountSettings = ({navigation}) => {
               multiline={true}
               onChangeText={text => setBio(text)}
               mode="light"
-
               label="Bio"
             />
           </Wrapper>

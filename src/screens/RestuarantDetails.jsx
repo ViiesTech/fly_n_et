@@ -30,7 +30,6 @@ import moment from 'moment';
 import {capitalize, isIOS} from '../utils/global';
 import {useIsFocused} from '@react-navigation/native';
 import MapView, {Marker} from 'react-native-maps';
-import Swiper from 'react-native-swiper';
 import FastImage from 'react-native-fast-image';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 

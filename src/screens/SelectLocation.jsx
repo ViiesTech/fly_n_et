@@ -125,6 +125,7 @@ const SelectLocation = ({navigation, route}) => {
         latitude: item?.geometry?.location?.lat?.toString(),
         longitude: item?.geometry?.location?.lng?.toString(),
       };
+      console.log("obj..................", obj)
       const res = await api.post('/user/user-location', obj, {
         headers: {Authorization: `Bearer ${context?.token}`},
       });
