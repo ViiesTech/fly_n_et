@@ -242,7 +242,7 @@ const RestuarantDetails = ({navigation, route}) => {
                 // autoplay
                 // autoplayDelay={2}
                 // autoplayLoop
-                index={1}
+                index={0}
                 showPagination
                 paginationDefaultColor={Color('text')}
                 paginationActiveColor={Color('drawerBg')}

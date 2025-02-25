@@ -46,7 +46,7 @@ const CFISearch = ({navigation}) => {
   const [filter, setFilter] = useState('');
   const [nauticalLocation,setNauticalLocation] = useState({})
   const [distance, setDistance] = useState('');
-  const [mode, setMode] = useState('');
+  const [mode, setMode] = useState('cfi');
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,7 +72,7 @@ const CFISearch = ({navigation}) => {
   // }, [filter, nauticalLocation, distance]);
 
   const getCFI = async (page = 1) => {
-    console.log('loadingn value',isLoading)
+    console.log('loadingn value',isLoading);
     if (isLoading) {
       // alert('kia horha hai')
       return;
@@ -86,6 +86,7 @@ const CFISearch = ({navigation}) => {
       // alert('is this even working ?')
 
       const newUsers = res?.data?.users?.data || [];
+      
       setContext(prevContext => ({
         ...prevContext,
         pro_users:
@@ -178,7 +179,7 @@ const CFISearch = ({navigation}) => {
           headers: {Authorization: `Bearer ${context?.token}`},
         });
 
-        console.log('responnse of cfgii',res.data?.users?.last_page)
+        console.log('responnse of cfgii',res.data?.users?.last_page);
   
         const newUsers = res?.data?.users?.data || [];
         setContext(prevContext => ({
@@ -441,7 +442,10 @@ const CFISearch = ({navigation}) => {
             </View>
           )}
           {
-                        context?.pro_users?.filter((val) => val?.user_type?.includes(mode))?.map((val, index) => {
+                        context?.pro_users
+                        ?.filter((val) => val?.user_type?.toLowerCase() === mode?.toLowerCase())
+                        ?.map((val, index) => {                
+                          // console.log('i am just checking is that true or not',context?.pro_users)
                             // const distance = calcCrow(parseFloat(context?.user?.latitude), parseFloat(context?.user?.longitude), parseFloat(val?.latitude), parseFloat(val?.longitude));
                             return (
                                 <View key={index}>
@@ -466,7 +470,7 @@ const CFISearch = ({navigation}) => {
                                                     color={'#FFC000'}
                                                     variant="Bold"
                                                 />
-                                                <Small color={Color('shadow')}>{parseFloat(val?.avg_rating).toFixed(1) || 0}</Small>
+                                                <Small color={Color('shadow')}>{!val?.avg_rating ? 0 : parseFloat(val?.avg_rating).toFixed(1)}</Small>
                                                 <Small color={Color('modelDark')}>({val?.rating_count || 0})</Small>
                                             </View>
                                         </View>
