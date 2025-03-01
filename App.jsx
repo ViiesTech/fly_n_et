@@ -1,11 +1,10 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/react-in-jsx-scope */
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Orientation from 'react-native-orientation-locker';
 import { NavigationContainer } from '@react-navigation/native';
 import { LogBox } from 'react-native';
-
 import Splash from './src/screens/Splash';
 import Loading from './src/screens/Loading';
 import GetStarted from './src/screens/GetStarted';
@@ -43,10 +42,16 @@ import CreateProProfile from './src/screens/CreateProProfile';
 import SelectLocation from './src/screens/SelectLocation';
 import PointToPoint from './src/screens/PointToPoint';
 import Map2 from './src/screens/Map2';
+import Packages from './src/screens/Packages';
+import PackageDetail from './src/screens/PackageDetail';
+import { Platform } from 'react-native';
+import Purchases from 'react-native-purchases';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
+  
+
   useEffect(() => {
     LogBox.ignoreLogs(['Warning']);
     Orientation.lockToPortrait();
@@ -55,6 +60,26 @@ function App() {
       Orientation.unlockAllOrientations();
     };
   }, []);
+
+
+  useEffect(() => {
+    const configurePurchases = async () => {
+      if (Platform.OS === 'ios') {
+        await Purchases.configure({ apiKey: 'appl_SAfJQCOjWHjmBWyfUcvNkSwuOnQ' });
+      }
+    };
+  
+    configurePurchases();
+  
+    return () => {
+      try {
+        Purchases.logOut();
+      } catch (error) {
+        console.log('Error during Purchases logOut:', error);
+      }
+    };
+  }, []);
+   
 
   const Sus = ({ component }) => {
     return <Suspense fallback={<Loading />}>{component}</Suspense>;
@@ -67,7 +92,7 @@ function App() {
             headerShown: false,
             animation: 'fade_from_bottom',
           }}>
-            <Stack.Screen name="Splash" component={Splash} />
+            {/* <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="Logout" component={Logout} />
             <Stack.Screen name="PointToPoint">
               {props => <Sus component={<PointToPoint {...props} />} />}
@@ -167,6 +192,12 @@ function App() {
             </Stack.Screen>
             <Stack.Screen name="UserType">
               {props => <Sus component={<UserType {...props} />} />}
+            </Stack.Screen> */}
+            <Stack.Screen name="Packages">
+              {props => <Sus component={<Packages {...props} />} />}
+            </Stack.Screen>
+            <Stack.Screen name="PackageDetail">
+              {props => <Sus component={<PackageDetail {...props} />} />}
             </Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>

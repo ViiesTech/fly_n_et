@@ -39,6 +39,7 @@
 		DDC117020E5B4935986509C8 /* Montserrat-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D76230002F054A869A7417EB /* Montserrat-ExtraLight.ttf */; };
 		ED16C37FB15C4B779B654F90 /* Manrope-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E1FE016C4D3E4946ACD83BF0 /* Manrope-Regular.ttf */; };
 		F282ADA06685479CB809B128 /* Montserrat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4EE7EB2F03D54A6E91F0FD82 /* Montserrat-Regular.ttf */; };
+		FA1EB1EE2D72258F00BE2A56 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA1EB1ED2D72258F00BE2A56 /* StoreKit.framework */; };
 		FC6893E00564A758F937B996 /* libPods-fly_eat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 75D4E3B406383D81EDEFA9A0 /* libPods-fly_eat.a */; };
 /* End PBXBuildFile section */
 
@@ -96,6 +97,7 @@
 		DB18A478317E43CE789E616F /* Pods-fly_eat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-fly_eat.debug.xcconfig"; path = "Target Support Files/Pods-fly_eat/Pods-fly_eat.debug.xcconfig"; sourceTree = "<group>"; };
 		E1FE016C4D3E4946ACD83BF0 /* Manrope-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manrope-Regular.ttf"; path = "../src/assets/fonts/Manrope-Regular.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		FA1EB1ED2D72258F00BE2A56 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		FEF2B1C5E88641508364A861 /* Montserrat-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Thin.ttf"; path = "../src/assets/fonts/Montserrat-Thin.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -113,6 +115,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FC6893E00564A758F937B996 /* libPods-fly_eat.a in Frameworks */,
+				FA1EB1EE2D72258F00BE2A56 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,6 +157,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FA1EB1ED2D72258F00BE2A56 /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				75D4E3B406383D81EDEFA9A0 /* libPods-fly_eat.a */,
 				13F6CE6AAC044BD00CF4DF51 /* libPods-fly_eat-fly_eatTests.a */,
@@ -713,10 +717,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -790,10 +791,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

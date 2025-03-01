@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-simple-toast';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
+import Purchases from 'react-native-purchases';
 
 const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 const validationSchema = Yup.object().shape({
@@ -39,6 +40,7 @@ const Login = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [location, setLocation] = useState();
+    const [isSubscribed,setIsSubscribed] = useState(null);
 
     useEffect(() => {
         Animated.timing(slideAnimation, {
@@ -51,23 +53,40 @@ const Login = ({ navigation }) => {
     useEffect(() => {
         if (context?.token && context?.isVerified) {
             Toast.show('Login Successfully', Toast.SHORT);
-            if (context?.user?.user_info) {
+            handlingNavigations()
+        } else if (context?.token && !context?.isVerified) {
+            nextScreen(() => navigation.replace('Verify'));
+        }
+    }, [context?.token, context?.isVerified, isSubscribed]);
+    
+
+    useEffect(() => {
+        requestLocationPermission();
+    }, []);
+
+    const handlingNavigations = async () => {
+       await checkSubscriptionStatus()
+            if (!isSubscribed) {
+                nextScreen(() => navigation.navigate('Packages'));
+            } else if (context?.user?.user_info) {
                 if (context?.user?.user_info?.address) {
-                    nextScreen(() => navigation.replace('Home'));
-                }else {
+                    nextScreen(() => navigation.navigate('Home'));
+                } else {
                     nextScreen(() => navigation.replace('SelectLocation'));
                 }
             } else {
                 nextScreen(() => navigation.replace('UserType'));
             }
-        } else if (context?.token && !context?.isVerified) {
-            nextScreen(() => navigation.replace('Verify'));
-        }
-    }, [context?.token, context?.isVerified]);
+    }
 
-    useEffect(() => {
-        requestLocationPermission();
-    }, []);
+    const checkSubscriptionStatus = async () => {
+        const customerInfo = await Purchases.getCustomerInfo();
+        
+        const isActive = customerInfo?.entitlements?.active?.["your_entitlement_id"];
+        console.log(customerInfo)
+        setIsSubscribed('hello');
+       
+    };
 
     async function requestLocationPermission() {
         try {
