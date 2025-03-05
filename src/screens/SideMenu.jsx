@@ -8,7 +8,7 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-nat
 import Br from '../components/Br';
 import { Pera, Small } from '../utils/Text';
 import { Color } from '../utils/Colors';
-import { AirplaneSquare, ArrowRight, Bookmark, Home, LogoutCurve, Notification, Setting, User } from 'iconsax-react-native';
+import { AirplaneSquare, ArrowRight, Bookmark, Crown1, Home, LogoutCurve, Notification, Setting, User } from 'iconsax-react-native';
 import BackBtn from '../components/BackBtn';
 
 import Wrapper from '../components/Wrapper';
@@ -67,6 +67,19 @@ const SideMenu = ({ navigation }) => {
                             color={Color('drawerBg')}
                         />
                         <Small color={Color('drawerBg')} heading font="bold">Notification</Small>
+                    </View>
+                    <ArrowRight
+                        size={hp('3%')}
+                        color={Color('lightText')}
+                    />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Packages')}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
+                        <Crown1
+                            size={hp('3%')}
+                            color={Color('drawerBg')}
+                        />
+                        <Small color={Color('drawerBg')} heading font="bold">Subscription</Small>
                     </View>
                     <ArrowRight
                         size={hp('3%')}

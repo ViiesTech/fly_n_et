@@ -40,7 +40,6 @@ const Login = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [location, setLocation] = useState();
-    const [isSubscribed,setIsSubscribed] = useState(null);
 
     useEffect(() => {
         Animated.timing(slideAnimation, {
@@ -57,7 +56,7 @@ const Login = ({ navigation }) => {
         } else if (context?.token && !context?.isVerified) {
             nextScreen(() => navigation.replace('Verify'));
         }
-    }, [context?.token, context?.isVerified, isSubscribed]);
+    }, [context?.token, context?.isVerified]);
     
 
     useEffect(() => {
@@ -65,8 +64,9 @@ const Login = ({ navigation }) => {
     }, []);
 
     const handlingNavigations = async () => {
-       await checkSubscriptionStatus()
-            if (!isSubscribed) {
+        const expiryDate = context?.user?.expired_at ? new Date(context.user.expired_at) : null;
+        const currentDate = new Date();
+            if (expiryDate && currentDate > expiryDate) {
                 nextScreen(() => navigation.navigate('Packages'));
             } else if (context?.user?.user_info) {
                 if (context?.user?.user_info?.address) {
@@ -78,15 +78,7 @@ const Login = ({ navigation }) => {
                 nextScreen(() => navigation.replace('UserType'));
             }
     }
-
-    const checkSubscriptionStatus = async () => {
-        const customerInfo = await Purchases.getCustomerInfo();
-        
-        const isActive = customerInfo?.entitlements?.active?.["your_entitlement_id"];
-        console.log(customerInfo)
-        setIsSubscribed('hello');
-       
-    };
+;
 
     async function requestLocationPermission() {
         try {

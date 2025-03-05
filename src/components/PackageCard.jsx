@@ -15,7 +15,7 @@ const PackageCard = ({package_name,price,type,style,onPress}) => {
         </View>
         </View>
         <View style={{flexDirection: 'row',gap: 15}}>
-          <Text style={[styles.textStyle,{fontWeight: 'bold',fontSize: hp(2.6)}]}>${price}</Text>
+          <Text style={[styles.textStyle,{fontWeight: 'bold',fontSize: hp(2.6)}]}>{price}</Text>
         <ArrowRight2 style={{marginTop: hp(0.4)}} size={hp('2.5%')} color={Color('text')} />
         </View>
     </TouchableOpacity>

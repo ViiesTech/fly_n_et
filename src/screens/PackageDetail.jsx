@@ -1,5 +1,5 @@
 import {Alert, StyleSheet, Text, View} from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {Color} from '../utils/Colors';
 import {
   heightPercentageToDP as hp,
@@ -8,6 +8,8 @@ import {
 import Background from '../utils/Background';
 import Btn from '../utils/Btn';
 import Purchases from 'react-native-purchases';
+import { api } from '../utils/api';
+import { DataContext } from '../utils/Context';
 
 const packageDetails = [
   {
@@ -33,10 +35,12 @@ const packageDetails = [
 ];
 
 const PackageDetail = ({route}) => {
+  const [loading,setLoading] = useState(false);
+   const { context,setContext } = useContext(DataContext);
   // const [offering, setOffering] = useState(null);
 
   const data = route?.params?.detail;
-  console.log(data?.identifier);
+  console.log(context?.user);
 
 
   const TopBar = () => {
@@ -45,33 +49,62 @@ const PackageDetail = ({route}) => {
         <Text style={styles.packageStyle}>
           {data?.packageType === 'ANNUAL' ? 'Yearly Package' : 'Monthly Package'}
         </Text>
-        <Text style={styles.priceText}>${data?.product?.price}</Text>
+        <Text style={styles.priceText}>{data?.product?.priceString}</Text>
       </View>
     );
   };
 
   const onConfirmPurchase = async () => {
-      if (!data) {
-        Alert.alert('Error', 'No available package for this plan.');
-        return;
-      }
-
-      try {
-       const purchaseMade = await Purchases.purchasePackage(data);
-        console.log('purchasemade',purchaseMade?.transaction)
-        // const customerInfo = await Purchases.getCustomerInfo();
-        // if (customerInfo?.entitlements.active['pro']) {
-        //   Alert.alert('Success', 'Purchase successful!');
-        // } else {
-        //   Alert.alert('Error', 'Purchase failed');
-        // }
-      } catch (error) {
-        if (!error.userCancelled) {
-          Alert.alert('Error', error.message);
-        }
-      }
+    
+    if (!data) {
+      Alert.alert('Error', 'No available package for this plan.');
+      setLoading(false);
+      return;
+    }
   
-  }
+    try {
+      setLoading(false);
+      const purchaseMade = await Purchases.purchasePackage(data); 
+    setLoading(true);
+
+      const obj = {
+        purchase_date: purchaseMade?.transaction?.purchaseDate,
+        sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
+      };
+  
+      console.log('Purchase data:', obj);
+  
+      // Get token (assuming it's stored in AsyncStorage)
+  
+      const response = await api.post('user/subscribe', obj, {
+        headers: {
+          Authorization: `Bearer ${context?.token}`,
+        },
+      });
+    
+      if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
+        setContext({
+          ...context,
+          user: {
+            ...context.user, 
+            expired_at: response.data.user.expired_at, 
+          },
+        });
+      }
+      console.log('Response of subscription:', response.data);
+      
+    } catch (error) {
+      console.log('Error:', error?.response?.data || error?.message);
+  
+      if (error?.response?.status === 401) {
+        Alert.alert('Unauthorized', 'Please log in again.');
+      } else {
+        Alert.alert('Error', error?.message || 'Something went wrong');
+      }
+    }
+    setLoading(false);
+  };
+  
 
   return (
    <View style={{flex: 1,backgroundColor: Color('text')}}> 
@@ -104,7 +137,7 @@ const PackageDetail = ({route}) => {
       </View>
     </Background>
      <View style={{flex: 1,justifyContent: 'flex-end',alignItems: 'center',marginBottom: hp(7)}}>
-     <Btn label={'Buy Purchase'} onPress={() => onConfirmPurchase()} btnStyle={{backgroundColor: Color('drawerBg'),width: '90%'}} />
+     <Btn loading={loading} label={'Buy Purchase'} onPress={() => onConfirmPurchase()} btnStyle={{backgroundColor: Color('drawerBg'),width: '90%'}} />
    </View>
    </View>
   );

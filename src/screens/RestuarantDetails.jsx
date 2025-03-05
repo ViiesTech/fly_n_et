@@ -311,7 +311,7 @@ const RestuarantDetails = ({navigation, route}) => {
                 </Pera>
                 <Br space={0.5} />
                 <Small size={hp(1.9)} color={Color('lightText')} heading font="medium">
-                  {context?.restuarent?.operation_hours}
+                  {context?.restuarent?.operation_hours + ' ' + '-' + context?.restuarent?.time_zone}
                   {/* {moment(context?.restuarent?.start_time, 'HH:mm').format(
                     'hh:mm A',
                   )}{' '}

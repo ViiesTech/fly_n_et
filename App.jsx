@@ -92,7 +92,7 @@ function App() {
             headerShown: false,
             animation: 'fade_from_bottom',
           }}>
-            {/* <Stack.Screen name="Splash" component={Splash} />
+            <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="Logout" component={Logout} />
             <Stack.Screen name="PointToPoint">
               {props => <Sus component={<PointToPoint {...props} />} />}
@@ -192,7 +192,7 @@ function App() {
             </Stack.Screen>
             <Stack.Screen name="UserType">
               {props => <Sus component={<UserType {...props} />} />}
-            </Stack.Screen> */}
+            </Stack.Screen>
             <Stack.Screen name="Packages">
               {props => <Sus component={<Packages {...props} />} />}
             </Stack.Screen>

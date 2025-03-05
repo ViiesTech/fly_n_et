@@ -11,26 +11,26 @@ import {useNavigation} from '@react-navigation/native';
 import PackageCard from '../components/PackageCard';
 import Purchases from 'react-native-purchases';
 
-const packages = [
-  {
-    id: 1,
-    package: 'Monthly',
-    type: 'Standard',
-    price: '4.99'
-  },
-  {
-    id: 2,
-    package: 'Yearly',
-    type: 'Professional',
-    price: '49.99'
-  }
-]
+// const packages = [
+//   {
+//     id: 1,
+//     package: 'Monthly',
+//     type: 'Standard',
+//     price: '4.99'
+//   },
+//   {
+//     id: 2,
+//     package: 'Yearly',
+//     type: 'Professional',
+//     price: '49.99'
+//   }
+// ]
 
 const Packages = () => {
   const [offerings,setOfferings] = useState(null);
   const navigation = useNavigation();
 
-  console.log(offerings)
+  console.log(offerings);
 
   useEffect(() => {
       const setupRevenueCat = async () => {
@@ -78,7 +78,7 @@ const Packages = () => {
         <Text style={styles.desc}>Choose the best plan that fits your needs. Enjoy premium features and seamless access with our subscription packages.</Text>
         <View style={{paddingTop: hp(5)}}>
           {offerings?.map((item) => (
-            <PackageCard onPress={() => navigation.navigate('PackageDetail',{detail: item})} style={{marginBottom: hp(2)}} type={item.packageType === 'ANNUAL' ? 'Professional' : 'Standard'} package_name={item.packageType === 'ANNUAL' ? 'Yearly' : 'Monthly'} price={item.product?.price} />
+            <PackageCard onPress={() => navigation.navigate('PackageDetail',{detail: item})} style={{marginBottom: hp(2)}} type={item.packageType === 'ANNUAL' ? 'Professional' : 'Standard'} package_name={item.packageType === 'ANNUAL' ? 'Yearly' : 'Monthly'} price={item.product.priceString} />
           ))}
         </View>
       </View>
