@@ -66,7 +66,7 @@ const Login = ({ navigation }) => {
     const handlingNavigations = async () => {
         const expiryDate = context?.user?.expired_at ? new Date(context.user.expired_at) : null;
         const currentDate = new Date();
-            if (expiryDate && currentDate > expiryDate) {
+            if (!expiryDate && currentDate > expiryDate || expiryDate && currentDate > expiryDate) {
                 nextScreen(() => navigation.navigate('Packages'));
             } else if (context?.user?.user_info) {
                 if (context?.user?.user_info?.address) {

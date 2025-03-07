@@ -8,7 +8,7 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-nat
 import Br from '../components/Br';
 import { Pera, Small } from '../utils/Text';
 import { Color } from '../utils/Colors';
-import { AirplaneSquare, ArrowRight, Bookmark, Crown1, Home, LogoutCurve, Notification, Setting, User } from 'iconsax-react-native';
+import { AirplaneSquare, ArrowRight, Bookmark, Crown1, Home, LogoutCurve, Notification, ProfileDelete, Setting, User } from 'iconsax-react-native';
 import BackBtn from '../components/BackBtn';
 
 import Wrapper from '../components/Wrapper';
@@ -18,6 +18,12 @@ import { storageUrl } from '../utils/api';
 
 const SideMenu = ({ navigation }) => {
     const {context} = useContext(DataContext);
+
+
+    const onDeleteAccount = async () => {
+        navigation.navigate('Message', {theme: 'light', title: 'Account Deletion', message: 'Are you sure you want to delete your account?', screen: 'GetStarted'})
+    }
+    
     const Options = () => {
         return (
             <>
@@ -80,6 +86,19 @@ const SideMenu = ({ navigation }) => {
                             color={Color('drawerBg')}
                         />
                         <Small color={Color('drawerBg')} heading font="bold">Subscription</Small>
+                    </View>
+                    <ArrowRight
+                        size={hp('3%')}
+                        color={Color('lightText')}
+                    />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.option} onPress={() => onDeleteAccount()}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
+                        <ProfileDelete
+                            size={hp('3%')}
+                            color={Color('drawerBg')}
+                        />
+                        <Small color={Color('drawerBg')} heading font="bold">Delete Account</Small>
                     </View>
                     <ArrowRight
                         size={hp('3%')}

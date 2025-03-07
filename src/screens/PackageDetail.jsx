@@ -1,5 +1,5 @@
 import {Alert, StyleSheet, Text, View} from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {Color} from '../utils/Colors';
 import {
   heightPercentageToDP as hp,
@@ -8,8 +8,9 @@ import {
 import Background from '../utils/Background';
 import Btn from '../utils/Btn';
 import Purchases from 'react-native-purchases';
-import { api } from '../utils/api';
+import { api, note } from '../utils/api';
 import { DataContext } from '../utils/Context';
+import { useNavigation } from '@react-navigation/native';
 
 const packageDetails = [
   {
@@ -37,6 +38,7 @@ const packageDetails = [
 const PackageDetail = ({route}) => {
   const [loading,setLoading] = useState(false);
    const { context,setContext } = useContext(DataContext);
+   const navigation = useNavigation();
   // const [offering, setOffering] = useState(null);
 
   const data = route?.params?.detail;
@@ -91,6 +93,7 @@ const PackageDetail = ({route}) => {
           },
         });
       }
+      navigation.navigate('Home')
       console.log('Response of subscription:', response.data);
       
     } catch (error) {
@@ -104,6 +107,21 @@ const PackageDetail = ({route}) => {
     }
     setLoading(false);
   };
+
+  const onRestorePurchase = async () => {
+    try {
+      const customerInfo = await Purchases.restorePurchases();
+      console.log('restore', customerInfo.entitlements.active);
+      if (Object.keys(customerInfo.entitlements.active).length > 0) {
+        note('Purchases Restored!', 'Your subscription has been restored successfully'); 
+        navigation.replace('Home');
+      } else {
+        note('Please buy the subscription', 'You have to buy the subscription first to continue'); 
+      }
+    } catch (e) {
+      console.error('Failed to restore purchases:', e);
+    }
+  }
   
 
   return (
@@ -138,6 +156,8 @@ const PackageDetail = ({route}) => {
     </Background>
      <View style={{flex: 1,justifyContent: 'flex-end',alignItems: 'center',marginBottom: hp(7)}}>
      <Btn loading={loading} label={'Buy Purchase'} onPress={() => onConfirmPurchase()} btnStyle={{backgroundColor: Color('drawerBg'),width: '90%'}} />
+     <Btn label={'Restore Purchases'} onPress={() => onRestorePurchase()} btnStyle={{backgroundColor: Color('drawerBg'),width: '90%',marginTop: hp(1)}} />
+
    </View>
    </View>
   );

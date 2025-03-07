@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import Background from '../utils/Background';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
@@ -11,6 +11,8 @@ import Btn from '../utils/Btn';
 import { TickCircle } from 'iconsax-react-native';
 import BackBtn from '../components/BackBtn';
 import { isIOS } from '../utils/global';
+import { api, note } from '../utils/api';
+import { DataContext } from '../utils/Context';
 
 const Message = ({ navigation, route }) => {
     const theme = route?.params?.theme;
@@ -19,6 +21,8 @@ const Message = ({ navigation, route }) => {
     const screen = route?.params?.screen;
     const isLightTheme = theme && theme === 'light';
     const [popUpAnimation] = useState(new Animated.Value(0.8));
+    const {context,setContext} = useContext(DataContext)
+    const [loading,setLoading] = useState(false)
 
     useEffect(() => {
         Animated.timing(popUpAnimation, {
@@ -33,8 +37,39 @@ const Message = ({ navigation, route }) => {
             toValue: 0.8,
             duration: 1000,
             useNativeDriver: true,
-        }).start(() => {
+        }).start(async () => {
+           if(title === 'Account Deletion') { 
+            setLoading(true)
+            const res = await api.post('/user/delete-account',{},{
+                headers: {
+                    'Authorization': `Bearer ${context?.token}`
+                }
+            }); 
+            if(res.data.status === 'success') {
+                note('Account Delete',res.data.message);
+                setLoading(false)
+                setContext({
+                    ...context,
+                    token: false,
+                    isVerified: false,
+                    user: null,
+                    notifications: null,
+                    restuarents: null,
+                    savedRestuarents: null,
+                    restuarent: null,
+                    about: null,
+                    terms: null,
+                    serviceImages: null,
+                    returnFromDetail: false,
+                })
+                navigation.navigate(screen);
+            } else {
+                note('Account Delete',res.data.message);
+                setLoading(false)
+            }
+        } else {
             navigation.navigate(screen || 'Home');
+        } 
         });
     };
 
@@ -54,7 +89,7 @@ const Message = ({ navigation, route }) => {
                             <H6 style={{textAlign: 'center'}} heading font="bold">{title || 'All Done'}</H6>
                             <Small color={Color('lightText')}>{message || 'You’re all set and ready to start!'}</Small>
                             <Br space={2} />
-                            <Btn textStyle={{color: Color(isLightTheme ? 'homeBg' : 'text')}} onPress={onContinue} label="Continue" btnStyle={{paddingHorizontal: wp('15%'), backgroundColor: Color(isLightTheme ? 'text' : 'btnColor')}} />
+                            <Btn loadingColor={Color('drawerBg')} loading={loading} textStyle={{color: Color(isLightTheme ? 'homeBg' : 'text')}} onPress={onContinue} label="Continue" btnStyle={{paddingHorizontal: wp('15%'), backgroundColor: Color(isLightTheme ? 'text' : 'btnColor')}} />
                         </View>
                     </Animated.View>
                 </View>

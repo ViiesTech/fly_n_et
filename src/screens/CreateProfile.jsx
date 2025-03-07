@@ -35,9 +35,6 @@ import {api, errHandler, note} from '../utils/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const validationSchema = Yup.object().shape({
-  age: Yup.number()
-    .required('Please enter your exact age in years.')
-    .min(18, 'You must be at least 18 years old'),
   dob: Yup.string()
     .required('Please enter your date of birth.')
     .matches(
