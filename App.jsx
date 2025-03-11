@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/react-in-jsx-scope */
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useContext, useEffect, useState } from 'react';
 import Orientation from 'react-native-orientation-locker';
 import { NavigationContainer } from '@react-navigation/native';
 import { LogBox } from 'react-native';
@@ -50,6 +50,7 @@ import Purchases from 'react-native-purchases';
 const Stack = createNativeStackNavigator();
 
 function App() {
+ 
   
 
   useEffect(() => {

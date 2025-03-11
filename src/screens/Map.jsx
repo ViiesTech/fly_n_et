@@ -96,8 +96,8 @@ const Map = ({navigation, route}) => {
           {
             latitude: context?.restuarent?.latitude,
             longitude: context?.restuarent?.longitude,
-            latitudeDelta: 4.8,
-            longitudeDelta: 4.8,
+            latitudeDelta: 6.8,
+            longitudeDelta: 6.8,
           },
           200,
         );
@@ -278,8 +278,8 @@ const Map = ({navigation, route}) => {
         initialRegion={{
           latitude: parseFloat(route?.params?.airport?.lat),
           longitude: parseFloat(route?.params?.airport?.lng),
-          latitudeDelta: 4.8,
-          longitudeDelta: 4.8,
+          latitudeDelta: 6.8,
+          longitudeDelta: 6.8,
         }}
         ref={mapRef}
         style={{...StyleSheet.absoluteFillObject, flex: 1}}

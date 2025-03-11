@@ -21,8 +21,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 
 const Home = ({ navigation }) => {
-    const { context } = useContext(DataContext);
+    const { context,setContext } = useContext(DataContext);
     const [location, setLocation] = useState();
+
+    // console.log('hh',context?.user.expired_at)
 
     useEffect(() => {
         requestLocationPermission();
@@ -204,6 +206,7 @@ const Home = ({ navigation }) => {
     const Button = () => {
         const [loading, setLoading] = useState(false);
         const onSearch = async () => {
+            if(!context.isHome) {  
             try {
                 setLoading(true);
                 const locationDetails = await AsyncStorage.getItem('locationDetails');
@@ -225,6 +228,10 @@ const Home = ({ navigation }) => {
                 });
                 console.log('restauratns responsne',res.data?.restaurant)
                 if (res.data?.restaurant?.length > 0) {
+                    setContext({
+                        ...context,
+                        isHome: true
+                    })
                     navigation.navigate('Map', { distance: distance, restaurants: res.data?.restaurant, location: location, airport: JSON.parse(locationDetails), airportDetails: JSON.parse(selectLocation) });
                 }else {
                     note('No Result Found', "Couldn't find any restaurant according to the given parameters");
@@ -234,6 +241,10 @@ const Home = ({ navigation }) => {
             } finally {
                 setLoading(false);
             }
+        } else {
+            navigation.navigate('Packages')
+        }
+
         };
         return <Btn loading={loading} onPress={onSearch} label="Fly-n-Eat Search" btnStyle={{ backgroundColor: Color('homeBg'), width: wp('70%') }} />;
     };

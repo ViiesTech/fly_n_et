@@ -30,11 +30,11 @@ const Packages = () => {
   const [offerings,setOfferings] = useState(null);
   const navigation = useNavigation();
 
-  const routes = navigation.getState().routes;
-  const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
+  // const routes = navigation.getState().routes;
+  // const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
   
 
-  console.log(previousScreen);
+  // console.log(previousScreen);
 
   useEffect(() => {
       const setupRevenueCat = async () => {
@@ -61,7 +61,7 @@ const Packages = () => {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-          {previousScreen ?  
+          {/* {previousScreen ?   */}
           <View style={{width: wp('20%'), alignItems: 'center'}}>
             <TouchableOpacity
               style={{
@@ -76,9 +76,9 @@ const Packages = () => {
               <ArrowLeft size={hp('2.5%')} color={Color('text')} />
             </TouchableOpacity>
           </View>
-          : null
-          }
-          <View style={previousScreen ?  {justifyContent: 'center', flex: 0.8} : {alignItems: 'center',flex: 1}}>
+          {/* : null */}
+          {/* } */}
+          <View style={{justifyContent: 'center', flex: 0.8}}>
             <Text style={styles.heading}>Our Packages</Text>
           </View>
         </View>

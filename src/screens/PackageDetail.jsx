@@ -51,7 +51,7 @@ const PackageDetail = ({route}) => {
         <Text style={styles.packageStyle}>
           {data?.packageType === 'ANNUAL' ? 'Yearly Package' : 'Monthly Package'}
         </Text>
-        <Text style={styles.priceText}>{data?.product?.priceString}</Text>
+        <Text style={styles.priceText}>{data.packageType === 'ANNUAL' ? data?.product?.priceString + ' ' + '/' + ' ' +  'YEAR (SAVE 15%)' : data?.product?.priceString + ' ' + '/' + ' ' + 'MONTH'}</Text>
       </View>
     );
   };
@@ -67,7 +67,7 @@ const PackageDetail = ({route}) => {
     try {
       setLoading(false);
       const purchaseMade = await Purchases.purchasePackage(data); 
-    setLoading(true);
+      setLoading(true);
 
       const obj = {
         purchase_date: purchaseMade?.transaction?.purchaseDate,

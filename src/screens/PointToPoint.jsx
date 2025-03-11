@@ -22,7 +22,7 @@ import { calculateDistance, nauticalMilesToMeters } from '../utils/global';
 const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 
 const PointToPoint = ({ navigation }) => {
-    const { context } = useContext(DataContext);
+    const { context,setContext } = useContext(DataContext);
     const [location, setLocation] = useState();
 
     useEffect(() => {
@@ -284,7 +284,7 @@ const PointToPoint = ({ navigation }) => {
         const [loading, setLoading] = useState(false);
         const onSearch = async () => {
               
-
+            if(!context?.isPoint) {
             try {
                 setLoading(true);
                 const locationDetails = await AsyncStorage.getItem('p2p_locationDetails');
@@ -373,6 +373,10 @@ const PointToPoint = ({ navigation }) => {
                 });
                 console.log('api response',res?.data?.restaurant);
                 if (res.data?.restaurant?.length > 0) {
+                    setContext({
+                        ...context,
+                        isPoint: true
+                    })
                     navigation.navigate('Map', {
                         distance: distance,
                         restaurants: res.data?.restaurant,
@@ -392,6 +396,9 @@ const PointToPoint = ({ navigation }) => {
             } finally {
                 setLoading(false);
             }
+        } else {
+            navigation.navigate('Packages')
+        }
         };
         return <Btn loading={loading} onPress={onSearch} label="Fly-n-Eat Search" btnStyle={{ backgroundColor: Color('homeBg'), width: wp('70%') }} />;
     };

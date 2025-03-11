@@ -17,6 +17,8 @@ export const AppContext = ({ children }) => {
         terms: null,
         serviceImages: null,
         returnFromDetail: false,
+        isHome: false,
+        isPoint: false,
     });
 
     useEffect(() => {
