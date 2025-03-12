@@ -25,6 +25,8 @@ const PointToPoint = ({ navigation }) => {
     const { context,setContext } = useContext(DataContext);
     const [location, setLocation] = useState();
 
+    // console.log('user',context?.isPoint)
+
     useEffect(() => {
         requestLocationPermission();
     }, []);
@@ -111,11 +113,15 @@ const PointToPoint = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
                 <View style={{ width: wp('60%'), alignItems: 'center' }}>
-                    <Small heading font="medium">Current Location</Small>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>
-                        <Loc size={hp('2%')} color={Color('text')} />
-                        <Small heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address}</Small>
-                    </View>
+                     {context?.token &&
+                                       <>
+                                        <Small heading font="medium">Current Location</Small>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>
+                                            <Loc size={hp('2%')} color={Color('text')} />
+                                            <Small heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address}</Small>
+                                        </View>
+                                        </>
+                                        }
                 </View>
                 <View style={{ width: wp('20%'), alignItems: 'center' }}>
                     <TouchableOpacity style={{
@@ -125,7 +131,13 @@ const PointToPoint = ({ navigation }) => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderRadius: hp('50%'),
-                    }} onPress={() => navigation.navigate('Notifications')}>
+                    }} onPress={() => {
+                        if(!context?.token) {
+                            navigation.navigate('Message',{theme: 'light', title: 'Login Required', message: 'Please log in to continue', screen: 'Login'})
+                        } else {
+                            navigation.navigate('Notifications')
+                        }
+                } }>
                         <Notification
                             size={hp('2.5%')}
                             color={Color('text')}
@@ -283,8 +295,10 @@ const PointToPoint = ({ navigation }) => {
     const Button = () => {
         const [loading, setLoading] = useState(false);
         const onSearch = async () => {
-              
-            if(!context?.isPoint) {
+            await AsyncStorage.removeItem('search')
+              const firstSearch = await AsyncStorage.getItem('search')
+            if(!context?.user?.expired_at && !firstSearch || context?.user?.expired_at && new Date(context?.user?.expired_at) > new Date()) {
+                // alert('why is hapenning')
             try {
                 setLoading(true);
                 const locationDetails = await AsyncStorage.getItem('p2p_locationDetails');
@@ -293,10 +307,10 @@ const PointToPoint = ({ navigation }) => {
                 const selectLocation = await AsyncStorage.getItem('p2p_selectLocation');
                 const selectLocation2 = await AsyncStorage.getItem('p2p_selectLocation2');
 
-                // if (!locationDetails || !locationDetails2 || !distance) {
-                //     note('Validation Error', 'Location and max distance is required');
-                //     return false;
-                // }
+                if (!locationDetails || !locationDetails2 || !distance) {
+                    note('Validation Error', 'Location and max distance is required');
+                    return false;
+                }
 
                 // const calculateNewCircle = (circle1, circle2, radius1, radius2) => {
                 //     // return console.log('value from function',circle1,circle2,radius1,radius2)
@@ -373,10 +387,11 @@ const PointToPoint = ({ navigation }) => {
                 });
                 console.log('api response',res?.data?.restaurant);
                 if (res.data?.restaurant?.length > 0) {
-                    setContext({
-                        ...context,
-                        isPoint: true
-                    })
+                    await AsyncStorage.setItem('search','done')
+                    // setContext({
+                    //     ...context,
+                    //     isPoint: true
+                    // })
                     navigation.navigate('Map', {
                         distance: distance,
                         restaurants: res.data?.restaurant,

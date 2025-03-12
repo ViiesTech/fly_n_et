@@ -33,7 +33,7 @@ const GetStarted = ({ navigation }) => {
                 <Btn
                     label="Let’s Get Started"
                     icon={<LoginCurve size={hp('3%')} color={Color('text')} />}
-                    onPress={() => navigation.navigate('Login')}
+                    onPress={() => navigation.navigate('Home')}
                 />
             </View>
         </>

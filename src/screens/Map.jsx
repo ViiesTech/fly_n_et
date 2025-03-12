@@ -73,6 +73,7 @@ const Map = ({navigation, route}) => {
     longitude: parseFloat(route?.params?.airport?.lng),
   };
 
+
   // const latitudeMid = (route?.params?.airport?.lat + route?.params?.airport2?.lat) / 2;
   // const longitudeMid = (route?.params?.airport?.lng +  route?.params?.airport2?.lng) / 2;
 
@@ -96,8 +97,8 @@ const Map = ({navigation, route}) => {
           {
             latitude: context?.restuarent?.latitude,
             longitude: context?.restuarent?.longitude,
-            latitudeDelta: 6.8,
-            longitudeDelta: 6.8,
+            latitudeDelta: 5.8,
+            longitudeDelta: 5.8,
           },
           200,
         );
@@ -278,8 +279,8 @@ const Map = ({navigation, route}) => {
         initialRegion={{
           latitude: parseFloat(route?.params?.airport?.lat),
           longitude: parseFloat(route?.params?.airport?.lng),
-          latitudeDelta: 6.8,
-          longitudeDelta: 6.8,
+          latitudeDelta: 5.8,
+          longitudeDelta: 5.8,
         }}
         ref={mapRef}
         style={{...StyleSheet.absoluteFillObject, flex: 1}}
@@ -554,7 +555,11 @@ const Map = ({navigation, route}) => {
                 <Callout
                   onPress={() => {
                     // return console.log('hello world',val)
+                   if(context?.token) { 
                     navigation.navigate('RestuarantDetails', {id: val?.id})
+                  } else {
+                    navigation.navigate('Message',{theme: 'light', title: 'Login Required', message: 'Please log in to continue', screen: 'Login'})
+                  }
                   }
                   }
                   tooltip>

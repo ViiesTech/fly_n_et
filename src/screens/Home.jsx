@@ -49,7 +49,6 @@ const Home = ({ navigation }) => {
                         message: 'Fly n Eat App access to your location',
                     }
                 );
-
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                     getLocations();
                 } else {
@@ -103,11 +102,15 @@ const Home = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
                 <View style={{ width: wp('60%'), alignItems: 'center' }}>
+                   {context?.token &&
+                   <>
                     <Small heading font="medium">Current Location</Small>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>
                         <Loc size={hp('2%')} color={Color('text')} />
                         <Small heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address}</Small>
                     </View>
+                    </>
+                    }
                 </View>
                 <View style={{ width: wp('20%'), alignItems: 'center' }}>
                     <TouchableOpacity style={{
@@ -117,7 +120,13 @@ const Home = ({ navigation }) => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderRadius: hp('50%'),
-                    }} onPress={() => navigation.navigate('Notifications')}>
+                    }} onPress={() => {
+                            if(!context?.token) {
+                                navigation.navigate('Message',{theme: 'light', title: 'Login Required', message: 'Please log in to continue', screen: 'Login'})
+                            } else {
+                                navigation.navigate('Notifications')
+                            }
+                    } }>
                         <Notification
                             size={hp('2.5%')}
                             color={Color('text')}
@@ -206,7 +215,8 @@ const Home = ({ navigation }) => {
     const Button = () => {
         const [loading, setLoading] = useState(false);
         const onSearch = async () => {
-            if(!context.isHome) {  
+        const firstsearch =  await AsyncStorage.getItem('firstSearch') 
+            if(!context?.user?.expired_at && !firstsearch || context?.user?.expired_at && new Date(context?.user?.expired_at) > new Date()) {  
             try {
                 setLoading(true);
                 const locationDetails = await AsyncStorage.getItem('locationDetails');
@@ -228,10 +238,11 @@ const Home = ({ navigation }) => {
                 });
                 console.log('restauratns responsne',res.data?.restaurant)
                 if (res.data?.restaurant?.length > 0) {
-                    setContext({
-                        ...context,
-                        isHome: true
-                    })
+                    await AsyncStorage.setItem('firstSearch','done')
+                    // setContext({
+                    //     ...context,
+                    //     isHome: true
+                    // })
                     navigation.navigate('Map', { distance: distance, restaurants: res.data?.restaurant, location: location, airport: JSON.parse(locationDetails), airportDetails: JSON.parse(selectLocation) });
                 }else {
                     note('No Result Found', "Couldn't find any restaurant according to the given parameters");
@@ -242,7 +253,7 @@ const Home = ({ navigation }) => {
                 setLoading(false);
             }
         } else {
-            navigation.navigate('Packages')
+            navigation.navigate('Packages');
         }
 
         };

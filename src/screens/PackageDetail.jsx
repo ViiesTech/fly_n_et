@@ -58,6 +58,7 @@ const PackageDetail = ({route}) => {
 
   const onConfirmPurchase = async () => {
     
+  if(context?.token) {  
     if (!data) {
       Alert.alert('Error', 'No available package for this plan.');
       setLoading(false);
@@ -105,10 +106,14 @@ const PackageDetail = ({route}) => {
         Alert.alert('Error', error?.message || 'Something went wrong');
       }
     }
-    setLoading(false);
+    setLoading(false)
+  } else {
+    navigation.navigate('Message',{theme: 'light', title: 'Login Required', message: 'Please log in to continue', screen: 'Login'})
+  }
   };
 
   const onRestorePurchase = async () => {
+    if(context?.token) {
     try {
       const customerInfo = await Purchases.restorePurchases();
       console.log('restore', customerInfo.entitlements.active);
@@ -121,6 +126,9 @@ const PackageDetail = ({route}) => {
     } catch (e) {
       console.error('Failed to restore purchases:', e);
     }
+  } else {
+    navigation.navigate('Message',{theme: 'light', title: 'Login Required', message: 'Please log in to continue', screen: 'Login'})
+  }
   }
   
 
@@ -204,6 +212,7 @@ const styles = StyleSheet.create({
   },
   detail: {
     color: 'black',
+    width: wp(80),
     fontSize: hp(1.6),
   },
 });

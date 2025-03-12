@@ -189,8 +189,8 @@ const RestuarantDetails = ({navigation, route}) => {
 
   const onVisitWebsite = async () => {
     // return console.log('hhello',context?.restuarent?.website)
-    await Linking.openURL(context?.restuarent?.website)
-  }
+    await Linking.openURL(context?.restuarent?.website);
+  };
 
   // const onSpecificRestaurant = () => {
   //   setContext({
@@ -204,30 +204,31 @@ const RestuarantDetails = ({navigation, route}) => {
   return (
     <>
       <StatusBar translucent barStyle="light-content" />
-      <BackBtn navigation={navigation} translucent />
-      <TouchableOpacity
-        onPress={bookmark}
-        style={{
-          position: 'absolute',
-          right: wp('5%'),
-          backgroundColor: Color('btnColor'),
-          padding: hp('1%'),
-          borderRadius: hp('100%'),
-          top: isIOS ? hp('6.3%') : hp('5%'),
-          zIndex: 1,
-        }}>
-        <Heart
-          size={hp('3%')}
-          color={Color('text')}
-          variant={context?.restuarent?.bookmarked ? 'Bold' : 'Outline'}
-        />
-      </TouchableOpacity>
+
       {!context?.restuarent || context?.restuarent?.id !== route?.params?.id ? (
         <View style={{flex: 1, justifyContent: 'center'}}>
           <ActivityIndicator size={'large'} color={Color('drawerBg')} />
         </View>
       ) : (
         <ScrollView style={{backgroundColor: Color('text')}}>
+          <BackBtn navigation={navigation} translucent />
+          <TouchableOpacity
+            onPress={bookmark}
+            style={{
+              position: 'absolute',
+              right: wp('5%'),
+              backgroundColor: Color('btnColor'),
+              padding: hp('1%'),
+              borderRadius: hp('100%'),
+              top: isIOS ? hp('6.3%') : hp('5%'),
+              zIndex: 1,
+            }}>
+            <Heart
+              size={hp('3%')}
+              color={Color('text')}
+              variant={context?.restuarent?.bookmarked ? 'Bold' : 'Outline'}
+            />
+          </TouchableOpacity>
           {context?.restuarent?.images?.length < 1 ? (
             <Image
               source={{
@@ -239,6 +240,53 @@ const RestuarantDetails = ({navigation, route}) => {
           ) : (
             <View style={{}}>
               <SwiperFlatList
+                index={0}
+                showPagination
+                // paginationDefaultColor={Color('text')}
+                // paginationActiveColor={Color('drawerBg')}
+                PaginationComponent={({paginationIndex, size}) => (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignSelf: 'center',
+                      // flex: 1,
+                      position: 'absolute',
+                      bottom: 10
+                    }}>
+                    {context?.restuarent?.images.map((_, index) => (
+                      <View
+                        key={index}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: 100,
+                          backgroundColor:
+                            paginationIndex === index
+                              ? Color('drawerBg')
+                              : Color('text'),
+                          marginHorizontal: 4,
+                          borderWidth: paginationIndex === index ? 2 : 0,
+                          borderColor:
+                            paginationIndex === index ? 'white' : 'transparent',
+                        }}
+                      />
+                    ))}
+                  </View>
+                )}
+                data={context?.restuarent?.images}
+                renderItem={({item}) => (
+                  <FastImage
+                    style={{width: wp('100%'), height: hp('40%')}}
+                    source={{
+                      uri: `${storageUrl}${item.path}`,
+                      priority: FastImage.priority.normal,
+                    }}
+                    resizeMode={FastImage.resizeMode.cover}
+                  />
+                )}
+              />
+
+              {/* <SwiperFlatList
                 // autoplay
                 // autoplayDelay={2}
                 // autoplayLoop
@@ -257,7 +305,7 @@ const RestuarantDetails = ({navigation, route}) => {
                     resizeMode={FastImage.resizeMode.cover}
                   />
                 )}
-              />
+              /> */}
               {/* <Swiper>
             {context?.restuarent?.images.map((item) => {
               return (
@@ -290,7 +338,11 @@ const RestuarantDetails = ({navigation, route}) => {
                     marginTop: hp(0.4),
                     // alignItems: 'center',
                   }}>
-                  <Small size={hp(1.6)} color={Color('homeBg')} heading font="bold">
+                  <Small
+                    size={hp(1.6)}
+                    color={Color('homeBg')}
+                    heading
+                    font="bold">
                     Location
                   </Small>
                   <Location size={hp('2.5%')} color={Color('homeBg')} />
@@ -302,7 +354,12 @@ const RestuarantDetails = ({navigation, route}) => {
                     font="medium">
                     {context?.restuarent?.address +
                       ' ' +
-                      context?.restuarent?.city + '-' + '-' + context?.restuarent?.state + '-' + context?.restuarent?.zip_code}
+                      context?.restuarent?.city +
+                      '-' +
+                      '-' +
+                      context?.restuarent?.state +
+                      '-' +
+                      context?.restuarent?.zip_code}
                   </Small>
                 </View>
                 <Br space={2} />
@@ -310,8 +367,15 @@ const RestuarantDetails = ({navigation, route}) => {
                   Opening Hours
                 </Pera>
                 <Br space={0.5} />
-                <Small size={hp(1.9)} color={Color('lightText')} heading font="medium">
-                  {context?.restuarent?.operation_hours + ' ' + '-' + context?.restuarent?.time_zone}
+                <Small
+                  size={hp(1.9)}
+                  color={Color('lightText')}
+                  heading
+                  font="medium">
+                  {context?.restuarent?.operation_hours +
+                    ' ' +
+                    '-' +
+                    context?.restuarent?.time_zone}
                   {/* {moment(context?.restuarent?.start_time, 'HH:mm').format(
                     'hh:mm A',
                   )}{' '}
@@ -328,7 +392,11 @@ const RestuarantDetails = ({navigation, route}) => {
                   Airport
                 </Pera>
                 <Br space={0.5} />
-                <Small size={hp(1.9)} color={Color('lightText')} heading font="medium">
+                <Small
+                  size={hp(1.9)}
+                  color={Color('lightText')}
+                  heading
+                  font="medium">
                   {context?.restuarent?.airport +
                     '-' +
                     context?.restuarent?.airport_name}
@@ -338,7 +406,11 @@ const RestuarantDetails = ({navigation, route}) => {
                   Description
                 </Pera>
                 <Br space={0.5} />
-                <Small size={hp(1.9)} color={Color('lightText')} heading font="medium">
+                <Small
+                  size={hp(1.9)}
+                  color={Color('lightText')}
+                  heading
+                  font="medium">
                   {context?.restuarent?.description}
                 </Small>
                 <Br space={2} />
@@ -524,7 +596,7 @@ const RestuarantDetails = ({navigation, route}) => {
                   label="Send Feedback"
                 />
                 <Br space={2} />
-                 <Btn
+                <Btn
                   onPress={() => onVisitWebsite()}
                   btnStyle={{backgroundColor: Color('homeBg')}}
                   label="View Website"

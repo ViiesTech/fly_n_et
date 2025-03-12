@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Background from '../utils/Background';
 import Br from '../components/Br';
@@ -9,9 +9,10 @@ import BackBtn from '../components/BackBtn';
 import Wrapper from '../components/Wrapper';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { Home, InfoCircle, Lock, Logout, Notification, TableDocument } from 'iconsax-react-native';
+import { DataContext } from '../utils/Context';
 
 const Settings = ({ navigation }) => {
-
+    const {context} = useContext(DataContext)
     return (
         <>
             <BackBtn navigation={navigation} />
@@ -31,6 +32,7 @@ const Settings = ({ navigation }) => {
                             </View>
                         </TouchableOpacity> */}
                         <Br space={1.2} />
+                       {context?.token && 
                         <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('AccountSettings')}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
                                 <Home
@@ -40,6 +42,7 @@ const Settings = ({ navigation }) => {
                                 <Small color={Color('drawerBg')} heading font="bold">Account Settings</Small>
                             </View>
                         </TouchableOpacity>
+                        }
                         <Br space={1.2} />
                         <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('About')}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
@@ -71,6 +74,7 @@ const Settings = ({ navigation }) => {
                             </View>
                         </TouchableOpacity>
                         <Br space={1.2} />
+                       {context?.token &&
                         <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Message', {theme: 'light', title: 'Logout', message: 'Are you sure you want to logout?', screen: 'Logout'})}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
                                 <Logout
@@ -80,6 +84,7 @@ const Settings = ({ navigation }) => {
                                 <Small color={Color('drawerBg')} heading font="bold">Sign Out</Small>
                             </View>
                         </TouchableOpacity>
+                        }
                     </Wrapper>
                 </View>
             </Background>

@@ -20,14 +20,22 @@ const SideMenu = ({ navigation }) => {
     const {context} = useContext(DataContext);
 
 
-    const onDeleteAccount = async () => {
-        navigation.navigate('Message', {theme: 'light', title: 'Account Deletion', message: 'Are you sure you want to delete your account?', screen: 'GetStarted'})
+    const onDeleteAccount = async () => { 
+        navigation.navigate('Message', {theme: 'light', title: context?.token ? 'Account Deletion' : 'Login Required', message: context?.token ? 'Are you sure you want to delete your account?' : 'Please login to continue', screen: context?.token ? 'GetStarted' : 'Login'})
+    }
+
+    const onNavigateScreen = (screenName) => {
+       if(screenName === 'Home' || screenName === 'Settings' || screenName === 'Packages') {
+        navigation.navigate(screenName)
+       } else {
+        navigation.navigate('Message',{theme: 'light', title: 'Login Required', message: 'Please log in to continue', screen: 'Login'})
+    }
     }
     
     const Options = () => {
         return (
             <>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Home')}>
+                <TouchableOpacity style={styles.option} onPress={() => onNavigateScreen('Home')}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
                         <Home
                             size={hp('3%')}
@@ -40,7 +48,7 @@ const SideMenu = ({ navigation }) => {
                         color={Color('lightText')}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Profile')}>
+                <TouchableOpacity style={styles.option} onPress={() => onNavigateScreen('Profile')}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
                         <User
                             size={hp('3%')}
@@ -53,7 +61,7 @@ const SideMenu = ({ navigation }) => {
                         color={Color('lightText')}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Bookmark')}>
+                <TouchableOpacity style={styles.option} onPress={() => onNavigateScreen('Bookmark')}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
                         <Bookmark
                             size={hp('3%')}
@@ -66,7 +74,7 @@ const SideMenu = ({ navigation }) => {
                         color={Color('lightText')}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Notifications')}>
+                <TouchableOpacity style={styles.option} onPress={() => onNavigateScreen('Notifications')}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
                         <Notification
                             size={hp('3%')}
@@ -79,7 +87,7 @@ const SideMenu = ({ navigation }) => {
                         color={Color('lightText')}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Packages')}>
+                <TouchableOpacity style={styles.option} onPress={() => onNavigateScreen('Packages')}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
                         <Crown1
                             size={hp('3%')}
@@ -119,6 +127,7 @@ const SideMenu = ({ navigation }) => {
                         color={Color('lightText')}
                     />
                 </TouchableOpacity>
+               {context?.token &&
                 <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Message', {theme: 'light', title: 'Logout', message: 'Are you sure you want to logout?', screen: 'Logout'})}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1.5%') }}>
                         <LogoutCurve
@@ -132,6 +141,7 @@ const SideMenu = ({ navigation }) => {
                         color={Color('sidebarLastOption')}
                     />
                 </TouchableOpacity>
+                }
             </>
         );
     };
@@ -143,6 +153,8 @@ const SideMenu = ({ navigation }) => {
                 <View style={{height: hp('91.5%')}}>
                     <Br space={isIOS ? 0.5 : 2.5} />
                     <Pera style={{ textAlign: 'center' }} color={Color('homeBg')} heading font="bold">Side Menu</Pera>
+                  {context?.token && 
+                  <> 
                     <Br space={5} />
                     <Image
                         source={{uri: `${storageUrl}${context?.user?.user_info?.profile_image}`}}
@@ -151,7 +163,9 @@ const SideMenu = ({ navigation }) => {
                     <Br space={1} />
                     <Pera style={{ textAlign: 'center' }} color={Color('homeBg')} heading font="bold">{capitalize(context?.user?.name)}</Pera>
                     <Small style={{ textAlign: 'center' }} color={Color('lightText')} heading font="medium">Pilot</Small>
-                    <Br space={3} />
+                    </>
+                }
+                    <Br space={context?.token ? 3 : 7} />
                     <Wrapper>
                         <View style={styles.options}>
                             <Options />

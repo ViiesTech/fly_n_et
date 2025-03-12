@@ -34,7 +34,7 @@ const Packages = () => {
   // const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
   
 
-  // console.log(previousScreen);
+  // console.log(offerings);
 
   useEffect(() => {
       const setupRevenueCat = async () => {

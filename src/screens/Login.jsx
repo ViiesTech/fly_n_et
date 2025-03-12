@@ -55,7 +55,7 @@ const Login = ({ navigation }) => {
             handlingNavigations()
         } else if (context?.token && !context?.isVerified) {
             nextScreen(() => navigation.replace('Verify'));
-        }
+        } 
     }, [context?.token, context?.isVerified]);
     
 

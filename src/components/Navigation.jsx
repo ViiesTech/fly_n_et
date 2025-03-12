@@ -55,8 +55,7 @@ const Navigation = ({label, navigation, ...props}) => {
               : null;
             const currentDate = new Date();
             if (
-              (!expiryDate && currentDate > expiryDate) ||
-              (expiryDate && currentDate > expiryDate)
+              !expiryDate || (expiryDate && currentDate > expiryDate)
             ) {
               navigation.navigate('Packages');
             } else {
