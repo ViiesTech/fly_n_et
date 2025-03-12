@@ -27,7 +27,9 @@ const Home = ({ navigation }) => {
     // console.log('hh',context?.user.expired_at)
 
     useEffect(() => {
+       if(context?.token) { 
         requestLocationPermission();
+    }
     }, []);
 
     const getLocation = async (place_id) => {
@@ -102,7 +104,7 @@ const Home = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
                 <View style={{ width: wp('60%'), alignItems: 'center' }}>
-                   {context?.token &&
+                   {context?.token && context?.user?.user_info?.address &&
                    <>
                     <Small heading font="medium">Current Location</Small>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>

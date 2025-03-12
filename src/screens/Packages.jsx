@@ -1,5 +1,5 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -10,6 +10,7 @@ import {ArrowLeft} from 'iconsax-react-native';
 import {useNavigation} from '@react-navigation/native';
 import PackageCard from '../components/PackageCard';
 import Purchases from 'react-native-purchases';
+import { DataContext } from '../utils/Context';
 
 // const packages = [
 //   {
@@ -29,12 +30,13 @@ import Purchases from 'react-native-purchases';
 const Packages = () => {
   const [offerings,setOfferings] = useState(null);
   const navigation = useNavigation();
+  const {context} = useContext(DataContext)
 
   // const routes = navigation.getState().routes;
   // const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
   
 
-  // console.log(offerings);
+  console.log(context?.user)
 
   useEffect(() => {
       const setupRevenueCat = async () => {
@@ -72,7 +74,13 @@ const Packages = () => {
                 justifyContent: 'center',
                 borderRadius: hp('50%'),
               }}
-              onPress={() => navigation.navigate('Home')}>
+              onPress={() => {
+                if(!context?.user?.user_info && context?.token) {
+                  navigation.navigate('UserType')
+                } else {
+                navigation.navigate('Home')
+              }
+              } }>
               <ArrowLeft size={hp('2.5%')} color={Color('text')} />
             </TouchableOpacity>
           </View>

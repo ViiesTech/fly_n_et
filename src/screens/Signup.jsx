@@ -166,19 +166,19 @@ const Signup = ({navigation}) => {
 
   const onUserSignup = async () => {
     try {
-      if (!location) {
-        note(
-          'Location is Required',
-          'You need to allow the app to get your location in order to use fly n eat!',
-          [
-            {
-              text: 'Request Again',
-              onPress: async () => await requestLocationPermission(),
-            },
-          ],
-        );
-        return;
-      }
+      // if (!location) {
+      //   note(
+      //     'Location is Required',
+      //     'You need to allow the app to get your location in order to use fly n eat!',
+      //     [
+      //       {
+      //         text: 'Request Again',
+      //         onPress: async () => await requestLocationPermission(),
+      //       },
+      //     ],
+      //   );
+      //   return;
+      // }
       Keyboard.dismiss();
       setLoading(true);
       const obj = {

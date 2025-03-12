@@ -77,8 +77,7 @@ const Login = ({ navigation }) => {
             } else {
                 nextScreen(() => navigation.replace('UserType'));
             }
-    }
-;
+    };
 
     async function requestLocationPermission() {
         try {
@@ -128,10 +127,10 @@ const Login = ({ navigation }) => {
 
     const onUserLogin = async () => {
         try {
-            if (!location) {
-                note('Location is Required', 'You need to allow the app to get your location in order to use fly n eat!', [{ text: 'Request Again', onPress: async () => await requestLocationPermission() }]);
-                return;
-            }
+            // if (!location) {
+            //     note('Location is Required', 'You need to allow the app to get your location in order to use fly n eat!', [{ text: 'Request Again', onPress: async () => await requestLocationPermission() }]);
+            //     return;
+            // }
             setLoading(true);
             Keyboard.dismiss();
             const obj = {
