@@ -17,6 +17,7 @@ export const AppContext = ({ children }) => {
         terms: null,
         serviceImages: null,
         returnFromDetail: false,
+        subscribed_details: null,
         // isHome: false,
         // isPoint: false,
     });

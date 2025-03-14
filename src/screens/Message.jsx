@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import Background from '../utils/Background';
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import { heightPercentageToDP as hp, widthPercentageToDP, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Br from '../components/Br';
 import { H6, Small } from '../utils/Text';
 import { Color } from '../utils/Colors';
@@ -87,7 +87,7 @@ const Message = ({ navigation, route }) => {
                             />
                             <Br space={2} />
                             <H6 style={{textAlign: 'center'}} heading font="bold">{title || 'All Done'}</H6>
-                            <Small color={Color('lightText')}>{message || 'You’re all set and ready to start!'}</Small>
+                            <Small style={message && {width: widthPercentageToDP('70%'),textAlign: 'center'}} color={Color('lightText')}>{message || 'You’re all set and ready to start!'}</Small>
                             <Br space={2} />
                             <Btn loadingColor={Color('drawerBg')} loading={loading} textStyle={{color: Color(isLightTheme ? 'homeBg' : 'text')}} onPress={onContinue} label="Continue" btnStyle={{paddingHorizontal: wp('15%'), backgroundColor: Color(isLightTheme ? 'text' : 'btnColor')}} />
                         </View>

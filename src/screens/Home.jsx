@@ -17,6 +17,7 @@ import { DataContext } from '../utils/Context';
 import { api, errHandler, note } from '../utils/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Purchases from 'react-native-purchases';
 
 const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 
@@ -24,13 +25,18 @@ const Home = ({ navigation }) => {
     const { context,setContext } = useContext(DataContext);
     const [location, setLocation] = useState();
 
-    // console.log('hh',context?.user.expired_at)
+    console.log('hhhhhh',context?.user?.expired_at)
 
     useEffect(() => {
        if(context?.token) { 
         requestLocationPermission();
+        // getSubscriptionInfo();
     }
     }, []);
+
+
+       
+    
 
     const getLocation = async (place_id) => {
         const BASE_URL = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${API_KEY}&fields=geometry`;

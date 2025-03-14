@@ -52,6 +52,7 @@ const Login = ({ navigation }) => {
     useEffect(() => {
         if (context?.token && context?.isVerified) {
             Toast.show('Login Successfully', Toast.SHORT);
+            console.log('atleast wrk',context?.user?.expired_at)
             handlingNavigations()
         } else if (context?.token && !context?.isVerified) {
             nextScreen(() => navigation.replace('Verify'));
@@ -64,6 +65,7 @@ const Login = ({ navigation }) => {
     }, []);
 
     const handlingNavigations = async () => {
+      await getSubscriptionInfo()
         const expiryDate = context?.user?.expired_at ? new Date(context.user.expired_at) : null;
         const currentDate = new Date();
             if (!expiryDate  || expiryDate && currentDate > expiryDate) {
@@ -77,6 +79,37 @@ const Login = ({ navigation }) => {
             } else {
                 nextScreen(() => navigation.replace('UserType'));
             }
+    };
+
+    const getSubscriptionInfo = async () => {
+        if (context?.subscribed_details) {
+        try {
+            // console.log('Purchaser Info:', purchaserInfo);
+
+                const obj = {
+                    sub_type: context?.subscribed_details?.sub_type,
+                    purchase_date: context?.subscribed_details?.purchased_date,
+                }
+                // console.log('hh')
+                      const response = await api.post('user/subscribe', obj, {
+                        headers: {
+                          Authorization: `Bearer ${context?.token}`,
+                        },
+                      });
+                      console.log('hh',response?.data)
+                      if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
+                        setContext(prevContext => ({
+                            ...prevContext,
+                            subscribed_details: null,
+                            user: { ...prevContext.user, expired_at: response.data.user.expired_at },
+                          }));
+                      }
+        } catch (error) {
+            console.error('Error fetching subscription info:', error);
+        }
+    }
+
+        // return { subscriptionType: "none", purchaseDate: null };
     };
 
     async function requestLocationPermission() {
@@ -150,7 +183,6 @@ const Login = ({ navigation }) => {
                 await AsyncStorage.setItem('isVerified', res?.data?.verified);
                 await AsyncStorage.setItem('user', JSON.stringify(res?.data?.user));
             }
-
             setContext({
                 ...context,
                 token: res?.data?.token,
