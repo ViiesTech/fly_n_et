@@ -46,13 +46,13 @@ import Packages from './src/screens/Packages';
 import PackageDetail from './src/screens/PackageDetail';
 import { Platform } from 'react-native';
 import Purchases from 'react-native-purchases';
+import { withIAPContext } from 'react-native-iap';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
  
-  
-
+  let APIKEY = Platform.OS === 'android' ? 'goog_NsTIazxZbCUKCthqNMbKrmCyyxT' : 'appl_SAfJQCOjWHjmBWyfUcvNkSwuOnQ';
   useEffect(() => {
     LogBox.ignoreLogs(['Warning']);
     Orientation.lockToPortrait();
@@ -65,9 +65,7 @@ function App() {
 
   useEffect(() => {
     const configurePurchases = async () => {
-      if (Platform.OS === 'ios') {
-        await Purchases.configure({ apiKey: 'appl_SAfJQCOjWHjmBWyfUcvNkSwuOnQ' });
-      }
+        await Purchases.configure({ apiKey: APIKEY });
     };
   
     configurePurchases();
@@ -207,6 +205,4 @@ function App() {
   );
 }
 
-export default function MobileApp() {
-  return <App />;
-}
+export default withIAPContext(App)

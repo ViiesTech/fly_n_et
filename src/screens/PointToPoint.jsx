@@ -19,7 +19,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { calculateDistance, nauticalMilesToMeters } from '../utils/global';
 
-const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
+const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 
 const PointToPoint = ({ navigation }) => {
     const { context,setContext } = useContext(DataContext);
@@ -152,7 +152,7 @@ const PointToPoint = ({ navigation }) => {
         const [predictions, setPredictions] = useState();
         const [selection, setSelection] = useState('');
         const searchAirports = async (searchKey) => {
-            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk&types=airport&components=country:us`;
+            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk&types=airport&components=country:us`;
             const response = await axios.get(BASE_URL, {
               params: {
                 key: API_KEY,
@@ -218,7 +218,7 @@ const PointToPoint = ({ navigation }) => {
         const [predictions, setPredictions] = useState();
         const [selection, setSelection] = useState('');
         const searchAirports = async (searchKey) => {
-            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk&types=airport&components=country:us`;
+            const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk&types=airport&components=country:us`;
             const response = await axios.get(BASE_URL, {
               params: {
                 key: API_KEY,

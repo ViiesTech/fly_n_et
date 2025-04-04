@@ -1,4 +1,4 @@
-package com.fly_eat
+package com.fly_n_eat
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

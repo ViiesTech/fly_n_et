@@ -1590,6 +1590,8 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
+  - RNIap (12.16.2):
+    - React-Core
   - RNPurchases (8.7.0):
     - PurchasesHybridCommon (= 13.21.0)
     - React-Core
@@ -1700,6 +1702,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNFastImage (from `../node_modules/react-native-fast-image`)
+  - RNIap (from `../node_modules/react-native-iap`)
   - RNPurchases (from `../node_modules/react-native-purchases`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -1857,6 +1860,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNFastImage:
     :path: "../node_modules/react-native-fast-image"
+  RNIap:
+    :path: "../node_modules/react-native-iap"
   RNPurchases:
     :path: "../node_modules/react-native-purchases"
   RNScreens:
@@ -1940,6 +1945,7 @@ SPEC CHECKSUMS:
   RevenueCat: e825836f5d6baa870c53d7281be25a5fd91abd91
   RNCAsyncStorage: cc6479c4acd84cc7004946946c8afe30b018184d
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
+  RNIap: 2fba6c91f79fb7c71fcc44465f606061653caf01
   RNPurchases: 3b35539c86769ad8a8f838060559cf13d0a8fcb1
   RNScreens: e6f9bc3a41be76af2ba0a815ea299a0000b1c838
   RNSVG: 3d2bdcaef51c8071880a9c0072fe324f4423a3ba

@@ -1,4 +1,4 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   heightPercentageToDP as hp,
@@ -11,6 +11,9 @@ import {useNavigation} from '@react-navigation/native';
 import PackageCard from '../components/PackageCard';
 import Purchases from 'react-native-purchases';
 import { DataContext } from '../utils/Context';
+
+import { endConnection, initConnection, flushFailedPurchasesCachedAsPendingAndroid, getSubscriptions, Subscription, } from 'react-native-iap'
+import AndroidPackageCard from '../components/AndroidPackageCard';
 
 // const packages = [
 //   {
@@ -30,15 +33,29 @@ import { DataContext } from '../utils/Context';
 const Packages = () => {
   const [offerings,setOfferings] = useState(null);
   const navigation = useNavigation();
+  const [products,setProducts] = useState([])
   const {context} = useContext(DataContext)
+
+  const isAndroid = Platform.OS === 'android'; // check platform is android or not
+
+  const [connection, setConnection] = useState(false);// set in-app purchase is connected or not
+  const [subscription, setSubscription] = useState([]);
+
+
 
   // const routes = navigation.getState().routes;
   // const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
   
 
-  console.log(context?.user)
+  console.log(products)
+
+  const productIds = ['flyneat_month','flyneat_year2'];
+  const androidsubscriptionsId = ['flyneat_month', 'flyneat_year2']
+
+
 
   useEffect(() => {
+    if(!isAndroid){
       const setupRevenueCat = async () => {
         try {
           const offerings = await Purchases.getOfferings();
@@ -51,8 +68,64 @@ const Packages = () => {
       };
   
       setupRevenueCat();
+    }
     }, []);
-  
+    
+
+
+
+    useEffect(()=>{
+      if(isAndroid){
+        initializeIAP();
+
+        return () => {
+          endConnection();
+        };
+      }
+    },[])
+
+
+    
+
+    useEffect(() => {
+      if(isAndroid){
+
+        if (connection) {
+          getSubscriptionInfo()
+        }
+      }
+      }, [connection]);
+
+
+        // To get Subscription information
+  const getSubscriptionInfo = async () => {
+    try {
+      const subscriptions = await getSubscriptions({
+        skus: androidsubscriptionsId,
+      })
+      console.log("sussssb", subscriptions)
+
+      setSubscription(subscriptions); // set subscription information
+    } catch (error) {
+      console.error('Error fetching products: ', error);
+    }
+  };
+
+
+
+    const initializeIAP = async () => {
+        try {
+          await initConnection().then(async (value) => {
+            setConnection(value);
+            isAndroid && (await flushFailedPurchasesCachedAsPendingAndroid());
+          });
+        } catch (error) {
+          console.error('Error initializing IAP: ', error);
+        }
+      };
+
+
+
 
   return (
     <Background noScroll={true} translucent={true} statusBarColor={Color('text')} noBackground>
@@ -92,9 +165,30 @@ const Packages = () => {
         </View>
         <Text style={styles.desc}>Choose the best plan that fits your needs. Enjoy premium features and seamless access with our subscription packages.</Text>
         <View style={{paddingTop: hp(5)}}>
-          {offerings?.map((item) => (
-            <PackageCard onPress={() => navigation.navigate('PackageDetail',{detail: item})} style={{marginBottom: hp(2)}} type={item.packageType === 'ANNUAL' ? 'Professional' : 'Standard'} package_name={item.packageType === 'ANNUAL' ? 'Yearly' : 'Monthly'} price={item.product.priceString} />
+          {
+            subscription.length > 0 ?
+            <>
+            {
+            subscription.map((item)=> {
+
+              // console.log("item", item.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
+              const priceString = item.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice
+
+              return(
+
+                      <AndroidPackageCard onPress={() => navigation.navigate('PackageDetail',{detail: item})} style={{marginBottom: hp(2)}}  package_name={item.name} price={priceString} />
+
+              )
+            })
+          }
+            </>
+            :
+            <>
+          {offerings?.reverse().map((item) => (
+            <PackageCard onPress={() => navigation.navigate('PackageDetail',{detail: item})} style={{marginBottom: hp(2)}}  package_name={item.packageType === 'ANNUAL' ? 'Yearly' : 'Monthly'} price={item.product.priceString} />
           ))}
+          </>
+          }
         </View>
       </View>
     </Background>

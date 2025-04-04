@@ -25,7 +25,7 @@ import axios from 'axios';
 import {DataContext} from '../utils/Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
+const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 
 const SelectLocation = ({navigation, route}) => {
   const {context, setContext} = useContext(DataContext);
@@ -62,6 +62,8 @@ const SelectLocation = ({navigation, route}) => {
         );
         const data = response?.data;
         const locationName = data?.results[0]?.formatted_address;
+
+        console.log(data)
 
         setLocation({
           latitude: crd?.latitude,

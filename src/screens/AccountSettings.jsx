@@ -128,7 +128,7 @@ const AccountSettings = ({navigation}) => {
                 value={context?.user?.user_info?.address}
                 readOnly
                 mode="light"
-                label="Location"
+                label="Home Airport"
               />
             </TouchableOpacity>
             <Br space={1.2} />

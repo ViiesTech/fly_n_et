@@ -282,164 +282,164 @@ const Profile = ({ navigation }) => {
     }
   };
 
-  if (context?.user?.user_type !== 'user') {
-    return (
-      <>
-        <StatusBar
-          translucent
-          backgroundColor="transparent"
-          barStyle="light-content"
-        />
-        <Background
-          detectScrollEnd
-          onScrollEnd={() => {
-            if (!isLoading && hasMore) {
-              getRestuarents(currentPage + 1);
-            }
-          }}
-        >
-          <View style={{ backgroundColor: Color('text') }}>
-            <TopBar />
-            <Wrapper>
-              <Pera color={Color('homeBg')} heading font="bold">
-                Tim Bookmarks
-              </Pera>
-              <Br space={1} />
-              <Pera color={Color('homeBg')} heading font="light">
-                {context?.user?.user_info?.bio}
-              </Pera>
-              <Br space={2} />
-              <Pera style={{fontStyle: 'italic'}} color={Color('homeBg')} heading font="bold">
-                Upload service images
-              </Pera>
-              <Br space={1} />
-              <View style={{flexDirection: 'row', gap: hp('1.5%'), flexWrap: 'wrap'}}>
-                <TouchableOpacity style={{
-                  backgroundColor: Color('imageUpload'),
-                  width: wp('26%'),
-                  height: wp('26%'),
-                  borderRadius: hp('2%'),
-                  alignItems: 'flex-end',
-                  justifyContent: 'flex-end',
-                  padding: hp('1%'),
-                }} onPress={uploadImage}>
-                  <DocumentUpload
-                    size={hp('3%')}
-                    color={Color('text')}
-                  />
-                </TouchableOpacity>
-                {images?.map((_, index) => {
-                  if (_?.id) {
-                    return (
-                      <TouchableOpacity style={{position: 'relative'}} onPress={() => setShow(_)}>
-                        <Image source={{ uri: `${storageUrl}${_.path}` }}
-                          style={{ width: wp('26%'), height: wp('26%'), borderRadius: hp('2%') }}
-                          resizeMode="stretch" />
-                          <TouchableOpacity style={{position: 'absolute', bottom: hp('1%'), right: hp('1%'), padding: hp('0.5%'), backgroundColor: Color('modelDark'), borderRadius: hp('50%')}} onPress={() => removeUploadedImage(_?.id, index)}>
-                            <Trash
-                              size={hp('2.5%')}
-                              color={Color('sidebarLastOption')}
-                            />
-                          </TouchableOpacity>
-                      </TouchableOpacity>
-                    );
-                  }
-                  return (
-                    <TouchableOpacity onPress={() => removeImage(index)}>
-                      <Image source={{ uri: `data:${images[index].type};base64,${images[index].base64}` }}
-                        style={{ width: wp('26%'), height: wp('26%'), borderRadius: hp('2%') }}
-                        resizeMode="stretch" />
-                    </TouchableOpacity>
-                  )
-                })}
-              </View>
-              <Br space={5} />
-              {context?.restuarents?.length === 0 && (
-                <Pera style={{ textAlign: 'center' }} color={Color('shadow')}>
-                  No Restuarent Found
-                </Pera>
-              )}
-              {
-                isLoaded && (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      flexWrap: 'wrap',
-                      columnGap: wp('5%'),
-                      rowGap: hp('2%'),
-                    }}>
-                    {context?.restuarents?.map((val, index) => {
-                      return (
-                        <Pressable
-                          key={index}
-                          style={styles.card}
-                          onPress={() =>
-                            navigation.navigate('RestuarantDetails', { id: val?.id })
-                          }>
-                          <Image
-                            source={{ uri: `${storageUrl}${val?.image_path}` }}
-                            style={styles.cardImg}
-                          />
-                          <Small color={Color('homeBg')} heading font="bold">
-                            {val?.title}
-                          </Small>
-                          <Small
-                            style={{ fontSize: hp('1.2%') }}
-                            color={Color('homeBg')}
-                            heading
-                            font="light">
-                            {val?.location}
-                          </Small>
-                          <TouchableOpacity
-                            style={{
-                              position: 'absolute',
-                              top: hp('1%'),
-                              right: hp('1%'),
-                              backgroundColor: Color('homeBg'),
-                              paddingVertical: hp('0.8%'),
-                              paddingHorizontal: hp('0.8%'),
-                              borderRadius: hp('1%'),
-                            }}
-                            onPress={() => bookmark(val?.id)}>
-                            <Bookmark
-                              size={hp('2%')}
-                              color={Color('text')}
-                              variant={val?.bookmarked ? 'Bold' : 'Outline'}
-                            />
-                          </TouchableOpacity>
-                        </Pressable>
-                      );
-                    })}
-                    <View style={{ marginVertical: '0', marginHorizontal: 'auto' }} >
-                      {isLoading && <ActivityIndicator size={hp('5%')} color={Color('shadow')} />}
-                    </View>
-                  </View>
-                )
-              }
-              <Br space={10} />
-            </Wrapper>
-          </View>
-        </Background>
-        <Navigation navigation={navigation} />
-        {
-          show && (
-            <Model style={{padding: 0}} show={show}>
-              <TouchableOpacity style={{position: 'absolute', zIndex: 1, right: hp('1%'), top: hp('1%'), padding: hp('0.5%'), backgroundColor: Color('modelDark'), borderRadius: hp('50%')}} onPress={() => setShow()}>
-                <Add
-                  size="32"
-                  color={Color('text')}
-                  style={{ transform: [{ rotate: '135deg' }], alignSelf: 'flex-end' }}
-                />
-              </TouchableOpacity>
-              <Image source={{ uri: `${storageUrl}${show?.path}` }}
-                style={{ width: wp('90%'), height: hp('50%') }}
-                resizeMode="stretch" />
-            </Model>
-          )
-        }
-      </>
-    );
-  }
+  // if (context?.user?.user_type !== 'user') {
+  //   return (
+  //     <>
+  //       <StatusBar
+  //         translucent
+  //         backgroundColor="transparent"
+  //         barStyle="light-content"
+  //       />
+  //       <Background
+  //         detectScrollEnd
+  //         onScrollEnd={() => {
+  //           if (!isLoading && hasMore) {
+  //             getRestuarents(currentPage + 1);
+  //           }
+  //         }}
+  //       >
+  //         <View style={{ backgroundColor: Color('text') }}>
+  //           <TopBar />
+  //           <Wrapper>
+  //             <Pera color={Color('homeBg')} heading font="bold">
+  //               Tim Bookmarks
+  //             </Pera>
+  //             <Br space={1} />
+  //             <Pera color={Color('homeBg')} heading font="light">
+  //               {context?.user?.user_info?.bio}
+  //             </Pera>
+  //             {/* <Br space={2} />
+  //             <Pera style={{fontStyle: 'italic'}} color={Color('homeBg')} heading font="bold">
+  //               Upload service images
+  //             </Pera> */}
+  //             {/* <Br space={1} /> */}
+  //             {/* <View style={{flexDirection: 'row', gap: hp('1.5%'), flexWrap: 'wrap'}}>
+  //               <TouchableOpacity style={{
+  //                 backgroundColor: Color('imageUpload'),
+  //                 width: wp('26%'),
+  //                 height: wp('26%'),
+  //                 borderRadius: hp('2%'),
+  //                 alignItems: 'flex-end',
+  //                 justifyContent: 'flex-end',
+  //                 padding: hp('1%'),
+  //               }} onPress={uploadImage}>
+  //                 <DocumentUpload
+  //                   size={hp('3%')}
+  //                   color={Color('text')}
+  //                 />
+  //               </TouchableOpacity>
+  //               {images?.map((_, index) => {
+  //                 if (_?.id) {
+  //                   return (
+  //                     <TouchableOpacity style={{position: 'relative'}} onPress={() => setShow(_)}>
+  //                       <Image source={{ uri: `${storageUrl}${_.path}` }}
+  //                         style={{ width: wp('26%'), height: wp('26%'), borderRadius: hp('2%') }}
+  //                         resizeMode="stretch" />
+  //                         <TouchableOpacity style={{position: 'absolute', bottom: hp('1%'), right: hp('1%'), padding: hp('0.5%'), backgroundColor: Color('modelDark'), borderRadius: hp('50%')}} onPress={() => removeUploadedImage(_?.id, index)}>
+  //                           <Trash
+  //                             size={hp('2.5%')}
+  //                             color={Color('sidebarLastOption')}
+  //                           />
+  //                         </TouchableOpacity>
+  //                     </TouchableOpacity>
+  //                   );
+  //                 }
+  //                 return (
+  //                   <TouchableOpacity onPress={() => removeImage(index)}>
+  //                     <Image source={{ uri: `data:${images[index].type};base64,${images[index].base64}` }}
+  //                       style={{ width: wp('26%'), height: wp('26%'), borderRadius: hp('2%') }}
+  //                       resizeMode="stretch" />
+  //                   </TouchableOpacity>
+  //                 )
+  //               })}
+  //             </View> */}
+  //             {/* <Br space={5} /> */}
+  //             {/* {context?.restuarents?.length === 0 && (
+  //               <Pera style={{ textAlign: 'center' }} color={Color('shadow')}>
+  //                 No Restuarent Found
+  //               </Pera>
+  //             )}
+  //             {
+  //               isLoaded && (
+  //                 <View
+  //                   style={{
+  //                     flexDirection: 'row',
+  //                     flexWrap: 'wrap',
+  //                     columnGap: wp('5%'),
+  //                     rowGap: hp('2%'),
+  //                   }}>
+  //                   {context?.restuarents?.map((val, index) => {
+  //                     return (
+  //                       <Pressable
+  //                         key={index}
+  //                         style={styles.card}
+  //                         onPress={() =>
+  //                           navigation.navigate('RestuarantDetails', { id: val?.id })
+  //                         }>
+  //                         <Image
+  //                           source={{ uri: `${storageUrl}${val?.image_path}` }}
+  //                           style={styles.cardImg}
+  //                         />
+  //                         <Small color={Color('homeBg')} heading font="bold">
+  //                           {val?.title}
+  //                         </Small>
+  //                         <Small
+  //                           style={{ fontSize: hp('1.2%') }}
+  //                           color={Color('homeBg')}
+  //                           heading
+  //                           font="light">
+  //                           {val?.location}
+  //                         </Small>
+  //                         <TouchableOpacity
+  //                           style={{
+  //                             position: 'absolute',
+  //                             top: hp('1%'),
+  //                             right: hp('1%'),
+  //                             backgroundColor: Color('homeBg'),
+  //                             paddingVertical: hp('0.8%'),
+  //                             paddingHorizontal: hp('0.8%'),
+  //                             borderRadius: hp('1%'),
+  //                           }}
+  //                           onPress={() => bookmark(val?.id)}>
+  //                           <Bookmark
+  //                             size={hp('2%')}
+  //                             color={Color('text')}
+  //                             variant={val?.bookmarked ? 'Bold' : 'Outline'}
+  //                           />
+  //                         </TouchableOpacity>
+  //                       </Pressable>
+  //                     );
+  //                   })}
+  //                   <View style={{ marginVertical: '0', marginHorizontal: 'auto' }} >
+  //                     {isLoading && <ActivityIndicator size={hp('5%')} color={Color('shadow')} />}
+  //                   </View>
+  //                 </View>
+  //               )
+  //             }
+  //             <Br space={10} /> */}
+  //           </Wrapper>
+  //         </View>
+  //       </Background>
+  //       <Navigation navigation={navigation} />
+  //       {/* {
+  //         show && (
+  //           <Model style={{padding: 0}} show={show}>
+  //             <TouchableOpacity style={{position: 'absolute', zIndex: 1, right: hp('1%'), top: hp('1%'), padding: hp('0.5%'), backgroundColor: Color('modelDark'), borderRadius: hp('50%')}} onPress={() => setShow()}>
+  //               <Add
+  //                 size="32"
+  //                 color={Color('text')}
+  //                 style={{ transform: [{ rotate: '135deg' }], alignSelf: 'flex-end' }}
+  //               />
+  //             </TouchableOpacity>
+  //             <Image source={{ uri: `${storageUrl}${show?.path}` }}
+  //               style={{ width: wp('90%'), height: hp('50%') }}
+  //               resizeMode="stretch" />
+  //           </Model>
+  //         )
+  //       } */}
+  //     </>
+  //   );
+  // }
 
   return (
     <>
@@ -464,13 +464,13 @@ const Profile = ({ navigation }) => {
             {/* <Pera color={Color('homeBg')} heading font="bold">
               Tim Recent Views
             </Pera> */}
-            <Br space={1} />
+            {/* <Br space={1} />
             {context?.restuarents?.length === 0 && (
               <Pera style={{ textAlign: 'center' }} color={Color('shadow')}>
                 No Restuarent Found
               </Pera>
-            )}
-            {
+            )} */}
+            {/* {
               isLoaded && (
                 <View
                   style={{
@@ -479,7 +479,7 @@ const Profile = ({ navigation }) => {
                     columnGap: wp('5%'),
                     rowGap: hp('2%'),
                   }}>
-                  {/* {context?.restuarents?.map((val, index) => {
+                  {context?.restuarents?.map((val, index) => {
                     return (
                       <Pressable
                         key={index}
@@ -520,14 +520,14 @@ const Profile = ({ navigation }) => {
                         </TouchableOpacity>
                       </Pressable>
                     );
-                  })} */}
+                  })}
                   <View style={{ marginVertical: '0', marginHorizontal: 'auto' }} >
                     {isLoading && <ActivityIndicator size={hp('5%')} color={Color('shadow')} />}
                   </View>
                 </View>
               )
-            }
-            <Br space={10} />
+            } */}
+            {/* <Br space={10} /> */}
           </Wrapper>
         </View>
       </Background>

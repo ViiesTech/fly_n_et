@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import React, { useEffect,useState } from 'react';
+import { Image, StyleSheet, View, Platform } from 'react-native';
 import Background from '../utils/Background';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Br from '../components/Br';
@@ -12,6 +12,10 @@ import { LoginCurve } from 'iconsax-react-native';
 import { isIOS } from '../utils/global';
 
 const GetStarted = ({ navigation }) => {
+  
+
+
+    
     const lineHeight = hp('8%');
     return (
         <>

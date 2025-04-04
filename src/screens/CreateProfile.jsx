@@ -57,6 +57,7 @@ const validationSchema = Yup.object().shape({
 
 const CreateProfile = ({navigation}) => {
   const typeData = [
+    'None',
     'Single Engine',
     'Beechcraft (the one Rick has)',
     'Cessna',
@@ -160,18 +161,19 @@ const CreateProfile = ({navigation}) => {
       nav();
     });
   };
-  const uploadProfileImage = async bannerImg => {
+  const uploadProfileImage = async () => {
     const result = await launchImageLibrary({
       mediaType: 'photo',
       maxWidth: 300,
       maxHeight: 300,
     });
+    console.log('hhh',result)
     if (result?.assets) {
-      if (bannerImg) {
-        setBanner(result.assets[0]);
-      } else {
-        setProfile(result.assets[0]);
-      }
+      // if (bannerImg) {
+      //   setBanner(result.assets[0]);
+      // } else {
+      // }
+      setProfile(result.assets[0]);
     }
   };
   const clickProfileImage = async bannerImg => {
@@ -182,11 +184,11 @@ const CreateProfile = ({navigation}) => {
       maxHeight: 300,
     });
     if (result?.assets) {
-      if (bannerImg) {
-        setBanner(result.assets[0]);
-      } else {
-        setProfile(result.assets[0]);
-      }
+      // if (bannerImg) {
+      //   setBanner(result.assets[0]);
+      // } else {
+      // }
+      setProfile(result.assets[0]);
     }
   };
   const onCreateProfile = async () => {
@@ -207,7 +209,7 @@ const CreateProfile = ({navigation}) => {
         dob: date_of_birth,
         aircraft_type: type,
         profile_image: profile,
-        banner_image: banner,
+        // banner_image: banner,
       };
 
       const formData = new FormData();
@@ -219,11 +221,11 @@ const CreateProfile = ({navigation}) => {
         type: profile.type,
         name: profile.fileName,
       });
-      formData.append('banner_image', banner ? {
-        uri: banner?.uri,
-        type: banner?.type,
-        name: banner?.fileName,
-      } : null);
+      // formData.append('banner_image', banner ? {
+      //   uri: banner?.uri,
+      //   type: banner?.type,
+      //   name: banner?.fileName,
+      // } : null);
       await validationSchema.validate(obj, {abortEarly: false});
       const res = await api.post('/user/user-info', formData, {
         headers: {
@@ -340,7 +342,7 @@ const CreateProfile = ({navigation}) => {
                   <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly />
                 </TouchableOpacity>
                 <Br space={1} />
-                <Pera heading font="bold">
+                {/* <Pera heading font="bold">
                   Banner Image
                 </Pera>
                 <Br space={1} />
@@ -368,8 +370,8 @@ const CreateProfile = ({navigation}) => {
                     style={{borderRadius: hp('1%')}}
                     readOnly
                   />
-                </TouchableOpacity>
-                <Br space={2} />
+                </TouchableOpacity> */}
+                {/* <Br space={2} /> */}
                 <View
                   style={{
                     marginTop: hp('1%'),

@@ -41,9 +41,9 @@ import axios from 'axios';
 const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 
 const validationSchema = Yup.object().shape({
-  age: Yup.number()
-    .required('Please enter your exact age in years.')
-    .min(18, 'You must be at least 18 years old'),
+  // age: Yup.number()
+  //   .required('Please enter your exact age in years.')
+  //   .min(18, 'You must be at least 18 years old'),
   dob: Yup.string()
     .required('Please enter your date of birth.')
     .matches(
@@ -65,22 +65,23 @@ const validationSchema = Yup.object().shape({
   phone: Yup.string().required(
     'Please enter your valid phone number.',
   ),
-  address: Yup.string().required(
-    'Please enter your full address.',
-  ),
-  bio: Yup.string().required(
-    'Please enter about your self.',
-  ),
+  // address: Yup.string().required(
+  //   'Please enter your full address.',
+  // ),
+  // bio: Yup.string().required(
+  //   'Please enter about your self.',
+  // ),
   user_type: Yup.string().required(
     'Please select atleast one user type!',
   ),
-  operation_time: Yup.string().required(
-    'Please enter your operational time.',
-  ),
+  // operation_time: Yup.string().required(
+  //   'Please enter your operational time.',
+  // ),
 });
 
 const CreateProProfile = ({ navigation }) => {
   const typeData = [
+    'None',
     'Single Engine',
     'Beechcraft (the one Rick has)',
     'Cessna',
@@ -190,6 +191,8 @@ const CreateProProfile = ({ navigation }) => {
     }
   }, [context?.user]);
 
+  console.log('hello',userType)
+
   const nextScreen = nav => {
     Animated.timing(slideAnimation, {
       toValue: hp('100%'),
@@ -214,12 +217,18 @@ const CreateProProfile = ({ navigation }) => {
     }
   };
   const clickProfileImage = async bannerImg => {
+    console.log("sdasadasdas")
     const result = await launchCamera({
       cameraType: 'back',
       mediaType: 'photo',
       maxWidth: 300,
       maxHeight: 300,
-    });
+    }).catch((error)=>{
+      console.log("error", error)
+    })
+
+    console.log("result",result)
+
     if (result?.assets) {
       if (bannerImg) {
         setBanner(result.assets[0]);
@@ -246,32 +255,32 @@ const CreateProProfile = ({ navigation }) => {
         dob: date_of_birth,
         aircraft_type: type,
         profile_image: profile,
-        banner_image: banner,
+        // banner_image: banner,
         phone: phone,
-        address: region,
-        bio: bio,
+        // address: region,
+        // bio: bio,
         user_type: userType,
-        operation_time: time,
+        // operation_time: time,
       };
       const formData = new FormData();
       // formData.append('age', age);
       formData.append('dob', date_of_birth);
       formData.append('aircraft_type', type);
       formData.append('phone', phone);
-      formData.append('address', region);
-      formData.append('bio', bio);
+      // formData.append('address', region);
+      // formData.append('bio', bio);
       formData.append('user_type', userType);
-      formData.append('operation_time', time);
+      // formData.append('operation_time', time);
       formData.append('profile_image', {
         uri: profile.uri,
         type: profile.type,
         name: profile.fileName,
       });
-      formData.append('banner_image', banner ? {
-        uri: banner?.uri,
-        type: banner?.type,
-        name: banner?.fileName,
-      } : null);
+      // formData.append('banner_image', banner ? {
+      //   uri: banner?.uri,
+      //   type: banner?.type,
+      //   name: banner?.fileName,
+      // } : null);
 
       await validationSchema.validate(obj, { abortEarly: false });
       const res = await api.post('/user/user-info', formData, {
@@ -424,25 +433,25 @@ const CreateProProfile = ({ navigation }) => {
                 style={{ borderRadius: hp('1%') }}
                 readOnly
               /> */}
-              <Br space={2} />
+              {/* <Br space={2} />
               <Input
                 defaultValue={location?.locationName}
                 label="Your Address"
                 style={{ borderRadius: hp('1%') }}
                 onChangeText={(text) => setRegion(text)}
-              />
+              /> */}
               <Br space={2} />
               <Input
                 label="Your Phone Number"
                 style={{ borderRadius: hp('1%') }}
                 onChangeText={(text) => setPhone(text)}
               />
-              <Br space={2} />
+              {/* <Br space={2} />
               <Input
                 label="Operational Time"
                 style={{ borderRadius: hp('1%') }}
                 onChangeText={(text) => setTime(text)}
-              />
+              /> */}
               <Br space={1.5} />
               <Pera heading font="bold">
                 Aircraft Type
@@ -460,7 +469,7 @@ const CreateProProfile = ({ navigation }) => {
                 <Input style={{ borderRadius: hp('1%') }} label="Select Type" value={userType} readOnly />
               </TouchableOpacity>
               <Br space={1} />
-              <Pera heading font="bold">
+              {/* <Pera heading font="bold">
                 Banner Image
               </Pera>
               <Br space={1} />
@@ -488,8 +497,8 @@ const CreateProProfile = ({ navigation }) => {
                   style={{ borderRadius: hp('1%') }}
                   readOnly
                 />
-              </TouchableOpacity>
-              <Br space={2} />
+              </TouchableOpacity> */}
+              {/* <Br space={2} />
               <Input
                 label="Enter Bio"
                 style={{ borderRadius: hp('1%'), height: hp('15%') }}
@@ -498,7 +507,7 @@ const CreateProProfile = ({ navigation }) => {
                 inputStyle={{ height: hp('10%'), textVerticalAlign: 'top', verticalAlign: 'top', borderRadius: 0, paddingTop: hp('1%') }}
                 multiline
               />
-              <Br space={2} />
+              <Br space={2} /> */}
               <View
                 style={{
                   marginTop: hp('1%'),

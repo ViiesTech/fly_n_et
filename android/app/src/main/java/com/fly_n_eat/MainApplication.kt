@@ -1,4 +1,4 @@
-package com.fly_eat
+package com.fly_n_eat
 
 import android.app.Application
 import com.facebook.react.PackageList

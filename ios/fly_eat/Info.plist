@@ -6,8 +6,14 @@
 	<string>Grant access to your location to give you the relevant restaurants.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Grant access to your location to give you the relevant restaurants.</string>
+<key>NSCameraUsageDescription</key>
+<string>Grant access to the camera to take a photo for your profile.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Grant access to user to take your photo in order to create your profile.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+<string>We need access to save photos.</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>We need access to your microphone for video recording.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>

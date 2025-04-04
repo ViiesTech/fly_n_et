@@ -1,4 +1,4 @@
-import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {useContext, useState} from 'react';
 import {Color} from '../utils/Colors';
 import {
@@ -45,6 +45,9 @@ const PackageDetail = ({route}) => {
   const data = route?.params?.detail;
   console.log(context?.subscribed_details);
 
+  // console.log("data", data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
+  const priceData = data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice
+
   const TopBar = () => {
     return (
       <View style={styles.topbar}>
@@ -72,6 +75,38 @@ const PackageDetail = ({route}) => {
           {data.packageType === 'ANNUAL'
             ? data?.product?.priceString + ' ' + '/' + ' ' + 'YEAR (SAVE 15%)'
             : data?.product?.priceString + ' ' + '/' + ' ' + 'MONTH'}
+        </Text>
+        </View>
+        {/* </View>   */}
+      </View>
+    );
+  };
+
+  const AndroidTopBar = () => {
+    return (
+      <View style={styles.topbar}>
+          {/* <View style={{width: wp('20%'), alignItems: 'center'}}> */}
+        <TouchableOpacity
+                      style={{
+                        backgroundColor: Color('btnColor'),
+                        width: hp('5%'),
+                        height: hp('5%'),
+                        marginLeft: hp(2.5),
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: hp('50%'),
+                      }}
+                      onPress={() =>  navigation.goBack()}>
+                      <ArrowLeft size={hp('2.5%')} color={Color('text')} />
+                    </TouchableOpacity>
+       <View style={{width: hp('35'),alignItems: 'center'}}>             
+        <Text style={styles.packageStyle}>
+          {data?.name}
+        </Text>
+        <Text style={styles.priceText}>
+          {priceData
+            ? priceData 
+            : priceData }
         </Text>
         </View>
         {/* </View>   */}
@@ -181,6 +216,64 @@ const PackageDetail = ({route}) => {
 
   return (
     <View style={{flex: 1, backgroundColor: Color('text')}}>
+      {
+        Platform.OS == "android" ?
+        <>
+      <Background
+        translucent={false}
+        noScroll={true}
+        statusBarColor={Color('homeBg')}
+        noBackground>
+        <AndroidTopBar />
+        <View style={styles.container}>
+          <Text style={styles.heading}>Package Details</Text>
+          <View
+            style={{
+              flexDirection: 'column',
+              gap: hp(2),
+              paddingTop: hp(3),
+            }}>
+            {packageDetails.map(item => (
+              <View
+                key={item.id}
+                style={{
+                  flexDirection: 'row',
+                  gap: wp(3),
+                }}>
+                <View style={styles.circleView} />
+                <Text style={styles.detail}>{item.text}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </Background>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          marginBottom: hp(7),
+        }}>
+        <Btn
+          loading={loading}
+          label={'Buy Purchase'}
+          onPress={() => onConfirmPurchase()}
+          btnStyle={{backgroundColor: Color('drawerBg'), width: '90%'}}
+        />
+        <Btn
+          label={'Restore Purchases'}
+          onPress={() => onRestorePurchase()}
+          btnStyle={{
+            backgroundColor: Color('drawerBg'),
+            width: '90%',
+            marginTop: hp(1),
+          }}
+        />
+      </View>
+        
+        </>
+        :
+        <>
       <Background
         translucent={false}
         noScroll={true}
@@ -232,6 +325,10 @@ const PackageDetail = ({route}) => {
           }}
         />
       </View>
+        
+        </>
+
+      }
     </View>
   );
 };
