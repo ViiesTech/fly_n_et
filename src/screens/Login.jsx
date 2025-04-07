@@ -50,11 +50,11 @@ const Login = ({ navigation }) => {
     }, [IsFocused]);
 
     useEffect(() => {
-        if (context?.token && context?.isVerified) {
+        if (!context?.skipNavigationCheck && context?.token && context?.isVerified) {
             Toast.show('Login Successfully', Toast.SHORT);
-            console.log('atleast wrk',context?.user?.expired_at)
+            // console.log('atleast wrk',context?.user?.expired_at)
             handlingNavigations()
-        } else if (context?.token && !context?.isVerified) {
+        } else if (!context?.skipNavigationCheck && context?.token && !context?.isVerified) {
             nextScreen(() => navigation.replace('Verify'));
         } 
     }, [context?.token, context?.isVerified]);
@@ -65,53 +65,67 @@ const Login = ({ navigation }) => {
     }, []);
 
     const handlingNavigations = async () => {
-      await getSubscriptionInfo()
-        const expiryDate = context?.user?.expired_at ? new Date(context.user.expired_at) : null;
+        const updatedExpiry = await getSubscriptionInfo();
+        const expiryDate = updatedExpiry
+          ? new Date(updatedExpiry)
+          : context?.user?.expired_at
+            ? new Date(context.user.expired_at)
+            : null;
+      
         const currentDate = new Date();
-            if (!expiryDate  || expiryDate && currentDate > expiryDate) {
-                nextScreen(() => navigation.navigate('Packages'));
-            } else if (context?.user?.user_info) {
-                if (context?.user?.user_info?.address) {
-                    nextScreen(() => navigation.navigate('Home'));
-                } else {
-                    nextScreen(() => navigation.replace('SelectLocation'));
-                }
-            } else {
-                nextScreen(() => navigation.replace('UserType'));
-            }
-    };
+
+        // console.log('hhhhwww',expiryDate)
+      
+        if (!expiryDate || currentDate > expiryDate) {
+            alert('what vbro ')
+          nextScreen(() => navigation.navigate('Packages'));
+        } else if (context?.user?.user_info) {
+          if (context.user.user_info.address) {
+            nextScreen(() => navigation.navigate('Home'));
+          } else {
+            nextScreen(() => navigation.replace('SelectLocation'));
+          }
+        } else {
+          nextScreen(() => navigation.replace('UserType'));
+        }
+        setContext({
+            ...context,
+            skipNavigationCheck: false
+        })
+      };
 
     const getSubscriptionInfo = async () => {
-        if (context?.subscribed_details) {
+        if (!context?.subscribed_details) return null;
+      
         try {
-            // console.log('Purchaser Info:', purchaserInfo);
-
-                const obj = {
-                    sub_type: context?.subscribed_details?.sub_type,
-                    purchase_date: context?.subscribed_details?.purchased_date,
-                }
-                // console.log('hh')
-                      const response = await api.post('user/subscribe', obj, {
-                        headers: {
-                          Authorization: `Bearer ${context?.token}`,
-                        },
-                      });
-                      console.log('hh',response?.data)
-                      if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
-                        setContext(prevContext => ({
-                            ...prevContext,
-                            subscribed_details: null,
-                            user: { ...prevContext.user, expired_at: response.data.user.expired_at },
-                          }));
-                      }
-        } catch (error) {
-            console.error('Error fetching subscription info:', error);
+          const obj = {
+            sub_type: context.subscribed_details.sub_type,
+            purchase_date: context.subscribed_details.purchased_date,
+          };
+      
+          const response = await api.post('user/subscribe', obj, {
+            headers: {
+              Authorization: `Bearer ${context?.token}`,
+            },
+          });
+      
+          if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
+            const updatedExpiry = response.data.user.expired_at;
+            setContext(prev => ({
+              ...prev,
+              subscribed_details: null,
+              user: { ...prev.user, expired_at: updatedExpiry },
+            }));
+      
+            return updatedExpiry; 
+          }
+        } catch (err) {
+          console.error('Error fetching subscription info:', err);
         }
-    }
-
-        // return { subscriptionType: "none", purchaseDate: null };
-    };
-
+      
+        return null;
+      };
+      
     async function requestLocationPermission() {
         try {
             if (Platform.OS === 'android') {

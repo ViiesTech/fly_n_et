@@ -26,7 +26,7 @@ const Home = ({ navigation }) => {
     const { context,setContext } = useContext(DataContext);
     const [location, setLocation] = useState();
 
-    console.log('hhhhhh',context?.user?.expired_at)
+    console.log('why',context?.user?.expired_at)
 
     useEffect(() => {
        if(context?.token) { 

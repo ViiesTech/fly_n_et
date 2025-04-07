@@ -73,17 +73,23 @@ const Packages = () => {
     
 
 
-
-    useEffect(()=>{
-      if(isAndroid){
-        initializeIAP();
-
-        return () => {
-          endConnection();
-        };
-      }
-    },[])
-
+    useEffect(() => {
+      const setup = async () => {
+        const result = await initConnection();
+        console.log("IAP connected?", result);
+        setConnection(result);
+    
+        if (Platform.OS === 'android') {
+          await flushFailedPurchasesCachedAsPendingAndroid();
+        }
+      };
+    
+      setup();
+    
+      return () => {
+        endConnection();
+      };
+    }, []);
 
     
 
@@ -113,16 +119,16 @@ const Packages = () => {
 
 
 
-    const initializeIAP = async () => {
-        try {
-          await initConnection().then(async (value) => {
-            setConnection(value);
-            isAndroid && (await flushFailedPurchasesCachedAsPendingAndroid());
-          });
-        } catch (error) {
-          console.error('Error initializing IAP: ', error);
-        }
-      };
+    // const initializeIAP = async () => {
+    //     try {
+    //       await initConnection().then(async (value) => {
+    //         setConnection(value);
+    //         isAndroid && (await flushFailedPurchasesCachedAsPendingAndroid());
+    //       });
+    //     } catch (error) {
+    //       console.error('Error initializing IAP: ', error);
+    //     }
+    //   };
 
 
 

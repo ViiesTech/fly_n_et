@@ -12,6 +12,7 @@ import {api, note} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import {useNavigation} from '@react-navigation/native';
 import { ArrowLeft } from 'iconsax-react-native';
+import { requestSubscription } from 'react-native-iap';
 
 const packageDetails = [
   {
@@ -43,7 +44,10 @@ const PackageDetail = ({route}) => {
   // const [offering, setOffering] = useState(null);
 
   const data = route?.params?.detail;
-  console.log(context?.subscribed_details);
+  console.log('user expiry',context?.user?.expired_at);
+  console.log('context',context?.subscribed_details)
+
+  // console.log("data",data)
 
   // console.log("data", data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
   const priceData = data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice
@@ -115,66 +119,123 @@ const PackageDetail = ({route}) => {
   };
 
   const onConfirmPurchase = async () => {
+
+
+    
     if (!data) {
       Alert.alert('Error', 'No available package for this plan.');
       setLoading(false);
       return;
     }
 
-    try {
-      setLoading(false);
-      const purchaseMade = await Purchases.purchasePackage(data);
-      setLoading(true);
-
-      // const obj = {
-      //   purchase_date: purchaseMade?.transaction?.purchaseDate,
-      //   sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
-      // };
-
-      // console.log('Purchase data:', obj);
-   
-      if (purchaseMade?.transaction?.purchaseDate && !context?.token) {
-        navigation.navigate('Message', {
-          theme: 'light',
-          title: 'Login Required',
-          message:
-            'To access your subscription benefits, please create or log in to your account',
-          screen: 'Login',
+    if(Platform.OS == 'android'){
+      try {
+        setLoading(false);
+        setContext({
+          ...context,
+          skipNavigationCheck: true
+        })
+        const offerToken = data?.subscriptionOfferDetails[0].offerToken
+        const purchaseData = await requestSubscription({
+          sku: data?.productId,
+          ...(offerToken && {
+            subscriptionOffers: [{ sku: data?.productId, offerToken }],
+          }),
         });
-      } 
-      setContext({
-        ...context,
-        subscribed_details: purchaseMade?.transaction?.purchaseDate && {
-        purchased_date: purchaseMade?.transaction?.purchaseDate,
-        sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
-      }})
-    
+        setLoading(true)
+        const purchase = purchaseData?.[0];
 
-      // const response = await api.post('user/subscribe', obj, {
-      //   headers: {
-      //     Authorization: `Bearer ${context?.token}`,
-      //   },
-      // });
+        if (purchase.transactionDate && !purchase?.isAcknowledgedAndroid) {
+          // return alert('hello')
+          if (!context?.token) {
+            navigation.navigate('Message', {
+              theme: 'light',
+              title: 'Login Required',
+              message:
+                'To access your subscription benefits, please create or log in to your account',
+              screen: 'Login',
+            });
+          }
+        
+          const subType = data?.productId.includes('year') ? 'yearly' : 'monthly';
+          const purchasedDate = new Date(purchase.transactionDate);
+        
+          setContext({
+            ...context,
+            subscribed_details: {
+              purchased_date: purchasedDate,
+              sub_type: subType,
+            },
+            skipNavigationCheck: false
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        setContext({
+          ...context,
+          skipNavigationCheck: false
+        })
+      }
+      setLoading(false)
 
-      // if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
-      //   setContext({
-      //     ...context,
-      //     user: {
-      //       ...context.user,
-      //       expired_at: response.data.user.expired_at,
-      //     },
-      //   });
-      // }
-      // navigation.navigate('Home')
-    } catch (error) {
-      console.log('Error:', error?.response?.data || error?.message);
+    }else{
 
-      if (error?.response?.status === 401) {
-        Alert.alert('Unauthorized', 'Please log in again.');
-      } else {
-        Alert.alert('Error', error?.message || 'Something went wrong');
+      try {
+        setLoading(false);
+        const purchaseMade = await Purchases.purchasePackage(data);
+        setLoading(true);
+  
+        // const obj = {
+        //   purchase_date: purchaseMade?.transaction?.purchaseDate,
+        //   sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
+        // };
+  
+        // console.log('Purchase data:', obj);
+     
+        if (purchaseMade?.transaction?.purchaseDate && !context?.token) {
+          navigation.navigate('Message', {
+            theme: 'light',
+            title: 'Login Required',
+            message:
+              'To access your subscription benefits, please create or log in to your account',
+            screen: 'Login',
+          });
+        } 
+        setContext({
+          ...context,
+          subscribed_details: purchaseMade?.transaction?.purchaseDate && {
+          purchased_date: purchaseMade?.transaction?.purchaseDate,
+          sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
+        }})
+      
+  
+        // const response = await api.post('user/subscribe', obj, {
+        //   headers: {
+        //     Authorization: `Bearer ${context?.token}`,
+        //   },
+        // });
+  
+        // if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
+        //   setContext({
+        //     ...context,
+        //     user: {
+        //       ...context.user,
+        //       expired_at: response.data.user.expired_at,
+        //     },
+        //   });
+        // }
+        // navigation.navigate('Home')
+      } catch (error) {
+        console.log('Error:', error?.response?.data || error?.message);
+  
+        if (error?.response?.status === 401) {
+          Alert.alert('Unauthorized', 'Please log in again.');
+        } else {
+          Alert.alert('Error', error?.message || 'Something went wrong');
+        }
       }
     }
+
     setLoading(false);
   };
 

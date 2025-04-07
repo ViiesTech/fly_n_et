@@ -18,6 +18,7 @@ export const AppContext = ({ children }) => {
         serviceImages: null,
         returnFromDetail: false,
         subscribed_details: null,
+        skipNavigationCheck: false
         // isHome: false,
         // isPoint: false,
     });
