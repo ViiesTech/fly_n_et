@@ -189,7 +189,6 @@ const SelectLocation = ({navigation, route}) => {
       });
   };
 
-
   if (!location) {
     return <></>;
   }

@@ -8,11 +8,13 @@ import {
 import Background from '../utils/Background';
 import Btn from '../utils/Btn';
 import Purchases from 'react-native-purchases';
-import {api, note} from '../utils/api';
+import {api, baseUrl, note} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import {useNavigation} from '@react-navigation/native';
 import { ArrowLeft } from 'iconsax-react-native';
 import { getAvailablePurchases, requestSubscription } from 'react-native-iap';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const packageDetails = [
   {
@@ -41,6 +43,9 @@ const PackageDetail = ({route}) => {
   const [loading, setLoading] = useState(false);
   const {context, setContext} = useContext(DataContext);
   const navigation = useNavigation();
+
+
+  console.log("context",context)
   // const [offering, setOffering] = useState(null);
 
   const data = route?.params?.detail;
@@ -155,6 +160,13 @@ const PackageDetail = ({route}) => {
                 'To access your subscription benefits, please create or log in to your account',
               screen: 'Login',
             });
+          }else{
+            if(context.token){
+              
+              console.log("going in navigatii func")
+              await handlingNavigations()
+              return
+            }
           }
         
           const subType = data?.productId.includes('year') ? 'yearly' : 'monthly';
@@ -202,7 +214,14 @@ const PackageDetail = ({route}) => {
               'To access your subscription benefits, please create or log in to your account',
             screen: 'Login',
           });
-        } 
+        }else{
+          if(context.token){
+            setLoading(false);
+            console.log("going in navigatii func")
+            await handlingNavigations()
+            return
+          }
+        }
         setContext({
           ...context,
           subscribed_details: purchaseMade?.transaction?.purchaseDate && {
@@ -210,23 +229,6 @@ const PackageDetail = ({route}) => {
           sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
         }})
       
-  
-        // const response = await api.post('user/subscribe', obj, {
-        //   headers: {
-        //     Authorization: `Bearer ${context?.token}`,
-        //   },
-        // });
-  
-        // if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
-        //   setContext({
-        //     ...context,
-        //     user: {
-        //       ...context.user,
-        //       expired_at: response.data.user.expired_at,
-        //     },
-        //   });
-        // }
-        // navigation.navigate('Home')
       } catch (error) {
         console.log('Error:', error?.response?.data || error?.message);
   
@@ -237,16 +239,7 @@ const PackageDetail = ({route}) => {
         }
       }
     }
-
     
-  
-   
-    
-    if(context.token){
-      setLoading(false);
-      console.log("going in navigatii func")
-      await handlingNavigations()
-    }
   };
 
   const onRestorePurchase = async () => {
@@ -321,38 +314,53 @@ const PackageDetail = ({route}) => {
 
 
   const handlingNavigations = async () => {
-    const updatedExpiry = await getSubscriptionInfo();
 
-    console.log("updatedExpiry",updatedExpiry)
+    const androidsubtype = data.subscriptionOfferDetails[0].basePlanId == "year" ? "yearly" : "monthly"
+    const iosSubType = data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly'
 
+    let datatoBeAppend = new FormData();
+    datatoBeAppend.append('sub_type', Platform.OS == "android" ? androidsubtype : iosSubType);
 
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `${baseUrl}/user/subscribe`,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        Authorization: `Bearer ${context.token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      data: datatoBeAppend,
+    };
 
-    const expiryDate = updatedExpiry
-      ? new Date(updatedExpiry)
-      : context?.user?.expired_at
-        ? new Date(context.user.expired_at)
-        : null;
-  
-    const currentDate = new Date();
+    axios
+      .request(config)
+      .then(async (response) => {
+        const updatedExpiry = response?.data?.user?.expired_at;
+        if (updatedExpiry) {
+          if (context?.token) {
+              await AsyncStorage.setItem('token', context?.token);
+              await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+              await AsyncStorage.setItem('user', JSON.stringify(response?.data?.user));
 
-    // console.log('hhhhwww',expiryDate)
-  
-    if (!expiryDate || currentDate > expiryDate) {
-  
-       navigation.navigate('Packages')
-    } else if (context?.user?.user_info) {
-      if (context.user.user_info.address) {
-        navigation.navigate('Home')
-      } else {
-        navigation.replace('SelectLocation')
-      }
-    } else {
-      navigation.replace('UserType')
-    }
-    setContext({
-        ...context,
-        skipNavigationCheck: false
-    })
+            setContext({
+              ...context,
+              token: context?.token,
+              isVerified: true,
+              user: response?.data?.user,
+            });
+            setLoading(false);
+            navigation.navigate('Home');
+          }else{
+            setLoading(false);
+          }
+
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        setLoading(false);
+      });
   };
 
    const nextScreen = (nav) => {
@@ -364,45 +372,12 @@ const PackageDetail = ({route}) => {
               nav();
           });
       };
+
+
   
 
 
-      const getSubscriptionInfo = async () => {
-        
-
-
-        if (!context?.subscribed_details) return null;
-   
-        try {
-          const obj = {
-            sub_type: context.subscribed_details.sub_type,
-            purchase_date: context.subscribed_details.purchased_date,
-          };
-          const response = await api.post('user/subscribe', obj, {
-            headers: {
-              Authorization: `Bearer ${context?.token}`,
-            },
-          });
-          console.log("response<><><><><><><><><><><><",response)
-
-            
-            console.log("Animated",response?.data?.status, response?.data?.user?.expired_at)
-            if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
-              const updatedExpiry = response.data.user.expired_at;
-              setContext(prev => ({
-                ...prev,
-                subscribed_details: null,
-                user: { ...prev.user, expired_at: updatedExpiry },
-              }));
-        
-              return updatedExpiry; 
-            }
-          } catch (err) {
-            console.error('Error fetching subscription info:', err);
-          }
-        
-          return null;
-        };
+ 
 
   return (
     <View style={{flex: 1, backgroundColor: Color('text')}}>

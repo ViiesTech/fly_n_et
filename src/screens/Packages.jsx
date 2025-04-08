@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Platform,
   SafeAreaView,
   StyleSheet,
@@ -28,7 +29,7 @@ import {
   Subscription,
 } from 'react-native-iap';
 import AndroidPackageCard from '../components/AndroidPackageCard';
-import {baseUrl} from '../utils/api';
+import {baseUrl, note} from '../utils/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -60,6 +61,7 @@ const Packages = () => {
 
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [PremiumCode, setPremiumCode] = useState("");
+  const [codeLoader, setCodeLoader] = useState(false)
 
   // const routes = navigation.getState().routes;
   // const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
@@ -127,8 +129,13 @@ const Packages = () => {
   };
 
   const SumbitPremiumCode = () => {
+    if(PremiumCode == ""){
+      return note("Enter Code", "Please enter the code to verify your access to the app.")
+      
+    }
+    setCodeLoader(true)
     let data = new FormData();
-    data.append('code', 'X6RgzCXb');
+    data.append('code', PremiumCode);
 
     let config = {
       method: 'post',
@@ -148,11 +155,16 @@ const Packages = () => {
         if (response.status) {
           console.log(JSON.stringify(response.data));
           subscibeForMonth();
+          
         } else {
           console.log('code is wrong');
+          setCodeLoader(false)
+          note("Wrong Code", "Please enter correct code.")
         }
       })
       .catch(error => {
+        setCodeLoader(false)
+        note("Wrong Code", "Please enter correct code.")
         console.log(error);
       });
   };
@@ -179,13 +191,14 @@ const Packages = () => {
       axios
         .request(config)
         .then(async (response) => {
+          setCodeLoader(false)
           const updatedExpiry = response?.data?.user?.expired_at;
           if (updatedExpiry) {
             if (context?.token) {
                 await AsyncStorage.setItem('token', context?.token);
                 await AsyncStorage.setItem('isVerified', JSON.stringify(true));
                 await AsyncStorage.setItem('user', JSON.stringify(response?.data?.user));
-  
+                setCodeLoader(false)
               setContext({
                 ...context,
                 token: context?.token,
@@ -194,13 +207,14 @@ const Packages = () => {
               });
               navigation.navigate('Home');
             }else{
-              
+              setCodeLoader(false)
             }
-  
+            setCodeLoader(false)
           }
         })
         .catch(error => {
           console.log(error);
+          setCodeLoader(false)
         });
     
 
@@ -353,6 +367,23 @@ const Packages = () => {
               value={PremiumCode}
             />
 
+            {
+              codeLoader == true ?
+
+              <View style={{
+                height: hp(7),
+                backgroundColor: Color('drawerBg'),
+                width: wp(85),
+                alignSelf: 'center',
+                borderRadius: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: hp(5),
+              }}>
+
+              <ActivityIndicator size={'small'} style={{alignSelf:'center'}} color={'#FFFFFF'}/>
+              </View>
+              :
             <TouchableOpacity
               onPress={() => SumbitPremiumCode()}
               style={{
@@ -365,11 +396,13 @@ const Packages = () => {
                 justifyContent: 'center',
                 marginTop: hp(5),
               }}>
+                
               <Text
                 style={{color: '#FFFFFF', fontSize: 20, fontWeight: 'bold'}}>
                 Submit
               </Text>
             </TouchableOpacity>
+            }
 
             <TouchableOpacity
               onPress={() => setShowPremiumModal(false)}

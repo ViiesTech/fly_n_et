@@ -26,16 +26,40 @@ const Home = ({ navigation }) => {
     const { context,setContext } = useContext(DataContext);
     const [location, setLocation] = useState();
 
-    console.log('why',context?.user?.expired_at)
+
+    const Latitude = context?.user?.latitude
+    const longitude = context?.user?.longitude
+
+
+    
 
     useEffect(() => {
        if(context?.token) { 
         requestLocationPermission();
         // getSubscriptionInfo();
+        convertLatLngToAddr()
     }
     }, []);
 
 
+    const convertLatLngToAddr = async() => {
+        const response = await axios.get(
+                  `https://maps.googleapis.com/maps/api/geocode/json?latlng=${Latitude},${longitude}&key=${API_KEY}`,
+                );
+                const data = response?.data;
+                const locationName = data?.results[0]?.formatted_address;
+
+
+
+                setLocation({
+                    latitude: Latitude,
+                    longitude: longitude,
+                    latitudeDelta: 0.0421,
+                    longitudeDelta: 0.0421,
+                    locationName: locationName,
+                });
+        
+    }
        
     
 
@@ -44,6 +68,8 @@ const Home = ({ navigation }) => {
         const response = await axios.get(BASE_URL);
         await AsyncStorage.setItem('locationDetails', JSON.stringify(response.data?.result?.geometry?.location));
     };
+
+
     const onSelectLocation = async (value) => {
         await AsyncStorage.setItem('selectLocation', JSON.stringify(value));
         getLocation(value?.place_id);
@@ -77,21 +103,28 @@ const Home = ({ navigation }) => {
         Geolocation.getCurrentPosition(async (pos) => {
             const crd = pos.coords;
 
+            console.log("crd")
+
             const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`);
             const data = response?.data;
             const locationName = data?.results[0]?.formatted_address;
+            if(locationName){
 
-            setLocation({
-                latitude: crd?.latitude,
-                longitude: crd?.longitude,
-                latitudeDelta: 0.0421,
-                longitudeDelta: 0.0421,
-                locationName: locationName,
-            });
+                setLocation({
+                    latitude: crd?.latitude,
+                    longitude: crd?.longitude,
+                    latitudeDelta: 0.0421,
+                    longitudeDelta: 0.0421,
+                    locationName: locationName,
+                });
+            }else{
+                convertLatLngToAddr()
+            }
         }, (err) => {
             console.log(err);
         });
     }
+
     const TopBar = () => {
         return (
             <View style={styles.topbar}>
