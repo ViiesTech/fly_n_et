@@ -53,6 +53,8 @@ const SelectLocation = ({navigation, route}) => {
       timeout: 20000,
       maximumAge: 10000,
     });
+
+
     Geolocation.getCurrentPosition(
       async pos => {
         const crd = pos.coords;
@@ -187,6 +189,7 @@ const SelectLocation = ({navigation, route}) => {
       });
   };
 
+
   if (!location) {
     return <></>;
   }
@@ -205,10 +208,12 @@ const SelectLocation = ({navigation, route}) => {
         initialRegion={{
           latitude: location?.latitude,
           longitude: location?.longitude,
+          // latitude: 40.730610,
+          // longitude: -73.935242,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
-        style={{...StyleSheet.absoluteFillObject, flex: 1}}
+        style={{...StyleSheet.absoluteFillObject, flex: 1,}}
         zoomLevel={12}
         mapType="standard"
         onPress={e => {

@@ -1,4 +1,4 @@
-import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   heightPercentageToDP as hp,
@@ -134,6 +134,7 @@ const Packages = () => {
 
 
   return (
+    <SafeAreaView style={{flex:1, }}>
     <Background noScroll={true} translucent={true} statusBarColor={Color('text')} noBackground>
       <View style={styles.container}>
         <View
@@ -198,6 +199,7 @@ const Packages = () => {
         </View>
       </View>
     </Background>
+    </SafeAreaView>
   );
 };
 
@@ -206,7 +208,7 @@ export default Packages;
 const styles = StyleSheet.create({
   container: {
     padding: hp(1),
-    paddingTop: 0,
+    paddingTop: Platform.OS == "android" ? 60 : 0,
   },
   heading: {
     color: 'black',

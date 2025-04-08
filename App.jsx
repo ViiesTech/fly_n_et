@@ -86,10 +86,11 @@ function App() {
   return (
     <>
       <AppContext>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{
+        <NavigationContainer > 
+          <Stack.Navigator  screenOptions={{
             headerShown: false,
             animation: 'fade_from_bottom',
+            
           }}>
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="Logout" component={Logout} />

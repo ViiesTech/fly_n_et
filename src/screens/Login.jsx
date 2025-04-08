@@ -77,7 +77,7 @@ const Login = ({ navigation }) => {
         // console.log('hhhhwww',expiryDate)
       
         if (!expiryDate || currentDate > expiryDate) {
-            alert('what vbro ')
+            
           nextScreen(() => navigation.navigate('Packages'));
         } else if (context?.user?.user_info) {
           if (context.user.user_info.address) {
@@ -108,6 +108,8 @@ const Login = ({ navigation }) => {
               Authorization: `Bearer ${context?.token}`,
             },
           });
+
+          console.log("sdasdad.......................................................", response.data)
       
           if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
             const updatedExpiry = response.data.user.expired_at;
