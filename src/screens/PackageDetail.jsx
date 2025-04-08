@@ -492,6 +492,8 @@ const PackageDetail = ({route}) => {
           </View>
         </View>
       </Background>
+
+      
       <View
         style={{
           flex: 1,

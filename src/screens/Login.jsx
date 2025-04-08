@@ -109,7 +109,6 @@ const Login = ({ navigation }) => {
             },
           });
 
-          console.log("sdasdad.......................................................", response.data)
       
           if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
             const updatedExpiry = response.data.user.expired_at;
@@ -193,12 +192,13 @@ const Login = ({ navigation }) => {
 
             await validationSchema.validate(obj, { abortEarly: false });
             const res = await api.post('/user/login', obj);
-            console.log('login responsne',res?.data)
+
             if (true) {
                 await AsyncStorage.setItem('token', res?.data?.token);
                 await AsyncStorage.setItem('isVerified', res?.data?.verified);
                 await AsyncStorage.setItem('user', JSON.stringify(res?.data?.user));
             }
+            
             setContext({
                 ...context,
                 token: res?.data?.token,
