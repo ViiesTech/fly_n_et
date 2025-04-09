@@ -194,7 +194,7 @@ const Feedback = ({navigation,route}) => {
     );
   }
 
-  console.log('hello world',imageUri)
+  // console.log('hello world',imageUri)
 
 
 

@@ -151,7 +151,7 @@ const Map = ({navigation, route}) => {
     majorAxis,
     minorAxis,
   );
-  console.log('elipse coordinates',ellipseCoordinates)
+  // console.log('elipse coordinates',ellipseCoordinates)
 
   const calculateNewCircle = (circle1, circle2, radius1, radius2) => {
     // return console.log('value from function',circle1,circle2,radius1,radius2)
@@ -202,7 +202,7 @@ const Map = ({navigation, route}) => {
   // console.log('New Circle Center:', newCircleCenter);
   // console.log('New Circle Radius:', newRadius);
 
-  console.log('hello world', route?.params?.restaurants);
+  // console.log('hello world', route?.params?.restaurants);
 
   // Create a refs object for each marker
   const markerRefs = useRef({});
