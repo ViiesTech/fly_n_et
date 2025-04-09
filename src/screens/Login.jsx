@@ -21,7 +21,7 @@ import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import Purchases from 'react-native-purchases';
 
-const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
+const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 const validationSchema = Yup.object().shape({
     email: Yup.string()
         .required('Please enter your valid email address to login.')
@@ -77,7 +77,7 @@ const Login = ({ navigation }) => {
         // console.log('hhhhwww',expiryDate)
       
         if (!expiryDate || currentDate > expiryDate) {
-            alert('what vbro ')
+            
           nextScreen(() => navigation.navigate('Packages'));
         } else if (context?.user?.user_info) {
           if (context.user.user_info.address) {
@@ -108,6 +108,7 @@ const Login = ({ navigation }) => {
               Authorization: `Bearer ${context?.token}`,
             },
           });
+
       
           if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
             const updatedExpiry = response.data.user.expired_at;
@@ -191,12 +192,13 @@ const Login = ({ navigation }) => {
 
             await validationSchema.validate(obj, { abortEarly: false });
             const res = await api.post('/user/login', obj);
-            console.log('login responsne',res?.data)
+
             if (true) {
                 await AsyncStorage.setItem('token', res?.data?.token);
                 await AsyncStorage.setItem('isVerified', res?.data?.verified);
                 await AsyncStorage.setItem('user', JSON.stringify(res?.data?.user));
             }
+
             setContext({
                 ...context,
                 token: res?.data?.token,

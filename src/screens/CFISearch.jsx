@@ -38,7 +38,7 @@ import {api, errHandler, storageUrl} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import {calcCrow, capitalize} from '../utils/global';
 
-const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
+const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 
 const CFISearch = ({navigation}) => {
   const {context, setContext} = useContext(DataContext);
@@ -109,12 +109,13 @@ const CFISearch = ({navigation}) => {
     Geolocation.getCurrentPosition(
       async pos => {
         const crd = pos.coords;
+        
 
         const response = await axios.get(
           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`,
         );
         const data = response.data;
-        const locationName = data.results[0].formatted_address;
+        const locationName = data?.results[0]?.formatted_address;
         setLocation({
           latitude: crd.latitude,
           longitude: crd.longitude,

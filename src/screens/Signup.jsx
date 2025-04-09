@@ -27,7 +27,7 @@ import axios from 'axios';
 import {Color} from '../utils/Colors';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
-const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
+const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 const validationSchema = Yup.object().shape({
   name: Yup.string()
     .required('Please enter your full name to register.')

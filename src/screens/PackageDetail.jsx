@@ -1,4 +1,4 @@
-import {Alert, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, Platform, StyleSheet, Text, TouchableOpacity, View, Animated} from 'react-native';
 import React, {useContext, useState} from 'react';
 import {Color} from '../utils/Colors';
 import {
@@ -8,11 +8,13 @@ import {
 import Background from '../utils/Background';
 import Btn from '../utils/Btn';
 import Purchases from 'react-native-purchases';
-import {api, note} from '../utils/api';
+import {api, baseUrl, note} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import {useNavigation} from '@react-navigation/native';
 import { ArrowLeft } from 'iconsax-react-native';
-import { requestSubscription } from 'react-native-iap';
+import { getAvailablePurchases, requestSubscription } from 'react-native-iap';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const packageDetails = [
   {
@@ -41,6 +43,9 @@ const PackageDetail = ({route}) => {
   const [loading, setLoading] = useState(false);
   const {context, setContext} = useContext(DataContext);
   const navigation = useNavigation();
+
+
+  console.log("context",context)
   // const [offering, setOffering] = useState(null);
 
   const data = route?.params?.detail;
@@ -117,11 +122,11 @@ const PackageDetail = ({route}) => {
       </View>
     );
   };
-
+  console.log("cot..........,.,.,", context?.token)
   const onConfirmPurchase = async () => {
 
 
-    
+
     if (!data) {
       Alert.alert('Error', 'No available package for this plan.');
       setLoading(false);
@@ -155,6 +160,13 @@ const PackageDetail = ({route}) => {
                 'To access your subscription benefits, please create or log in to your account',
               screen: 'Login',
             });
+          }else{
+            if(context.token){
+              
+              console.log("going in navigatii func")
+              await handlingNavigations()
+              return
+            }
           }
         
           const subType = data?.productId.includes('year') ? 'yearly' : 'monthly';
@@ -168,6 +180,8 @@ const PackageDetail = ({route}) => {
             },
             skipNavigationCheck: false
           });
+
+      
         }
       } catch (error) {
         console.log(error);
@@ -200,7 +214,14 @@ const PackageDetail = ({route}) => {
               'To access your subscription benefits, please create or log in to your account',
             screen: 'Login',
           });
-        } 
+        }else{
+          if(context.token){
+            setLoading(false);
+            console.log("going in navigatii func")
+            await handlingNavigations()
+            return
+          }
+        }
         setContext({
           ...context,
           subscribed_details: purchaseMade?.transaction?.purchaseDate && {
@@ -208,23 +229,6 @@ const PackageDetail = ({route}) => {
           sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
         }})
       
-  
-        // const response = await api.post('user/subscribe', obj, {
-        //   headers: {
-        //     Authorization: `Bearer ${context?.token}`,
-        //   },
-        // });
-  
-        // if (response?.data?.status === 'success' && response?.data?.user?.expired_at) {
-        //   setContext({
-        //     ...context,
-        //     user: {
-        //       ...context.user,
-        //       expired_at: response.data.user.expired_at,
-        //     },
-        //   });
-        // }
-        // navigation.navigate('Home')
       } catch (error) {
         console.log('Error:', error?.response?.data || error?.message);
   
@@ -235,11 +239,42 @@ const PackageDetail = ({route}) => {
         }
       }
     }
-
-    setLoading(false);
+    
   };
 
   const onRestorePurchase = async () => {
+
+    if(Platform.OS == "android"){
+
+      try {
+
+        // const purchases = await RNIap.getAvailablePurchases();
+        const purchases = await getAvailablePurchases();
+        console.log("purchases",purchases);// get current available purchases
+
+        if(purchases.length > 0){
+
+          navigation.navigate('Message', {
+            theme: 'light',
+            title: 'Login Required',
+            message:
+              'To access your subscription benefits, please create or log in to your account',
+            screen: 'Login',
+          });
+
+        }else{
+          note(
+            'Please buy the subscription',
+            'You have to buy the subscription first to continue',
+          );
+        }
+   
+      } catch (e) {
+        console.error('Failed to restore purchases:', e);
+      }
+      
+      
+    }else{
     try {
       const customerInfo = await Purchases.restorePurchases();
       console.log('restore', customerInfo.entitlements.active);
@@ -273,7 +308,76 @@ const PackageDetail = ({route}) => {
     } catch (e) {
       console.error('Failed to restore purchases:', e);
     }
+      
+  }
   };
+
+
+  const handlingNavigations = async () => {
+
+    const androidsubtype = data.subscriptionOfferDetails[0].basePlanId == "year" ? "yearly" : "monthly"
+    const iosSubType = data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly'
+
+    let datatoBeAppend = new FormData();
+    datatoBeAppend.append('sub_type', Platform.OS == "android" ? androidsubtype : iosSubType);
+
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `${baseUrl}/user/subscribe`,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        Authorization: `Bearer ${context.token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      data: datatoBeAppend,
+    };
+
+    axios
+      .request(config)
+      .then(async (response) => {
+        const updatedExpiry = response?.data?.user?.expired_at;
+        if (updatedExpiry) {
+          if (context?.token) {
+              await AsyncStorage.setItem('token', context?.token);
+              await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+              await AsyncStorage.setItem('user', JSON.stringify(response?.data?.user));
+
+            setContext({
+              ...context,
+              token: context?.token,
+              isVerified: true,
+              user: response?.data?.user,
+            });
+            setLoading(false);
+            navigation.navigate('Home');
+          }else{
+            setLoading(false);
+          }
+
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        setLoading(false);
+      });
+  };
+
+   const nextScreen = (nav) => {
+          Animated.timing(slideAnimation, {
+              toValue: hp('100%'),
+              duration: 1000,
+              useNativeDriver: true,
+          }).start(() => {
+              nav();
+          });
+      };
+
+
+  
+
+
+ 
 
   return (
     <View style={{flex: 1, backgroundColor: Color('text')}}>
@@ -363,6 +467,8 @@ const PackageDetail = ({route}) => {
           </View>
         </View>
       </Background>
+
+      
       <View
         style={{
           flex: 1,
