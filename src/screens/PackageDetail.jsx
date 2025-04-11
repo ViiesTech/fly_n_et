@@ -52,10 +52,12 @@ const PackageDetail = ({route}) => {
   console.log('user expiry',context?.user?.expired_at);
   console.log('context',context?.subscribed_details)
 
+   const isAndroid = Platform.OS === 'android'; 
+
   // console.log("data",data)
 
   // console.log("data", data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
-  const priceData = data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice
+  const priceData = isAndroid && data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice
 
   const TopBar = () => {
     return (

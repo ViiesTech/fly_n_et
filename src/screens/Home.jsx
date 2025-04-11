@@ -30,7 +30,7 @@ const Home = ({ navigation }) => {
     const Latitude = context?.user?.latitude
     const longitude = context?.user?.longitude
 
-
+        console.log('helo3r',context?.user?.user_info?.address)
     
 
     useEffect(() => {
@@ -49,7 +49,7 @@ const Home = ({ navigation }) => {
                 const data = response?.data;
                 const locationName = data?.results[0]?.formatted_address;
 
-
+                console.log(locationName)
 
                 setLocation({
                     latitude: Latitude,
@@ -108,6 +108,8 @@ const Home = ({ navigation }) => {
             const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`);
             const data = response?.data;
             const locationName = data?.results[0]?.formatted_address;
+
+            console.log(locationName)
             if(locationName){
 
                 setLocation({
@@ -144,12 +146,12 @@ const Home = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
                 <View style={{ width: wp('60%'), alignItems: 'center' }}>
-                   {context?.token && context?.user?.user_info?.address &&
+                   {context?.token && 
                    <>
                     <Small heading font="medium">Current Location</Small>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>
                         <Loc size={hp('2%')} color={Color('text')} />
-                        <Small heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address}</Small>
+                        <Small heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address || location?.locationName}</Small>
                     </View>
                     </>
                     }

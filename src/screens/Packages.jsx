@@ -360,7 +360,9 @@ const Packages = () => {
                 borderRadius: 100,
                 paddingHorizontal: 10,
                 marginTop: hp(4),
+                minHeight: hp(5)
               }}
+              
               onChangeText={(txt)=> {
                 setPremiumCode(txt)
               }}
