@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   Alert,
   Animated,
@@ -9,6 +9,7 @@ import {
   PermissionsAndroid,
   Platform,
   ScrollView,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -17,23 +18,23 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import { H5, Pera, Small } from '../utils/Text';
+import {H5, Pera, Small} from '../utils/Text';
 import Br from '../components/Br';
 import Btn from '../utils/Btn';
 import Background from '../utils/Background';
-import { capitalize, drawerInner, drawerStyle } from '../utils/global';
+import {capitalize, drawerInner, drawerStyle} from '../utils/global';
 import Input from '../components/Input';
-import { useIsFocused } from '@react-navigation/native';
-import { Color } from '../utils/Colors';
+import {useIsFocused} from '@react-navigation/native';
+import {Color} from '../utils/Colors';
 import RadioBtn from '../components/RadioBtn';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { Add } from 'iconsax-react-native';
-import { DataContext } from '../utils/Context';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {Add} from 'iconsax-react-native';
+import {DataContext} from '../utils/Context';
 import DOB from '../components/DOB';
 import Model from '../components/Model';
 import * as Yup from 'yup';
 import moment from 'moment';
-import { api, errHandler, note } from '../utils/api';
+import {api, errHandler, note} from '../utils/api';
 import Geolocation from '@react-native-community/geolocation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -62,24 +63,20 @@ const validationSchema = Yup.object().shape({
     'Please select the aircraft type from the dropdown.',
   ),
   profile_image: Yup.object().required('Please upload your profile image.'),
-  phone: Yup.string().required(
-    'Please enter your valid phone number.',
-  ),
+  phone: Yup.string().required('Please enter your valid phone number.'),
   // address: Yup.string().required(
   //   'Please enter your full address.',
   // ),
   // bio: Yup.string().required(
   //   'Please enter about your self.',
   // ),
-  user_type: Yup.string().required(
-    'Please select atleast one user type!',
-  ),
+  user_type: Yup.string().required('Please select atleast one user type!'),
   // operation_time: Yup.string().required(
   //   'Please enter your operational time.',
   // ),
 });
 
-const CreateProProfile = ({ navigation }) => {
+const CreateProProfile = ({navigation}) => {
   const typeData = [
     'None',
     'Single Engine',
@@ -132,7 +129,7 @@ const CreateProProfile = ({ navigation }) => {
     'Flight Design',
   ];
 
-  const { context, setContext } = useContext(DataContext);
+  const {context, setContext} = useContext(DataContext);
   const IsFocused = useIsFocused();
   const [slideAnimation] = useState(new Animated.Value(hp('100%')));
   const [profile, setProfile] = useState(null);
@@ -191,7 +188,7 @@ const CreateProProfile = ({ navigation }) => {
     }
   }, [context?.user]);
 
-  console.log('hello',userType)
+  console.log('hello', userType);
 
   const nextScreen = nav => {
     Animated.timing(slideAnimation, {
@@ -217,17 +214,17 @@ const CreateProProfile = ({ navigation }) => {
     }
   };
   const clickProfileImage = async bannerImg => {
-    console.log("sdasadasdas")
+    console.log('sdasadasdas');
     const result = await launchCamera({
       cameraType: 'back',
       mediaType: 'photo',
       maxWidth: 300,
       maxHeight: 300,
-    }).catch((error)=>{
-      console.log("error", error)
-    })
+    }).catch(error => {
+      console.log('error', error);
+    });
 
-    console.log("result",result)
+    console.log('result', result);
 
     if (result?.assets) {
       if (bannerImg) {
@@ -282,7 +279,7 @@ const CreateProProfile = ({ navigation }) => {
       //   name: banner?.fileName,
       // } : null);
 
-      await validationSchema.validate(obj, { abortEarly: false });
+      await validationSchema.validate(obj, {abortEarly: false});
       const res = await api.post('/user/user-info', formData, {
         headers: {
           Authorization: `Bearer ${context?.token}`,
@@ -316,7 +313,7 @@ const CreateProProfile = ({ navigation }) => {
           {
             title: 'Fly n Eat',
             message: 'Fly n Eat App access to your location',
-          }
+          },
         );
 
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
@@ -334,40 +331,49 @@ const CreateProProfile = ({ navigation }) => {
   }
 
   async function getLocation() {
-    Geolocation.setRNConfiguration({ enableHighAccuracy: false, timeout: 20000, maximumAge: 10000 });
-    Geolocation.getCurrentPosition(async (pos) => {
-      const crd = pos.coords;
-
-      const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`);
-      const data = response?.data;
-      const locationName = data?.results[0]?.formatted_address;
-
-      setLocation({
-        latitude: crd?.latitude,
-        longitude: crd?.longitude,
-        latitudeDelta: 0.0421,
-        longitudeDelta: 0.0421,
-        locationName: locationName,
-      });
-    }, (err) => {
-      console.log(err);
+    Geolocation.setRNConfiguration({
+      enableHighAccuracy: false,
+      timeout: 20000,
+      maximumAge: 10000,
     });
+    Geolocation.getCurrentPosition(
+      async pos => {
+        const crd = pos.coords;
+
+        const response = await axios.get(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`,
+        );
+        const data = response?.data;
+        const locationName = data?.results[0]?.formatted_address;
+
+        setLocation({
+          latitude: crd?.latitude,
+          longitude: crd?.longitude,
+          latitudeDelta: 0.0421,
+          longitudeDelta: 0.0421,
+          locationName: locationName,
+        });
+      },
+      err => {
+        console.log(err);
+      },
+    );
   }
   return (
     <>
       <Background translucent={false} statusBarColor={Color('drawerBg')}>
-        <View style={{ height: hp('97%'), justifyContent: 'space-between' }}>
+        <View style={{height: hp('97%'), justifyContent: 'space-between'}}>
           <Animated.View
             style={[
-              { transform: [{ translateY: slideAnimation }], zIndex: 100 },
+              {transform: [{translateY: slideAnimation}], zIndex: 100},
               drawerStyle,
             ]}>
-            <ScrollView style={[drawerInner, { zIndex: 1, height: null }]}>
-              <H5 style={{ textAlign: 'center' }} heading font="bold">
+            <ScrollView style={[drawerInner, {zIndex: 1, height: null}]}>
+              <H5 style={{textAlign: 'center'}} heading font="bold">
                 Signup Pro User
               </H5>
               <Br space={0.5} />
-              <Small style={{ textAlign: 'center' }} font="light">
+              <Small style={{textAlign: 'center'}} font="light">
                 Enter your details!
               </Small>
               <Br space={3} />
@@ -403,9 +409,9 @@ const CreateProProfile = ({ navigation }) => {
                       'Select an Option',
                       'Do you want to upload an image or click one from the camera?',
                       [
-                        { text: 'Cancel' },
-                        { text: 'Camera', onPress: () => clickProfileImage() },
-                        { text: 'Upload', onPress: () => uploadProfileImage() },
+                        {text: 'Cancel'},
+                        {text: 'Camera', onPress: () => clickProfileImage()},
+                        {text: 'Upload', onPress: () => uploadProfileImage()},
                       ],
                     );
                   }}>
@@ -413,14 +419,14 @@ const CreateProProfile = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
               <Br space={1} />
-              <Pera heading font="bold" style={{ textAlign: 'center' }}>
+              <Pera heading font="bold" style={{textAlign: 'center'}}>
                 {capitalize(context?.user?.name)}
               </Pera>
               <Small
                 color={Color('lightText')}
                 heading
                 font="regular"
-                style={{ textAlign: 'center' }}>
+                style={{textAlign: 'center'}}>
                 {context?.user?.email}
               </Small>
               <Br space={5} />
@@ -443,8 +449,8 @@ const CreateProProfile = ({ navigation }) => {
               <Br space={2} />
               <Input
                 label="Your Phone Number"
-                style={{ borderRadius: hp('1%') }}
-                onChangeText={(text) => setPhone(text)}
+                style={{borderRadius: hp('1%')}}
+                onChangeText={text => setPhone(text)}
               />
               {/* <Br space={2} />
               <Input
@@ -457,17 +463,26 @@ const CreateProProfile = ({ navigation }) => {
                 Aircraft Type
               </Pera>
               <Br space={1} />
-              <TouchableOpacity onPress={() => setShow(!show)}>
-                <Input style={{ borderRadius: hp('1%') }} label="Select Type" value={type} readOnly />
+              <TouchableOpacity
+                style={{
+                  borderRadius: hp('1%'),
+                  padding: hp('2%'),
+                  borderWidth: 1,
+                  borderColor: Color('lightGray'),
+                }}
+                onPress={() => setShow(!show)}>
+                <Text style={{color: Color('lightGray')}}>{type ? type : 'Select Type'}</Text>
+                {/* <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly={false} /> */}
               </TouchableOpacity>
               <Br space={1} />
               <Pera heading font="bold">
                 User Type
               </Pera>
               <Br space={1} />
-              <TouchableOpacity onPress={() => setShow1(!show1)}>
-                <Input style={{ borderRadius: hp('1%') }} label="Select Type" value={userType} readOnly />
-              </TouchableOpacity>
+                  <TouchableOpacity style={{borderRadius: hp('1%'),padding: hp('2%'),borderWidth: 1,borderColor: Color('lightGray')}} onPress={() => setShow1(!show1)}>
+                                  <Text style={{color: Color('lightGray')}}>{!userType ? 'Select Type' : userType}</Text>
+                                {/* <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly={false} /> */}
+                              </TouchableOpacity>
               <Br space={1} />
               {/* <Pera heading font="bold">
                 Banner Image
@@ -546,7 +561,7 @@ const CreateProProfile = ({ navigation }) => {
           <Add
             size="32"
             color={Color('shadow')}
-            style={{ transform: [{ rotate: '135deg' }], alignSelf: 'flex-end' }}
+            style={{transform: [{rotate: '135deg'}], alignSelf: 'flex-end'}}
           />
         </TouchableOpacity>
         {typeData.map((t, index) => {
@@ -569,7 +584,7 @@ const CreateProProfile = ({ navigation }) => {
           <Add
             size="32"
             color={Color('shadow')}
-            style={{ transform: [{ rotate: '135deg' }], alignSelf: 'flex-end' }}
+            style={{transform: [{rotate: '135deg'}], alignSelf: 'flex-end'}}
           />
         </TouchableOpacity>
         <TouchableOpacity

@@ -37,9 +37,9 @@ const UserType = ({ navigation, route }) => {
                     <Animated.View style={[{ transform: [{ translateY: slideAnimation }] }, drawerStyle]}>
                         <View
                             style={drawerInner}>
-                            <H5 style={{ textAlign: 'center' }} heading font="bold">Signup with Fly-n-Eat</H5>
+                            <H5 style={{ textAlign: 'center' }} heading font="bold">Signup</H5>
                             <Br space={0.5} />
-                            <Small style={{ textAlign: 'center' }} font="light">We can help to recover your account</Small>
+                            {/* <Small style={{ textAlign: 'center' }} font="light">We can help to recover your account</Small> */}
                             <Br space={1.5} />
                             <Image
                                 source={require('../assets/images/logo.png')}
@@ -48,7 +48,7 @@ const UserType = ({ navigation, route }) => {
                             <Br space={5} />
                             <Btn onPress={() => navigation.navigate('CreateProfile')} label="User" />
                             <Br space={2} />
-                            <Btn onPress={() => navigation.navigate('CreateProProfile')} label="Pro User" />
+                            <Btn onPress={() => navigation.navigate('CreateProProfile')} label="CFI/CFII" />
                         </View>
                     </Animated.View>
                 </View>

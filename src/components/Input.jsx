@@ -12,7 +12,7 @@ const Input = ({ mode, label, style, inputStyle,textAlign,multiline,keyboardType
         <>
             <View style={[styles.input, lightModeStyle, style]}>
                 {label && <Small font="regular" style={styles.label} color={mode === 'light' ? Color('shadow') : Color('text')}>{label}</Small>}
-                <TextInput keyboardType={keyboardType} multiline={multiline} textAlignVertical={textAlign} style={[styles.inputField, inputStyle, {color: mode === 'light' ? Color('shadow') : Color('text')}]} {...props} />
+                <TextInput  keyboardType={keyboardType} multiline={multiline} textAlignVertical={textAlign} style={[styles.inputField, inputStyle, {color: mode === 'light' ? Color('shadow') : Color('text')}]} {...props} />
             </View>
         </>
     );

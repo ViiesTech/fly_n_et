@@ -90,7 +90,6 @@ function App() {
           <Stack.Navigator  screenOptions={{
             headerShown: false,
             animation: 'fade_from_bottom',
-            
           }}>
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="Logout" component={Logout} />

@@ -31,6 +31,7 @@ const Home = ({ navigation }) => {
     const longitude = context?.user?.longitude
 
         console.log('helo3r',context?.user?.user_info?.address)
+        console.log('first',context?.token)
     
 
     useEffect(() => {
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
     inputField: {
         borderRadius: hp('50%'),
         paddingHorizontal: wp('5%'),
-        // paddingVertical: 0,
+        paddingVertical: Platform.OS === 'android' && 0,
         color: Color('homeBg'),
         fontFamily: 'Montserrat-Regular',
         textAlign: 'center',

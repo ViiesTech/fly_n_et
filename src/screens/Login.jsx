@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
-import { Animated, Image, Keyboard, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { Animated, Image, Keyboard, KeyboardAvoidingView, PermissionsAndroid, Platform, TouchableOpacity, View } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { Color } from '../utils/Colors';
 import { H5, Small } from '../utils/Text';
@@ -40,6 +40,7 @@ const Login = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [location, setLocation] = useState();
+
 
     useEffect(() => {
         Animated.timing(slideAnimation, {
@@ -225,9 +226,10 @@ const Login = ({ navigation }) => {
     return (
         <>
             <Background translucent={true}>
-                <View style={{ height: hp('100%'), justifyContent: 'space-between' }}>
+                 <View style={{ height: hp('100%'), justifyContent: 'space-between' }}>
                     <View />
                     <Animated.View style={[{ transform: [{ translateY: slideAnimation }] }, drawerStyle]}>
+                {/* <KeyboardAvoidingView behavior='padding'>                */}
                         <View
                             style={drawerInner}>
                             <H5 style={{ textAlign: 'center' }} heading font="bold">Login Account</H5>
@@ -257,6 +259,7 @@ const Login = ({ navigation }) => {
                                 <Small style={{ textAlign: 'center' }} heading font="regular">Don’t have an account? Signup</Small>
                             </TouchableOpacity>
                         </View>
+            {/* </KeyboardAvoidingView> */}
                     </Animated.View>
                 </View>
             </Background>

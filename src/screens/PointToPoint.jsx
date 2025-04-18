@@ -466,10 +466,10 @@ const styles = StyleSheet.create({
         borderRadius: hp('50%'),
         paddingHorizontal: wp('5%'),
         color: Color('homeBg'),
+        paddingVertical: Platform.OS === 'android' && 0,
         fontFamily: 'Montserrat-Regular',
         textAlign: 'center',
         fontWeight: '600',
         fontSize: hp(2)
-        
     },
 });

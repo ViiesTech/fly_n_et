@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Animated, Image, Keyboard, View } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { H5, Small } from '../utils/Text';
@@ -11,7 +11,8 @@ import { drawerInner, drawerStyle } from '../utils/global';
 import Input from '../components/Input';
 import * as Yup from 'yup';
 import { api, errHandler, note } from '../utils/api';
-import { useIsFocused } from '@react-navigation/native';
+import { CommonActions, useIsFocused } from '@react-navigation/native';
+import { DataContext } from '../utils/Context';
 
 const validationSchema = Yup.object().shape({
     new_password: Yup.string()
@@ -32,6 +33,7 @@ const ResetPassword = ({ navigation, route }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const user_id = route.params?.user_id;
+
 
     const [slideAnimation] = useState(new Animated.Value(hp('100%')));
 
@@ -66,7 +68,7 @@ const ResetPassword = ({ navigation, route }) => {
             await validationSchema.validate(obj, { abortEarly: false });
             const res = await api.post('/user/reset-password', obj);
             note('Password Changed Successfully', res?.data?.message);
-            nextScreen(() => navigation.replace('Login'));
+            nextScreen(() => navigation.navigate('Login'));
         } catch (err) {
             await errHandler(err, null, navigation);
         } finally {

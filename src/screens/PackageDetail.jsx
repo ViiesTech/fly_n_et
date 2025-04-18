@@ -15,6 +15,7 @@ import { ArrowLeft } from 'iconsax-react-native';
 import { getAvailablePurchases, requestSubscription } from 'react-native-iap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import LoaderOverlay from '../components/LoaderOverlay';
 
 const packageDetails = [
   {
@@ -68,7 +69,6 @@ const PackageDetail = ({route}) => {
                         backgroundColor: Color('btnColor'),
                         width: hp('5%'),
                         height: hp('5%'),
-                        marginLeft: hp(2.5),
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderRadius: hp('50%'),
@@ -127,8 +127,6 @@ const PackageDetail = ({route}) => {
   console.log("cot..........,.,.,", context?.token)
   const onConfirmPurchase = async () => {
 
-
-
     if (!data) {
       Alert.alert('Error', 'No available package for this plan.');
       setLoading(false);
@@ -136,8 +134,8 @@ const PackageDetail = ({route}) => {
     }
 
     if(Platform.OS == 'android'){
+      setLoading(true);
       try {
-        setLoading(false);
         setContext({
           ...context,
           skipNavigationCheck: true
@@ -149,7 +147,7 @@ const PackageDetail = ({route}) => {
             subscriptionOffers: [{ sku: data?.productId, offerToken }],
           }),
         });
-        setLoading(true)
+        // setLoading(true)
         const purchase = purchaseData?.[0];
 
         if (purchase.transactionDate && !purchase?.isAcknowledgedAndroid) {
@@ -182,8 +180,6 @@ const PackageDetail = ({route}) => {
             },
             skipNavigationCheck: false
           });
-
-      
         }
       } catch (error) {
         console.log(error);
@@ -191,15 +187,15 @@ const PackageDetail = ({route}) => {
           ...context,
           skipNavigationCheck: false
         })
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
-
     }else{
 
+      setLoading(true);
       try {
-        setLoading(false);
         const purchaseMade = await Purchases.purchasePackage(data);
-        setLoading(true);
+        // setLoading(true);
   
         // const obj = {
         //   purchase_date: purchaseMade?.transaction?.purchaseDate,
@@ -207,6 +203,8 @@ const PackageDetail = ({route}) => {
         // };
   
         // console.log('Purchase data:', obj);
+
+        // return console.log('hello world',purchaseMade)
      
         if (purchaseMade?.transaction?.purchaseDate && !context?.token) {
           navigation.navigate('Message', {
@@ -218,12 +216,15 @@ const PackageDetail = ({route}) => {
           });
         }else{
           if(context.token){
+            
             setLoading(false);
             console.log("going in navigatii func")
             await handlingNavigations()
             return
           }
         }
+
+        //  alert('lilill') 
         setContext({
           ...context,
           subscribed_details: purchaseMade?.transaction?.purchaseDate && {
@@ -239,17 +240,17 @@ const PackageDetail = ({route}) => {
         } else {
           Alert.alert('Error', error?.message || 'Something went wrong');
         }
+      } finally {
+        setLoading(false)
       }
     }
     
   };
 
   const onRestorePurchase = async () => {
-
     if(Platform.OS == "android"){
-
+    setLoading(true)
       try {
-
         // const purchases = await RNIap.getAvailablePurchases();
         const purchases = await getAvailablePurchases();
         console.log("purchases",purchases);// get current available purchases
@@ -273,10 +274,14 @@ const PackageDetail = ({route}) => {
    
       } catch (e) {
         console.error('Failed to restore purchases:', e);
+        
+      } finally {
+        setLoading(false)
       }
       
       
     }else{
+   setLoading(true)
     try {
       const customerInfo = await Purchases.restorePurchases();
       console.log('restore', customerInfo.entitlements.active);
@@ -309,6 +314,8 @@ const PackageDetail = ({route}) => {
       }
     } catch (e) {
       console.error('Failed to restore purchases:', e);
+    } finally {
+      setLoading(false)
     }
       
   }
@@ -316,10 +323,11 @@ const PackageDetail = ({route}) => {
 
 
   const handlingNavigations = async () => {
-
-    const androidsubtype = data.subscriptionOfferDetails[0].basePlanId == "year" ? "yearly" : "monthly"
-    const iosSubType = data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly'
-
+    // console.log("first", data)
+    // return
+    const androidsubtype = Platform.OS === 'android' &&  data?.subscriptionOfferDetails[0]?.basePlanId == "year" ? "yearly" : "monthly"
+    const iosSubType = Platform.OS === 'ios' && data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly'
+// return console.log('hello world',iosSubType)
     let datatoBeAppend = new FormData();
     datatoBeAppend.append('sub_type', Platform.OS == "android" ? androidsubtype : iosSubType);
 
@@ -423,12 +431,12 @@ const PackageDetail = ({route}) => {
         }}>
         <Btn
           loading={loading}
-          label={'Buy Purchase'}
+          label={'Purchase'}
           onPress={() => onConfirmPurchase()}
           btnStyle={{backgroundColor: Color('drawerBg'), width: '90%'}}
         />
         <Btn
-          label={'Restore Purchases'}
+          label={'Restore Purchase'}
           onPress={() => onRestorePurchase()}
           btnStyle={{
             backgroundColor: Color('drawerBg'),
@@ -479,13 +487,13 @@ const PackageDetail = ({route}) => {
           marginBottom: hp(7),
         }}>
         <Btn
-          loading={loading}
-          label={'Buy Purchase'}
+          // loading={loading}
+          label={'Purchase'}
           onPress={() => onConfirmPurchase()}
           btnStyle={{backgroundColor: Color('drawerBg'), width: '90%'}}
         />
         <Btn
-          label={'Restore Purchases'}
+          label={'Restore Purchase'}
           onPress={() => onRestorePurchase()}
           btnStyle={{
             backgroundColor: Color('drawerBg'),
@@ -493,10 +501,9 @@ const PackageDetail = ({route}) => {
             marginTop: hp(1),
           }}
         />
+       <LoaderOverlay visible={loading} />
       </View>
-        
         </>
-
       }
     </View>
   );

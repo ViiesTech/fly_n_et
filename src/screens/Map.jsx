@@ -8,6 +8,8 @@ import {
   View,
   Text,
   Alert,
+  Platform,
+  
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -37,7 +39,7 @@ import axios from 'axios';
 import {DataContext} from '../utils/Context';
 import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import WebView from 'react-native-webview';
-
+import Modal from 'react-native-modal'
 // const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 
@@ -61,8 +63,10 @@ const Map = ({navigation, route}) => {
   const isFocused = useIsFocused();
   const {context, setContext} = useContext(DataContext);
   const [airPorts, setAirPorts] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
   const [waypoint, setWaypoint] = useState([]);
-  const [polylineCoordinates,setPolylineCoordinates] = useState([])
+  const [restaurantDetail, setRestaurantDetail] = useState({});
+  const [polylineCoordinates, setPolylineCoordinates] = useState([]);
   const mapRef = useRef(null);
   const origin = {
     latitude: parseFloat(context?.user?.latitude),
@@ -72,7 +76,6 @@ const Map = ({navigation, route}) => {
     latitude: parseFloat(route?.params?.airport?.lat),
     longitude: parseFloat(route?.params?.airport?.lng),
   };
-
 
   // const latitudeMid = (route?.params?.airport?.lat + route?.params?.airport2?.lat) / 2;
   // const longitudeMid = (route?.params?.airport?.lng +  route?.params?.airport2?.lng) / 2;
@@ -171,8 +174,6 @@ const Map = ({navigation, route}) => {
 
   const userRadiusMeters = nauticalMilesToMeters(distance);
 
-  
-
   // useEffect(() => {
   //   // Get polyline coordinates between origin and destination
   //   const coords = getPolylineCoordinates(origin2, destination2);
@@ -266,7 +267,7 @@ const Map = ({navigation, route}) => {
   }
 
   return (
-    <>
+    <View style={{flex:1, }}>
       <View style={{zIndex: 1}}>
         <BackBtn navigation={navigation} translucent />
       </View>
@@ -286,13 +287,14 @@ const Map = ({navigation, route}) => {
         style={{...StyleSheet.absoluteFillObject, flex: 1}}
         zoomLevel={12}
         mapType="standard">
-        {route?.params?.p2p && (
-          <Polyline
-            coordinates={[origin2,destination2]}
-            strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-            strokeWidth={6}
-          />
-        ) 
+        {
+          route?.params?.p2p && (
+            <Polyline
+              coordinates={[origin2, destination2]}
+              strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
+              strokeWidth={6}
+            />
+          )
           // <Polyline
           //   coordinates={[origin, destination]}
           //   strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
@@ -417,7 +419,7 @@ const Map = ({navigation, route}) => {
             {console.log(route.params?.airport2)}
             {route?.params?.p2p && (
               <>
-               {/* <Circle 
+                {/* <Circle 
                   center={newCircleCenter}
                   radius={newRadius}
                   strokeColor={Color('btnColor')}
@@ -517,99 +519,215 @@ const Map = ({navigation, route}) => {
           ?.map((val, index) => {
             const Img = isIOS ? Image : WebView;
             return (
-              // <Marker
-              //     coordinate={{
-              //         latitude: parseFloat(val?.latitude),
-              //         longitude: parseFloat(val?.longitude),
-              //     }}
-              //     title={val?.title}
-              //     description={val?.description}
-              //     key={index}
-              //     onPress={() => setVisitBtn(val?.id)}
-              //     image={{uri: `https://praetorstestnet.com/flyneat/${val?.image_path}`}}
-              //     ref={ref => (markerRefs.current[index] = ref)}
-              // />
-              <Marker
-                coordinate={{
-                  latitude: parseFloat(val?.latitude),
-                  longitude: parseFloat(val?.longitude),
-                }}
-                // title={val?.title}
-
-                // description={val?.description}
-                key={index}
-                // image={{uri: `https://praetorstestnet.com/flyneat/${val?.image_path}`}}
-                ref={ref => (markerRefs.current[index] = ref)}>
-                <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                  <Image
-                    source={{
-                      uri: `https://praetorstestnet.com/flyneat/${val?.image?.path}`,
-                    }}
-                    style={{
-                      height: 50,
-                      width: 50,
-                      borderRadius: 100,
-                    }}
-                  />
-                </View>
-                <Callout
+              <>
+                <Marker
                   onPress={() => {
-                    // return console.log('hello world',val)
-                   if(context?.token) { 
-                    navigation.navigate('RestuarantDetails', {id: val?.id})
-                  } else {
-                    navigation.navigate('Message',{theme: 'light', title: 'Login Required', message: 'Please log in to continue', screen: 'Login'})
-                  }
-                  }
-                  }
-                  tooltip>
-                  <View
-                    style={{
-                      width: 200,
-                      padding: 10,
-                      backgroundColor: 'white',
-                      borderRadius: 10,
-                      alignItems: 'center',
-                    }}>
-                    <Img
-                      resizeMode="stretch"
-                      style={{height: 100, width: 180, borderRadius: 5}}
+                    if(Platform.OS === 'android') {
+                      setModalVisible(true)
+                      setRestaurantDetail(val)
+                    }
+                  }}
+                  coordinate={{
+                    latitude: parseFloat(val?.latitude),
+                    longitude: parseFloat(val?.longitude),
+                  }}
+                  // title={val?.title}
+
+                  // description={val?.description}
+                  key={index}
+                  // image={{uri: `https://praetorstestnet.com/flyneat/${val?.image_path}`}}
+                  ref={ref => (markerRefs.current[index] = ref)}>
+                  <TouchableOpacity
+                    onPress={() => {
+                    if(Platform.OS === 'ios') {  
+                      setModalVisible(true);
+                      setRestaurantDetail(val);
+                    }}}
+                    style={{alignItems: 'center', justifyContent: 'center'}}>
+                    <Image
                       source={{
                         uri: `https://praetorstestnet.com/flyneat/${val?.image?.path}`,
                       }}
-                    />
-                    <Text
                       style={{
-                        fontSize: 12,
-                        color: 'black',
-                        fontWeight: 'bold',
-                        marginTop: 5,
-                        textAlign: 'center',
-                        marginBottom: 2,
+                        height: 50,
+                        width: 50,
+                        borderRadius: 100,
                       }}
-                      numberOfLines={2}>
-                      {val?.title}
-                    </Text>
-                    {val?.description && (
+                    />
+                  </TouchableOpacity>
+
+                  {/* <Callout
+                    style={{zIndex: 1}}
+                    tooltip
+                    onPress={() => {
+                      // return console.log('hello world',val)
+                      if (context?.token) {
+                        navigation.navigate('RestuarantDetails', {id: val?.id});
+                      } else {
+                        navigation.navigate('Message', {
+                          theme: 'light',
+                          title: 'Login Required',
+                          message: 'Please log in to continue',
+                          screen: 'Login',
+                        });
+                      }
+                    }}>
+                    <View
+                      style={{
+                        width: 200,
+                        padding: 10,
+                        backgroundColor: 'white',
+                        borderRadius: 10,
+                        alignItems: 'center',
+                      }}>
+                      <Img
+                        resizeMode="stretch"
+                        style={{height: 100, width: 180, borderRadius: 5}}
+                        source={{
+                          uri: `https://praetorstestnet.com/flyneat/${val?.image?.path}`,
+                        }}
+                      />
                       <Text
                         style={{
-                          fontSize: 10,
+                          fontSize: 12,
                           color: 'black',
+                          fontWeight: 'bold',
+                          marginTop: 5,
                           textAlign: 'center',
-                          marginBottom: 5,
+                          marginBottom: 2,
                         }}
-                        numberOfLines={3}>
-                        {val?.description}
+                        numberOfLines={2}>
+                        {val?.title}
                       </Text>
-                    )}
-                  </View>
-                </Callout>
-              </Marker>
+                      {val?.description && (
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            color: 'black',
+                            textAlign: 'center',
+                            marginBottom: 5,
+                          }}
+                          numberOfLines={3}>
+                          {val?.description}
+                        </Text>
+                      )}
+                    </View>
+                  </Callout> */}
+                </Marker>
+              </>
             );
           })}
       </MapView>
-    </>
+
+      <Modal
+        isVisible={modalVisible}
+        style={{flex:1}}
+        onBackdropPress={()=> setModalVisible(false)}
+        // transparent
+        // animationType="fade"
+        animationIn={"fadeIn"}
+        animationOut={"fadeOut"}
+        >
+        <TouchableOpacity onPress={() => {
+           if (context?.token) {
+            navigation.navigate('RestuarantDetails', {id: restaurantDetail?.id});
+          } else {
+            navigation.navigate('Message', {
+              theme: 'light',
+              title: 'Login Required',
+              message: 'Please log in to continue',
+              screen: 'Login',
+            });
+          }
+          setModalVisible(false)
+        }} style={{ alignItems:'center', justifyContent:'center', backgroundColor:'transparent'}}>
+          <View
+            style={{
+              width: 250,
+              padding: 15,
+              backgroundColor: 'white',
+              borderRadius: 12,
+              alignItems: 'center',
+              shadowColor: '#000',
+              shadowOffset: {width: 0, height: 2},
+              shadowOpacity: 0.25,
+              shadowRadius: 4,
+              elevation: 5,
+            }}>
+            <Image
+              resizeMode="cover"
+              style={{height: 120, width: 220, borderRadius: 8}}
+              source={{
+                uri: `https://praetorstestnet.com/flyneat/${restaurantDetail?.image?.path}`,
+              }}
+            />
+            <Text
+              style={{
+                fontSize: 14,
+                color: '#333',
+                fontWeight: 'bold',
+                marginTop: 10,
+                textAlign: 'center',
+              }}
+              numberOfLines={2}>
+              {restaurantDetail?.title}
+            </Text>
+            {restaurantDetail?.description && (
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: '#555',
+                  textAlign: 'center',
+                  marginTop: 4,
+                }}
+                numberOfLines={3}>
+                {restaurantDetail?.description}
+              </Text>
+            )}
+          </View>
+          </TouchableOpacity>
+
+      </Modal>
+      
+    </View>
   );
 };
 
 export default Map;
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: widthPercentageToDP(80),
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    marginBottom: 15,
+    color: '#666',
+  },
+  closeButton: {
+    backgroundColor: Color.Primary,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+});

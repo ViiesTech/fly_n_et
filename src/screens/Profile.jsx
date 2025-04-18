@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
+import React, {useContext, useEffect, useLayoutEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -9,6 +9,7 @@ import {
   Pressable,
   StatusBar,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -17,23 +18,30 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import Br from '../components/Br';
-import { Pera, Small } from '../utils/Text';
-import { Color } from '../utils/Colors';
-import { Add, ArrowLeft, Bookmark, DocumentUpload, Edit2, Trash } from 'iconsax-react-native';
+import {Pera, Small} from '../utils/Text';
+import {Color} from '../utils/Colors';
+import {
+  Add,
+  ArrowLeft,
+  Bookmark,
+  DocumentUpload,
+  Edit2,
+  Trash,
+} from 'iconsax-react-native';
 import Navigation from '../components/Navigation';
 import Wrapper from '../components/Wrapper';
-import { capitalize, isIOS } from '../utils/global';
-import { DataContext } from '../utils/Context';
-import { api, errHandler, storageUrl } from '../utils/api';
+import {capitalize, isIOS} from '../utils/global';
+import {DataContext} from '../utils/Context';
+import {api, errHandler, storageUrl} from '../utils/api';
 import Toast from 'react-native-simple-toast';
 import Background from '../utils/Background';
-import { launchImageLibrary } from 'react-native-image-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 import Model from '../components/Model';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 
-const Profile = ({ navigation }) => {
+const Profile = ({navigation}) => {
   const focused = useIsFocused();
-  const { context, setContext } = useContext(DataContext);
+  const {context, setContext} = useContext(DataContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -42,67 +50,69 @@ const Profile = ({ navigation }) => {
   const [show, setShow] = useState();
   const translate = -hp('5%');
 
-  useEffect(() => {
-    getRestuarents();
-    getUploadedImages();
-  }, [focused]);
+  console.log(context?.user);
 
-  useEffect(() => {
-    setImages(context?.serviceImages);
-  }, [context?.serviceImages]);
+  // useEffect(() => {
+  //   getRestuarents();
+  //   getUploadedImages();
+  // }, [focused]);
 
-  useLayoutEffect(() => {
-    setTimeout(() => {
-      setIsLoaded(true);
-    }, 300);
-  }, []);
+  // useEffect(() => {
+  //   setImages(context?.serviceImages);
+  // }, [context?.serviceImages]);
 
-  const getRestuarents = async (page = 1) => {
-    if (isLoading || !hasMore) {return;}
+  // useLayoutEffect(() => {
+  //   setTimeout(() => {
+  //     setIsLoaded(true);
+  //   }, 300);
+  // }, []);
 
-    setIsLoading(true);
+  // const getRestuarents = async (page = 1) => {
+  //   if (isLoading || !hasMore) {return;}
 
-    try {
-      const res = await api.get(`/restaurant/list?page=${page}`, {
-        headers: { Authorization: `Bearer ${context?.token}` },
-      });
+  //   setIsLoading(true);
 
-      const newRestaurants = res?.data?.restaurant || [];
+  //   try {
+  //     const res = await api.get(`/restaurant/list?page=${page}`, {
+  //       headers: { Authorization: `Bearer ${context?.token}` },
+  //     });
 
-      setContext((prevContext) => ({
-        ...prevContext,
-        restuarents: page === 1
-          ? newRestaurants // Replace existing restaurants on the first page
-          : [...prevContext.restuarents, ...newRestaurants], // Append new restaurants
-      }));
+  //     const newRestaurants = res?.data?.restaurant || [];
 
-      setCurrentPage(page);
-      setHasMore(page < res?.data?.last_page);
+  //     setContext((prevContext) => ({
+  //       ...prevContext,
+  //       restuarents: page === 1
+  //         ? newRestaurants // Replace existing restaurants on the first page
+  //         : [...prevContext.restuarents, ...newRestaurants], // Append new restaurants
+  //     }));
 
-    } catch (err) {
-      await errHandler(err, null, navigation);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     setCurrentPage(page);
+  //     setHasMore(page < res?.data?.last_page);
 
-  const bookmark = async id => {
-    try {
-      const res = await api.post(
-        '/bookmark/store',
-        {
-          restaurant_id: id,
-        },
-        {
-          headers: { Authorization: `Bearer ${context?.token}` },
-        },
-      );
-      Toast.show(res?.data?.message, Toast.SHORT);
-      await getRestuarents();
-    } catch (err) {
-      await errHandler(err, null, navigation);
-    }
-  };
+  //   } catch (err) {
+  //     await errHandler(err, null, navigation);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // const bookmark = async id => {
+  //   try {
+  //     const res = await api.post(
+  //       '/bookmark/store',
+  //       {
+  //         restaurant_id: id,
+  //       },
+  //       {
+  //         headers: { Authorization: `Bearer ${context?.token}` },
+  //       },
+  //     );
+  //     Toast.show(res?.data?.message, Toast.SHORT);
+  //     await getRestuarents();
+  //   } catch (err) {
+  //     await errHandler(err, null, navigation);
+  //   }
+  // };
 
   const uploadImage = async () => {
     const result = await launchImageLibrary({
@@ -116,35 +126,34 @@ const Profile = ({ navigation }) => {
     }
   };
 
-  const removeImage = (index) => {
+  const removeImage = index => {
     const arr = images.filter((_, i) => i !== index);
     setImages(arr);
   };
 
-  const getUploadedImages = async () => {
-    const res = await api.get(
-      '/user/service-images',
-      {headers: { Authorization: `Bearer ${context?.token}` }},
-    );
-    setContext((prevContext) => ({
-      ...prevContext,
-      serviceImages: res.data?.images,
-    }));
-  };
+  // const getUploadedImages = async () => {
+  //   const res = await api.get(
+  //     '/user/service-images',
+  //     {headers: { Authorization: `Bearer ${context?.token}` }},
+  //   );
+  //   setContext((prevContext) => ({
+  //     ...prevContext,
+  //     serviceImages: res.data?.images,
+  //   }));
+  // };
 
   const removeUploadedImage = async (id, index) => {
     try {
       Toast.show('Deleting...', Toast.SHORT);
-      await api.delete(
-        '/user/remove-image/' + id,
-        {headers: { Authorization: `Bearer ${context?.token}` }},
-      );
+      await api.delete('/user/remove-image/' + id, {
+        headers: {Authorization: `Bearer ${context?.token}`},
+      });
       const arr = images.filter((_, i) => i !== index);
-      setContext((prevContext) => ({
+      setContext(prevContext => ({
         ...prevContext,
         serviceImages: arr,
       }));
-    }catch(err) {
+    } catch (err) {
       await errHandler(err, null, navigation);
     }
   };
@@ -157,9 +166,7 @@ const Profile = ({ navigation }) => {
             style={{
               width: wp('100%'),
             }}
-            source={{
-              uri: context?.user?.user_info?.banner_image ? `${storageUrl}${context?.user?.user_info?.banner_image}` : 'https://picsum.photos/500/300',
-            }}>
+            source={require('../assets/images/splash.png')}>
             <View
               style={{
                 flexDirection: 'row',
@@ -167,7 +174,7 @@ const Profile = ({ navigation }) => {
                 height: hp('20%'),
                 marginTop: hp('2%'),
               }}>
-              <View style={{ width: wp('20%'), alignItems: 'center' }}>
+              <View style={{width: wp('20%'), alignItems: 'center'}}>
                 <TouchableOpacity
                   style={{
                     backgroundColor: Color('btnColor'),
@@ -181,8 +188,8 @@ const Profile = ({ navigation }) => {
                   <ArrowLeft size={hp('2.5%')} color={Color('text')} />
                 </TouchableOpacity>
               </View>
-              <View style={{ width: wp('60%'), alignItems: 'center' }} />
-              <View style={{ width: wp('20%'), alignItems: 'center' }}>
+              <View style={{width: wp('60%'), alignItems: 'center'}} />
+              <View style={{width: wp('20%'), alignItems: 'center'}}>
                 <TouchableOpacity
                   style={{
                     backgroundColor: Color('btnColor'),
@@ -200,9 +207,13 @@ const Profile = ({ navigation }) => {
           </ImageBackground>
         </View>
         <Image
-          source={{
-            uri: `${storageUrl}${context?.user?.user_info?.profile_image}`,
-          }}
+          source={
+            context?.user?.user_info?.profile_image
+              ? {
+                  uri: `${storageUrl}${context?.user?.user_info?.profile_image}`,
+                }
+              : require('../assets/images/userProfile.jpeg')
+          }
           style={{
             borderWidth: 1,
             borderColor: Color('shadow'),
@@ -210,14 +221,14 @@ const Profile = ({ navigation }) => {
             height: hp('10%'),
             borderRadius: hp('50%'),
             alignSelf: 'center',
-            transform: [{ translateY: translate }],
+            transform: [{translateY: translate}],
           }}
         />
         <View>
           <Pera
             style={{
               textAlign: 'center',
-              transform: [{ translateY: translate + hp('1%') }],
+              transform: [{translateY: translate + hp('1%')}],
             }}
             color={Color('homeBg')}
             heading
@@ -227,14 +238,68 @@ const Profile = ({ navigation }) => {
           <Small
             style={{
               textAlign: 'center',
-              transform: [{ translateY: translate + hp('1%') }],
+              transform: [{translateY: translate + hp('1%')}],
             }}
             color={Color('homeBg')}
             heading
             font="medium">
             {context?.user?.email}
           </Small>
-          <Small
+          <View
+            style={{
+              borderWidth: 0.5,
+              padding: hp(0.7),
+              width: wp(90),
+              alignSelf: 'center',
+              paddingHorizontal: wp('5%'),
+              borderColor: Color('shadow'),
+              borderRadius: hp('50%'),
+            }}>
+            <Text
+              style={{
+                color: Color('shadow'),
+                fontSize: hp('1.2%'),
+              }}>
+              Bio
+            </Text>
+            <Text
+              style={{
+                color: Color('shadow'),
+                fontSize: hp('1.5%'),
+                marginTop: hp(0.7),
+              }}>
+              {context?.user?.user_info?.bio && context?.user?.user_info?.bio}
+            </Text>
+          </View>
+          <View
+            style={{
+              borderWidth: 0.5,
+              padding: hp(0.7),
+              width: wp(90),
+              marginTop: hp(2),
+              alignSelf: 'center',
+              paddingHorizontal: wp('5%'),
+              borderColor: Color('shadow'),
+              borderRadius: hp('50%'),
+            }}>
+            <Text
+              style={{
+                color: Color('shadow'),
+                fontSize: hp('1.2%'),
+              }}>
+              Experience
+            </Text>
+            <Text
+              style={{
+                color: Color('shadow'),
+                fontSize: hp('1.5%'),
+                marginTop: hp(0.7),
+              }}>
+              {context?.user?.user_info?.experience &&
+                context?.user?.user_info?.experience}
+            </Text>
+          </View>
+          {/* <Small
             style={{
               textAlign: 'center',
               transform: [{ translateY: translate + hp('1%') }],
@@ -253,28 +318,30 @@ const Profile = ({ navigation }) => {
             heading
             font="medium">
             {context?.user?.user_info?.experience}
-          </Small>
+          </Small> */}
         </View>
       </>
     );
   };
 
-  const updateImages = async (arr) => {
+  const updateImages = async arr => {
     try {
       Toast.show('Uploading...', Toast.SHORT);
       const formData = new FormData();
-      arr.forEach((image) => {
+      arr.forEach(image => {
         const uri = image.uri;
         const type = image.type; // Ensure you have the correct mime type
         const name = image.fileName; // Ensure you have the correct file name
         // Append image data to the formData
-        formData.append('image_path[]', { uri, type, name });
+        formData.append('image_path[]', {uri, type, name});
       });
 
-      const res = await api.post(
-        '/user/service-images', formData,
-        {headers: { Authorization: `Bearer ${context?.token}`, 'Content-Type': 'multipart/form-data' }},
-      );
+      const res = await api.post('/user/service-images', formData, {
+        headers: {
+          Authorization: `Bearer ${context?.token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       await getUploadedImages();
       Toast.show(res?.data?.message, Toast.SHORT);
     } catch (err) {
@@ -449,16 +516,15 @@ const Profile = ({ navigation }) => {
         barStyle="light-content"
       />
       <Background
-        detectScrollEnd
-        onScrollEnd={() => {
-          if (!isLoading && hasMore) {
-            getRestuarents(currentPage + 1);
-          }
-        }}
+        // detectScrollEnd
+        // onScrollEnd={() => {
+        //   if (!isLoading && hasMore) {
+        //     getRestuarents(currentPage + 1);
+        //   }
+        // }}
         statusBarColor={Color('homeBg')}
-        noBackground={true}
-      >
-        <View style={{ backgroundColor: Color('text') }}>
+        noBackground={true}>
+        <View style={{backgroundColor: Color('text')}}>
           <TopBar />
           <Wrapper>
             {/* <Pera color={Color('homeBg')} heading font="bold">

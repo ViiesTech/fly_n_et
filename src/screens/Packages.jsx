@@ -1,7 +1,9 @@
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -60,13 +62,13 @@ const Packages = () => {
   const [subscription, setSubscription] = useState([]);
 
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [PremiumCode, setPremiumCode] = useState("");
-  const [codeLoader, setCodeLoader] = useState(false)
+  const [PremiumCode, setPremiumCode] = useState('');
+  const [codeLoader, setCodeLoader] = useState(false);
 
   // const routes = navigation.getState().routes;
   // const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
 
-  console.log(products);
+  console.log('offerings',context?.user?.expired_at);
 
   const productIds = ['flyneat_month', 'flyneat_year2'];
   const androidsubscriptionsId = ['flyneat_month', 'flyneat_year2'];
@@ -129,11 +131,13 @@ const Packages = () => {
   };
 
   const SumbitPremiumCode = () => {
-    if(PremiumCode == ""){
-      return note("Enter Code", "Please enter the code to verify your access to the app.")
-      
+    if (PremiumCode == '') {
+      return note(
+        'Enter Code',
+        'Please enter the code to verify your access to the app.',
+      );
     }
-    setCodeLoader(true)
+    setCodeLoader(true);
     let data = new FormData();
     data.append('code', PremiumCode);
 
@@ -153,73 +157,77 @@ const Packages = () => {
       .request(config)
       .then(response => {
         if (response.status) {
+          note('Code', response.data.message);
           console.log(JSON.stringify(response.data));
+          setContext(prevContext => ({
+            ...prevContext,
+            user:{
+              ...prevContext?.user,
+              freetrial_status: response.data?.user.freetrial_status,
+            }
+          }))
           subscibeForMonth();
-          
         } else {
           console.log('code is wrong');
-          setCodeLoader(false)
-          note("Wrong Code", "Please enter correct code.")
+          setCodeLoader(false);
+          note('Wrong Code', 'Please enter correct code.');
         }
       })
       .catch(error => {
-        setCodeLoader(false)
-        note("Wrong Code", "Please enter correct code.")
+        setCodeLoader(false);
+        note('Wrong Code', 'Please enter correct code.');
         console.log(error);
       });
   };
 
   const subscibeForMonth = () => {
+    let data = new FormData();
+    data.append('sub_type', 'monthly');
 
-  
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `${baseUrl}/user/subscribe`,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        Authorization: `Bearer ${context.token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      data: data,
+    };
 
-      let data = new FormData();
-      data.append('sub_type', 'monthly');
-  
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: `${baseUrl}/user/subscribe`,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          Authorization: `Bearer ${context.token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-        data: data,
-      };
-  
-      axios
-        .request(config)
-        .then(async (response) => {
-          setCodeLoader(false)
-          const updatedExpiry = response?.data?.user?.expired_at;
-          if (updatedExpiry) {
-            if (context?.token) {
-                await AsyncStorage.setItem('token', context?.token);
-                await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-                await AsyncStorage.setItem('user', JSON.stringify(response?.data?.user));
-                setCodeLoader(false)
-              setContext({
-                ...context,
-                token: context?.token,
-                isVerified: true,
-                user: response?.data?.user,
-              });
-              navigation.navigate('Home');
-            }else{
-              setCodeLoader(false)
-            }
-            setCodeLoader(false)
+    axios
+      .request(config)
+      .then(async response => {
+        setCodeLoader(false);
+        const updatedExpiry = response?.data?.user?.expired_at;
+        if (updatedExpiry) {
+          if (context?.token) {
+            await AsyncStorage.setItem('token', context?.token);
+            await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+            await AsyncStorage.setItem(
+              'user',
+              JSON.stringify(response?.data?.user),
+            );
+            setCodeLoader(false);
+            setContext({
+              ...context,
+              token: context?.token,
+              isVerified: true,
+              user: response?.data?.user,
+            });
+            navigation.navigate('Home');
+          } else {
+            setCodeLoader(false);
           }
-        })
-        .catch(error => {
-          console.log(error);
-          setCodeLoader(false)
-        });
-    
-
+          setCodeLoader(false);
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        setCodeLoader(false);
+      });
   };
-
 
   const goToLogin = () => {
     if (!context?.token) {
@@ -230,9 +238,9 @@ const Packages = () => {
           'To access your subscription benefits, please create or log in to your account',
         screen: 'Login',
       });
-      return
+      return;
     }
-  }
+  };
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -281,20 +289,35 @@ const Packages = () => {
           </Text>
 
           <TouchableOpacity
-            onPress={() => {context?.token ? setShowPremiumModal(true): goToLogin()}}
+            disabled={context?.user?.freetrial_status}
+            onPress={() => {
+              context?.token ? setShowPremiumModal(true) : goToLogin();
+            }}
             style={{
-              height: hp(7),
+              // height: hp(7),
+              padding: hp(2.5),
               backgroundColor: Color('drawerBg'),
               width: wp(85),
               alignSelf: 'center',
               borderRadius: 10,
               alignItems: 'center',
-              justifyContent: 'center',
+              gap: 10,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              // justifyContent: 'center',
               marginTop: hp(5),
             }}>
+            <View style={{flexDirection: 'row',gap: 10}}>  
+              <View style={styles.circleView} />
             <Text style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'}}>
               Premium User
             </Text>
+            </View>
+           {context?.user?.freetrial_status && 
+            <Text style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'}}>
+              {context?.user?.freetrial_status}
+            </Text>
+            }
           </TouchableOpacity>
 
           <View style={{marginTop: 20}}>
@@ -320,22 +343,25 @@ const Packages = () => {
               </>
             ) : (
               <>
-                {offerings?.reverse().map(item => (
-                  <PackageCard
-                    onPress={() =>
-                      navigation.navigate('PackageDetail', {detail: item})
-                    }
-                    style={{marginBottom: hp(2)}}
-                    package_name={
-                      item.packageType === 'ANNUAL' ? 'Yearly' : 'Monthly'
-                    }
-                    price={item.product.priceString}
-                  />
-                ))}
+                {offerings?.reverse().map(item => {
+                  // console.log('offerings', item);
+                  return (
+                    <PackageCard
+                      onPress={() =>
+                        navigation.navigate('PackageDetail', {detail: item})
+                      }
+                      style={{marginBottom: hp(2)}}
+                      package_name={
+                        item.packageType === 'ANNUAL' ? 'Yearly' : 'Monthly'
+                      }
+                      price={item.product.priceString}
+                    />
+                  );
+                })}
               </>
             )}
           </View>
-        </View>
+        </View> 
         {showPremiumModal && (
           <View
             style={{
@@ -348,6 +374,8 @@ const Packages = () => {
               justifyContent: 'center',
               padding: 20,
             }}>
+           <KeyboardAvoidingView behavior='padding'>   
+          <ScrollView style={{flexGrow: 1}} contentContainerStyle={{alignItems: 'center', justifyContent: 'center',flex: 1}}>
             <Text style={[styles.heading, {fontSize: hp(3)}]}>
               Enter Premium Code
             </Text>
@@ -360,51 +388,51 @@ const Packages = () => {
                 borderRadius: 100,
                 paddingHorizontal: 10,
                 marginTop: hp(4),
-                minHeight: hp(5)
+                minHeight: hp(5),
               }}
-              
-              onChangeText={(txt)=> {
-                setPremiumCode(txt)
+              onChangeText={txt => {
+                setPremiumCode(txt);
               }}
               value={PremiumCode}
             />
 
-            {
-              codeLoader == true ?
-
-              <View style={{
-                height: hp(7),
-                backgroundColor: Color('drawerBg'),
-                width: wp(85),
-                alignSelf: 'center',
-                borderRadius: 10,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: hp(5),
-              }}>
-
-              <ActivityIndicator size={'small'} style={{alignSelf:'center'}} color={'#FFFFFF'}/>
+            {codeLoader == true ? (
+              <View
+                style={{
+                  height: hp(7),
+                  backgroundColor: Color('drawerBg'),
+                  width: wp(85),
+                  alignSelf: 'center',
+                  borderRadius: 10,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: hp(5),
+                }}>
+                <ActivityIndicator
+                  size={'small'}
+                  style={{alignSelf: 'center'}}
+                  color={'#FFFFFF'}
+                />
               </View>
-              :
-            <TouchableOpacity
-              onPress={() => SumbitPremiumCode()}
-              style={{
-                height: hp(7),
-                backgroundColor: Color('drawerBg'),
-                width: wp(85),
-                alignSelf: 'center',
-                borderRadius: 10,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: hp(5),
-              }}>
-                
-              <Text
-                style={{color: '#FFFFFF', fontSize: 20, fontWeight: 'bold'}}>
-                Submit
-              </Text>
-            </TouchableOpacity>
-            }
+            ) : (
+              <TouchableOpacity
+                onPress={() => SumbitPremiumCode()}
+                style={{
+                  height: hp(7),
+                  backgroundColor: Color('drawerBg'),
+                  width: wp(85),
+                  alignSelf: 'center',
+                  borderRadius: 10,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: hp(5),
+                }}>
+                <Text
+                  style={{color: '#FFFFFF', fontSize: 20, fontWeight: 'bold'}}>
+                  Submit
+                </Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity
               onPress={() => setShowPremiumModal(false)}
@@ -423,6 +451,8 @@ const Packages = () => {
                 Close
               </Text>
             </TouchableOpacity>
+          </ScrollView>
+          </KeyboardAvoidingView>
           </View>
         )}
       </Background>
@@ -448,5 +478,13 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingTop: hp(4),
     width: wp(80),
+  },
+  circleView:{
+    height: hp(1.5),
+    width: hp(1.5),
+    marginTop: hp(0.3),
+    borderWidth: 2,
+    borderColor: Color('text'),
+    borderRadius: 100,
   },
 });

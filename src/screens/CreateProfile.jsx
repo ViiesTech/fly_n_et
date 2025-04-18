@@ -7,6 +7,7 @@ import {
   Image,
   Keyboard,
   ScrollView,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -338,9 +339,17 @@ const CreateProfile = ({navigation}) => {
                   Aircraft Type
                 </Pera>
                 <Br space={1} />
-                <TouchableOpacity onPress={() => setShow(!show)}>
-                  <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly />
-                </TouchableOpacity>
+            <TouchableOpacity
+                           style={{
+                             borderRadius: hp('1%'),
+                             padding: hp('2%'),
+                             borderWidth: 1,
+                             borderColor: Color('lightGray'),
+                           }}
+                           onPress={() => setShow(!show)}>
+                           <Text style={{color: Color('lightGray')}}>{type ? type : 'Select Type'}</Text>
+                           {/* <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly={false} /> */}
+                         </TouchableOpacity>
                 <Br space={1} />
                 {/* <Pera heading font="bold">
                   Banner Image

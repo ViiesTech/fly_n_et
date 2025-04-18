@@ -3,6 +3,7 @@ import {
   Animated,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
   Modal,
   PermissionsAndroid,
   Platform,
@@ -227,6 +228,7 @@ const Signup = ({navigation}) => {
           <View />
           <Animated.View
             style={[{transform: [{translateY: slideAnimation}]}, drawerStyle]}>
+                    {/* <KeyboardAvoidingView keyboardVerticalOffset={10} behavior='padding'   >    */}
             <View style={drawerInner}>
               <H5 style={{textAlign: 'center'}} heading font="bold">
                 Create App account!
@@ -343,6 +345,7 @@ const Signup = ({navigation}) => {
                 </View>
               </View>
             </Modal>
+            {/* </KeyboardAvoidingView> */}
           </Animated.View>
         </View>
       </Background>
