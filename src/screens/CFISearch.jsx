@@ -353,9 +353,9 @@ const CFISearch = ({navigation}) => {
             //   flexDirection: 'row',
               borderRadius: hp('1%'),
               alignItems: 'center',
-            //   gap: hp('1%'),
+            //   gap: hp('1%'),s
               padding: hp('1%'),
-              width: hp(25),
+              width: wp(65),
               backgroundColor: Color('inputSearch'),
               marginTop: predictions?.length < 1 ? hp(2) : hp(12),
             }}>
@@ -388,7 +388,7 @@ const CFISearch = ({navigation}) => {
               btnStyle={{
                 backgroundColor: Color('homeBg'),
                 marginTop: predictions?.length < 1 ? hp(2) : hp(12),
-                paddingHorizontal: hp('5%'),
+                width: wp(21)
               }}
             />
             </View>

@@ -1,10 +1,10 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/react-in-jsx-scope */
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Suspense, useContext, useEffect, useState } from 'react';
+import { Suspense,  useContext,  useEffect } from 'react';
 import Orientation from 'react-native-orientation-locker';
-import { NavigationContainer } from '@react-navigation/native';
-import { LogBox } from 'react-native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { Alert, LogBox } from 'react-native';
 import Splash from './src/screens/Splash';
 import Loading from './src/screens/Loading';
 import GetStarted from './src/screens/GetStarted';
@@ -30,7 +30,7 @@ import About from './src/screens/About';
 import Terms from './src/screens/Terms';
 import Privacy from './src/screens/Privacy';
 import Verify from './src/screens/Verify';
-import { AppContext } from './src/utils/Context';
+import { AppContext, DataContext } from './src/utils/Context';
 import Logout from './src/screens/Logout';
 import CFISelection from './src/screens/CFISelection';
 import CFIScreen from './src/screens/CFIScreen';
@@ -47,10 +47,17 @@ import PackageDetail from './src/screens/PackageDetail';
 import { Platform } from 'react-native';
 import Purchases from 'react-native-purchases';
 import { withIAPContext } from 'react-native-iap';
+import { api } from './src/utils/api';
+import { navigationRef, replace } from './src/utils/global';
 
 const Stack = createNativeStackNavigator();
 
-function App() {
+function MainApp() {
+  const {context,setContext} = useContext(DataContext)
+
+  console.log('from c==>',context?.token);
+
+
  
   let APIKEY = Platform.OS === 'android' ? 'goog_NsTIazxZbCUKCthqNMbKrmCyyxT' : 'appl_SAfJQCOjWHjmBWyfUcvNkSwuOnQ';
   useEffect(() => {
@@ -62,6 +69,59 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!context?.token) return; 
+  
+    // const interval = setInterval(() => {
+    //   checkToken();
+    // }, 60000); 
+  
+    // return () => clearInterval(interval);
+    checkToken()
+  }, [context?.token]);
+  
+  const checkToken = async () => {
+    try {
+      const res = await api.get('/user/check-token', {
+        headers: {
+          Authorization: `Bearer ${context?.token}`,
+        },
+      });
+      console.log('response of check token:', res.data);
+      if(res.data.error === 'Invalid token.' || res.data.error === 'Token is expired') {
+        Alert.alert(
+          'Session Expired',
+          'Your account was accessed on another device. Please log in again to continue.',
+          [
+            {
+              text: 'Log In',
+              onPress: () => {
+                setContext({
+                  ...context,
+                  token: false,
+                  isVerified: false,
+                  user: null,
+                  notifications: null,
+                  restuarents: null,
+                  savedRestuarents: null,
+                  restuarent: null,
+                  about: null,
+                  terms: null,
+                  serviceImages: null,
+                  returnFromDetail: false,
+              })
+              replace('Logout');
+              },
+              style: 'default',
+            },
+          ],
+          { cancelable: false }
+        );
+      }
+    } catch (error) {
+      console.log('Token check failed:', error);
+    }
+  };
 
   useEffect(() => {
     const configurePurchases = async () => {
@@ -86,7 +146,7 @@ function App() {
   return (
     <>
       <AppContext>
-        <NavigationContainer > 
+        <NavigationContainer ref={navigationRef}> 
           <Stack.Navigator  screenOptions={{
             headerShown: false,
             animation: 'fade_from_bottom',
@@ -204,5 +264,14 @@ function App() {
     </>
   );
 }
+
+function App() {
+  return (
+    <AppContext>
+      <MainApp />
+    </AppContext>
+  );
+}
+
 
 export default withIAPContext(App)

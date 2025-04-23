@@ -33,7 +33,6 @@ import {storageUrl} from '../utils/api';
 const SideMenu = ({navigation}) => {
   const {context} = useContext(DataContext);
 
-  console.log(context?.token);
 
   const onDeleteAccount = async () => {
     navigation.navigate('Message', {
@@ -237,9 +236,9 @@ const SideMenu = ({navigation}) => {
             <>
               <Br space={5} />
               <Image
-                source={{
+                source={context?.user?.user_info?.profile_image ? {
                   uri: `${storageUrl}${context?.user?.user_info?.profile_image}`,
-                }}
+                } : require('../assets/images/userProfile.jpeg')}
                 style={{
                   width: hp('14%'),
                   height: hp('14%'),

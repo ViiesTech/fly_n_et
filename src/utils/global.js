@@ -1,9 +1,11 @@
-import {Platform} from 'react-native';
+import {Dimensions, Platform} from 'react-native';
 import {Color} from './Colors';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import { createNavigationContainerRef, StackActions } from '@react-navigation/native';
+
 
 export const drawerStyle = {
   backgroundColor: Color('drawerBg'),
@@ -155,4 +157,50 @@ export function calcCrow(lat1, lon1, lat2, lon2) {
 
 function toRad(Value) {
   return (Value * Math.PI) / 180;
+}
+
+const percentageCalculation = (max, val) =>
+  max * (val / 100);
+
+const fontCalculation = (
+  height,
+  width,
+  val,
+) => {
+  const widthDimension = height > width ? width : height;
+  const aspectRatioBasedHeight = (16 / 9) * widthDimension;
+  return percentageCalculation(
+    Math.sqrt(
+      Math.pow(aspectRatioBasedHeight, 2) + Math.pow(widthDimension, 2),
+    ),
+    val,
+  );
+};
+export const responsiveFontSize = (f) => {
+  const { height, width } = Dimensions.get('window');
+  return fontCalculation(height, width, f);
+};
+export const responsiveHeight = (h) => {
+  const { height } = Dimensions.get('window');
+  return height * (h / 100);
+};
+export const responsiveWidth = (w) => {
+  const { width } = Dimensions.get('window');
+  return width * (w / 100);
+};
+
+
+
+export const navigationRef = createNavigationContainerRef();
+
+export function navigate(name, params) {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate(name, params);
+  }
+}
+
+export function replace(name, params) {
+  if (navigationRef.isReady()) {
+    navigationRef.dispatch(StackActions.replace(name, params));
+  }
 }

@@ -2,18 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Grant access to your location to give you the relevant restaurants.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Grant access to your location to give you the relevant restaurants.</string>
-<key>NSCameraUsageDescription</key>
-<string>Grant access to the camera to take a photo for your profile.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Grant access to user to take your photo in order to create your profile.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-<string>We need access to save photos.</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>We need access to your microphone for video recording.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -43,6 +31,18 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Grant access to the camera to take a photo for your profile.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Grant access to your location to give you the relevant restaurants.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Grant access to your location to give you the relevant restaurants.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need access to your microphone for video recording.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need access to save photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Grant access to user to take your photo in order to create your profile.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Manrope-Bold.ttf</string>
@@ -79,9 +79,17 @@
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>

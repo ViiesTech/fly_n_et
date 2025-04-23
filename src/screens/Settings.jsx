@@ -16,6 +16,7 @@ const Settings = ({ navigation }) => {
     return (
         <>
             <BackBtn navigation={navigation} />
+            <Br space={6} />
             <Background translucent={false} bgColor={Color('sidebarBg')} statusBarColor={Color('sidebarBg')} barStyle="dark-content" noBackground>
                 <View>
                     <Br space={8} />

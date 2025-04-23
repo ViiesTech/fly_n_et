@@ -38,6 +38,7 @@ const About = ({navigation}) => {
   return (
     <>
       <BackBtn navigation={navigation} />
+      <Br space={6} />
       <Background
         bgColor={Color('sidebarBg')}
         statusBarColor={Color('sidebarBg')}

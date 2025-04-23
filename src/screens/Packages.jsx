@@ -68,7 +68,7 @@ const Packages = () => {
   // const routes = navigation.getState().routes;
   // const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
 
-  console.log('offerings',context?.user?.expired_at);
+  console.log('offerings', context?.user?.expired_at);
 
   const productIds = ['flyneat_month', 'flyneat_year2'];
   const androidsubscriptionsId = ['flyneat_month', 'flyneat_year2'];
@@ -161,11 +161,11 @@ const Packages = () => {
           console.log(JSON.stringify(response.data));
           setContext(prevContext => ({
             ...prevContext,
-            user:{
+            user: {
               ...prevContext?.user,
               freetrial_status: response.data?.user.freetrial_status,
-            }
-          }))
+            },
+          }));
           subscibeForMonth();
         } else {
           console.log('code is wrong');
@@ -253,11 +253,10 @@ const Packages = () => {
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: 'space-between',
               alignItems: 'center',
+              paddingHorizontal: 16,
             }}>
-            {/* {previousScreen ?   */}
-            <View style={{width: wp('20%'), alignItems: 'center'}}>
+            <View style={{width: wp('20%'), alignItems: 'flex-start'}}>
               <TouchableOpacity
                 style={{
                   backgroundColor: Color('btnColor'),
@@ -277,19 +276,21 @@ const Packages = () => {
                 <ArrowLeft size={hp('2.5%')} color={Color('text')} />
               </TouchableOpacity>
             </View>
-            {/* : null */}
-            {/* } */}
-            <View style={{justifyContent: 'center', flex: 0.8}}>
+
+            <View style={{flex: 1, alignItems: 'center'}}>
               <Text style={styles.heading}>Our Packages</Text>
             </View>
+            <View style={{width: wp('20%')}} />
           </View>
+
           <Text style={styles.desc}>
             Choose the best plan that fits your needs. Enjoy premium features
             and seamless access with our subscription packages.
           </Text>
 
+          {context?.token &&      
           <TouchableOpacity
-            disabled={context?.user?.freetrial_status}
+            // disabled={context?.user?.freetrial_status}
             onPress={() => {
               context?.token ? setShowPremiumModal(true) : goToLogin();
             }}
@@ -307,19 +308,21 @@ const Packages = () => {
               // justifyContent: 'center',
               marginTop: hp(5),
             }}>
-            <View style={{flexDirection: 'row',gap: 10}}>  
+            <View style={{flexDirection: 'row', gap: 10}}>
               <View style={styles.circleView} />
-            <Text style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'}}>
-              Premium User
-            </Text>
+              <Text
+                style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'}}>
+                Premium User
+              </Text>
             </View>
-           {context?.user?.freetrial_status && 
-            <Text style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'}}>
-              {context?.user?.freetrial_status}
-            </Text>
-            }
+            {context?.user?.freetrial_status && (
+              <Text
+                style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'}}>
+                {context?.user?.freetrial_status}
+              </Text>
+            )}
           </TouchableOpacity>
-
+          }
           <View style={{marginTop: 20}}>
             {subscription.length > 0 ? (
               <>
@@ -328,7 +331,6 @@ const Packages = () => {
                   const priceString =
                     item.subscriptionOfferDetails[0].pricingPhases
                       .pricingPhaseList[0].formattedPrice;
-
                   return (
                     <AndroidPackageCard
                       onPress={() =>
@@ -361,7 +363,7 @@ const Packages = () => {
               </>
             )}
           </View>
-        </View> 
+        </View>
         {showPremiumModal && (
           <View
             style={{
@@ -374,85 +376,104 @@ const Packages = () => {
               justifyContent: 'center',
               padding: 20,
             }}>
-           <KeyboardAvoidingView behavior='padding'>   
-          <ScrollView style={{flexGrow: 1}} contentContainerStyle={{alignItems: 'center', justifyContent: 'center',flex: 1}}>
-            <Text style={[styles.heading, {fontSize: hp(3)}]}>
-              Enter Premium Code
-            </Text>
-            <TextInput
-              placeholder="Enter the premium code"
-              style={{
-                borderWidth: 1,
-                borderColor: 'black',
-                width: wp('80%'),
-                borderRadius: 100,
-                paddingHorizontal: 10,
-                marginTop: hp(4),
-                minHeight: hp(5),
-              }}
-              onChangeText={txt => {
-                setPremiumCode(txt);
-              }}
-              value={PremiumCode}
-            />
-
-            {codeLoader == true ? (
-              <View
-                style={{
-                  height: hp(7),
-                  backgroundColor: Color('drawerBg'),
-                  width: wp(85),
-                  alignSelf: 'center',
-                  borderRadius: 10,
+            <KeyboardAvoidingView behavior="padding">
+              <ScrollView
+                style={{flexGrow: 1}}
+                contentContainerStyle={{
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginTop: hp(5),
+                  flex: 1,
                 }}>
-                <ActivityIndicator
-                  size={'small'}
-                  style={{alignSelf: 'center'}}
-                  color={'#FFFFFF'}
-                />
-              </View>
-            ) : (
-              <TouchableOpacity
-                onPress={() => SumbitPremiumCode()}
-                style={{
-                  height: hp(7),
-                  backgroundColor: Color('drawerBg'),
-                  width: wp(85),
-                  alignSelf: 'center',
-                  borderRadius: 10,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: hp(5),
-                }}>
-                <Text
-                  style={{color: '#FFFFFF', fontSize: 20, fontWeight: 'bold'}}>
-                  Submit
+                <Text style={[styles.heading, {fontSize: hp(3)}]}>
+                  Enter Premium Code
                 </Text>
-              </TouchableOpacity>
-            )}
+                <Text style={[styles.desc, {paddingTop: hp(2)}]}>
+                  Get 1 month of full access completely free—no credit card
+                  needed, no hidden fees. Enjoy all premium features for 30
+                  days, totally risk-free!
+                </Text>
+                <TextInput
+                  placeholder="Enter the premium code"
+                  style={{
+                    borderWidth: 1,
+                    borderColor: 'black',
+                    width: wp('80%'),
+                    borderRadius: 100,
+                    paddingHorizontal: 10,
+                    marginTop: hp(4),
+                    minHeight: hp(5),
+                  }}
+                  onChangeText={txt => {
+                    setPremiumCode(txt);
+                  }}
+                  value={PremiumCode}
+                />
 
-            <TouchableOpacity
-              onPress={() => setShowPremiumModal(false)}
-              style={{
-                height: hp(7),
-                backgroundColor: Color('drawerBg'),
-                width: wp(85),
-                alignSelf: 'center',
-                borderRadius: 10,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: hp(2),
-              }}>
-              <Text
-                style={{color: '#FFFFFF', fontSize: 20, fontWeight: 'bold'}}>
-                Close
-              </Text>
-            </TouchableOpacity>
-          </ScrollView>
-          </KeyboardAvoidingView>
+                {codeLoader == true ? (
+                  <View
+                    style={{
+                      height: hp(7),
+                      backgroundColor: Color('drawerBg'),
+                      width: wp(85),
+                      alignSelf: 'center',
+                      borderRadius: 10,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: hp(5),
+                    }}>
+                    <ActivityIndicator
+                      size={'small'}
+                      style={{alignSelf: 'center'}}
+                      color={'#FFFFFF'}
+                    />
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => SumbitPremiumCode()}
+                    style={{
+                      height: hp(7),
+                      backgroundColor: Color('drawerBg'),
+                      width: wp(85),
+                      alignSelf: 'center',
+                      borderRadius: 10,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: hp(5),
+                    }}>
+                    <Text
+                      style={{
+                        color: '#FFFFFF',
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                      }}>
+                      Submit
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                <TouchableOpacity
+                  onPress={() => setShowPremiumModal(false)}
+                  style={{
+                    height: hp(7),
+                    backgroundColor: Color('drawerBg'),
+                    width: wp(85),
+                    alignSelf: 'center',
+                    borderRadius: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: hp(2),
+                  }}>
+                  <Text
+                    style={{
+                      color: '#FFFFFF',
+                      fontSize: 20,
+                      fontWeight: 'bold',
+                    }}>
+                    Close
+                  </Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </KeyboardAvoidingView>
           </View>
         )}
       </Background>
@@ -479,7 +500,7 @@ const styles = StyleSheet.create({
     paddingTop: hp(4),
     width: wp(80),
   },
-  circleView:{
+  circleView: {
     height: hp(1.5),
     width: hp(1.5),
     marginTop: hp(0.3),

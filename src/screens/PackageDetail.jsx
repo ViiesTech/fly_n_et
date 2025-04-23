@@ -1,4 +1,12 @@
-import {Alert, Platform, StyleSheet, Text, TouchableOpacity, View, Animated} from 'react-native';
+import {
+  Alert,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Animated,
+} from 'react-native';
 import React, {useContext, useState} from 'react';
 import {Color} from '../utils/Colors';
 import {
@@ -11,8 +19,8 @@ import Purchases from 'react-native-purchases';
 import {api, baseUrl, note} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import {useNavigation} from '@react-navigation/native';
-import { ArrowLeft } from 'iconsax-react-native';
-import { getAvailablePurchases, requestSubscription } from 'react-native-iap';
+import {ArrowLeft} from 'iconsax-react-native';
+import {getAvailablePurchases, requestSubscription} from 'react-native-iap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import LoaderOverlay from '../components/LoaderOverlay';
@@ -45,48 +53,50 @@ const PackageDetail = ({route}) => {
   const {context, setContext} = useContext(DataContext);
   const navigation = useNavigation();
 
-
-  console.log("context",context)
+  console.log('context', context);
   // const [offering, setOffering] = useState(null);
 
   const data = route?.params?.detail;
-  console.log('user expiry',context?.user?.expired_at);
-  console.log('context',context?.subscribed_details)
+  console.log('user expiry', context?.user?.expired_at);
+  console.log('context', context?.subscribed_details);
 
-   const isAndroid = Platform.OS === 'android'; 
+  const isAndroid = Platform.OS === 'android';
 
   // console.log("data",data)
 
   // console.log("data", data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
-  const priceData = isAndroid && data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice
+  const priceData =
+    isAndroid &&
+    data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0]
+      .formattedPrice;
 
   const TopBar = () => {
     return (
       <View style={styles.topbar}>
-          {/* <View style={{width: wp('20%'), alignItems: 'center'}}> */}
+        {/* <View style={{width: wp('20%'), alignItems: 'center'}}> */}
         <TouchableOpacity
-                      style={{
-                        backgroundColor: Color('btnColor'),
-                        width: hp('5%'),
-                        height: hp('5%'),
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: hp('50%'),
-                      }}
-                      onPress={() =>  navigation.goBack()}>
-                      <ArrowLeft size={hp('2.5%')} color={Color('text')} />
-                    </TouchableOpacity>
-       <View style={{width: hp('35'),alignItems: 'center'}}>             
-        <Text style={styles.packageStyle}>
-          {data?.packageType === 'ANNUAL'
-            ? 'Yearly Package'
-            : 'Monthly Package'}
-        </Text>
-        <Text style={styles.priceText}>
-          {data.packageType === 'ANNUAL'
-            ? data?.product?.priceString + ' ' + '/' + ' ' + 'YEAR (SAVE 15%)'
-            : data?.product?.priceString + ' ' + '/' + ' ' + 'MONTH'}
-        </Text>
+          style={{
+            backgroundColor: Color('btnColor'),
+            width: hp('5%'),
+            height: hp('5%'),
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: hp('50%'),
+          }}
+          onPress={() => navigation.goBack()}>
+          <ArrowLeft size={hp('2.5%')} color={Color('text')} />
+        </TouchableOpacity>
+        <View style={{flex: 1, alignItems: 'center'}}>
+          <Text style={styles.packageStyle}>
+            {data?.packageType === 'ANNUAL'
+              ? 'Yearly Package'
+              : 'Monthly Package'}
+          </Text>
+          <Text style={styles.priceText}>
+            {data.packageType === 'ANNUAL'
+              ? data?.product?.priceString + ' ' + '/' + ' ' + 'YEAR (SAVE 15%)'
+              : data?.product?.priceString + ' ' + '/' + ' ' + 'MONTH'}
+          </Text>
         </View>
         {/* </View>   */}
       </View>
@@ -96,55 +106,50 @@ const PackageDetail = ({route}) => {
   const AndroidTopBar = () => {
     return (
       <View style={styles.topbar}>
-          {/* <View style={{width: wp('20%'), alignItems: 'center'}}> */}
+        {/* <View style={{width: wp('20%'), alignItems: 'center'}}> */}
         <TouchableOpacity
-                      style={{
-                        backgroundColor: Color('btnColor'),
-                        width: hp('5%'),
-                        height: hp('5%'),
-                        marginLeft: hp(2.5),
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: hp('50%'),
-                      }}
-                      onPress={() =>  navigation.goBack()}>
-                      <ArrowLeft size={hp('2.5%')} color={Color('text')} />
-                    </TouchableOpacity>
-       <View style={{width: hp('35'),alignItems: 'center'}}>             
-        <Text style={styles.packageStyle}>
-          {data?.name}
-        </Text>
-        <Text style={styles.priceText}>
-          {priceData
-            ? priceData 
-            : priceData }
-        </Text>
+          style={{
+            backgroundColor: Color('btnColor'),
+            width: hp('5%'),
+            height: hp('5%'),
+            marginLeft: hp(2.5),
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: hp('50%'),
+          }}
+          onPress={() => navigation.goBack()}>
+          <ArrowLeft size={hp('2.5%')} color={Color('text')} />
+        </TouchableOpacity>
+        <View style={{width: hp('35'), alignItems: 'center'}}>
+          <Text style={styles.packageStyle}>{data?.name}</Text>
+          <Text style={styles.priceText}>
+            {priceData ? priceData : priceData}
+          </Text>
         </View>
         {/* </View>   */}
       </View>
     );
   };
-  console.log("cot..........,.,.,", context?.token)
+  console.log('cot..........,.,.,', context?.token);
   const onConfirmPurchase = async () => {
-
     if (!data) {
       Alert.alert('Error', 'No available package for this plan.');
       setLoading(false);
       return;
     }
 
-    if(Platform.OS == 'android'){
+    if (Platform.OS == 'android') {
       setLoading(true);
       try {
         setContext({
           ...context,
-          skipNavigationCheck: true
-        })
-        const offerToken = data?.subscriptionOfferDetails[0].offerToken
+          skipNavigationCheck: true,
+        });
+        const offerToken = data?.subscriptionOfferDetails[0].offerToken;
         const purchaseData = await requestSubscription({
           sku: data?.productId,
           ...(offerToken && {
-            subscriptionOffers: [{ sku: data?.productId, offerToken }],
+            subscriptionOffers: [{sku: data?.productId, offerToken}],
           }),
         });
         // setLoading(true)
@@ -160,52 +165,52 @@ const PackageDetail = ({route}) => {
                 'To access your subscription benefits, please create or log in to your account',
               screen: 'Login',
             });
-          }else{
-            if(context.token){
-              
-              console.log("going in navigatii func")
-              await handlingNavigations()
-              return
+          } else {
+            if (context.token) {
+              console.log('going in navigatii func');
+              await handlingNavigations();
+              return;
             }
           }
-        
-          const subType = data?.productId.includes('year') ? 'yearly' : 'monthly';
+
+          const subType = data?.productId.includes('year')
+            ? 'yearly'
+            : 'monthly';
           const purchasedDate = new Date(purchase.transactionDate);
-        
+
           setContext({
             ...context,
             subscribed_details: {
               purchased_date: purchasedDate,
               sub_type: subType,
             },
-            skipNavigationCheck: false
+            skipNavigationCheck: false,
           });
         }
       } catch (error) {
         console.log(error);
         setContext({
           ...context,
-          skipNavigationCheck: false
-        })
+          skipNavigationCheck: false,
+        });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }else{
-
+    } else {
       setLoading(true);
       try {
         const purchaseMade = await Purchases.purchasePackage(data);
         // setLoading(true);
-  
+
         // const obj = {
         //   purchase_date: purchaseMade?.transaction?.purchaseDate,
         //   sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
         // };
-  
+
         // console.log('Purchase data:', obj);
 
         // return console.log('hello world',purchaseMade)
-     
+
         if (purchaseMade?.transaction?.purchaseDate && !context?.token) {
           navigation.navigate('Message', {
             theme: 'light',
@@ -214,49 +219,46 @@ const PackageDetail = ({route}) => {
               'To access your subscription benefits, please create or log in to your account',
             screen: 'Login',
           });
-        }else{
-          if(context.token){
-            
+        } else {
+          if (context.token) {
             setLoading(false);
-            console.log("going in navigatii func")
-            await handlingNavigations()
-            return
+            console.log('going in navigatii func');
+            await handlingNavigations();
+            return;
           }
         }
 
-        //  alert('lilill') 
+        //  alert('lilill')
         setContext({
           ...context,
           subscribed_details: purchaseMade?.transaction?.purchaseDate && {
-          purchased_date: purchaseMade?.transaction?.purchaseDate,
-          sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
-        }})
-      
+            purchased_date: purchaseMade?.transaction?.purchaseDate,
+            sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
+          },
+        });
       } catch (error) {
         console.log('Error:', error?.response?.data || error?.message);
-  
+
         if (error?.response?.status === 401) {
           Alert.alert('Unauthorized', 'Please log in again.');
         } else {
           Alert.alert('Error', error?.message || 'Something went wrong');
         }
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-    
   };
 
   const onRestorePurchase = async () => {
-    if(Platform.OS == "android"){
-    setLoading(true)
+    if (Platform.OS == 'android') {
+      setLoading(true);
       try {
         // const purchases = await RNIap.getAvailablePurchases();
         const purchases = await getAvailablePurchases();
-        console.log("purchases",purchases);// get current available purchases
+        console.log('purchases', purchases); // get current available purchases
 
-        if(purchases.length > 0){
-
+        if (purchases.length > 0) {
           navigation.navigate('Message', {
             theme: 'light',
             title: 'Login Required',
@@ -264,72 +266,75 @@ const PackageDetail = ({route}) => {
               'To access your subscription benefits, please create or log in to your account',
             screen: 'Login',
           });
-
-        }else{
+        } else {
           note(
             'Please buy the subscription',
             'You have to buy the subscription first to continue',
           );
         }
-   
       } catch (e) {
         console.error('Failed to restore purchases:', e);
-        
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-      
-      
-    }else{
-   setLoading(true)
-    try {
-      const customerInfo = await Purchases.restorePurchases();
-      console.log('restore', customerInfo.entitlements.active);
-      if (
-        Object.keys(customerInfo.entitlements.active).length > 0 &&
-        !context?.token
-      ) {
-        // note('Purchases Restored!', 'Your subscription has been restored successfully');
-        navigation.navigate('Message', {
-          theme: 'light',
-          title: 'Login Required',
-          message:
-            'To access your subscription benefits, please create or log in to your account',
-          screen: 'Login',
-        });
-        // navigation.replace('Home');
-      } else if (
-        Object.keys(customerInfo.entitlements.active).length > 0 &&
-        context?.token
-      ) {
-        note(
-          'Purchases Restored!',
-          'Your subscription has been restored successfully',
-        );
-      } else {
-        note(
-          'Please buy the subscription',
-          'You have to buy the subscription first to continue',
-        );
+    } else {
+      setLoading(true);
+      try {
+        const customerInfo = await Purchases.restorePurchases();
+        console.log('restore', customerInfo.entitlements.active);
+        if (
+          Object.keys(customerInfo.entitlements.active).length > 0 &&
+          !context?.token
+        ) {
+          // note('Purchases Restored!', 'Your subscription has been restored successfully');
+          navigation.navigate('Message', {
+            theme: 'light',
+            title: 'Login Required',
+            message:
+              'To access your subscription benefits, please create or log in to your account',
+            screen: 'Login',
+          });
+          // navigation.replace('Home');
+        } else if (
+          Object.keys(customerInfo.entitlements.active).length > 0 &&
+          context?.token
+        ) {
+          note(
+            'Purchases Restored!',
+            'Your subscription has been restored successfully',
+          );
+        } else {
+          note(
+            'Please buy the subscription',
+            'You have to buy the subscription first to continue',
+          );
+        }
+      } catch (e) {
+        console.error('Failed to restore purchases:', e);
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      console.error('Failed to restore purchases:', e);
-    } finally {
-      setLoading(false)
     }
-      
-  }
   };
-
 
   const handlingNavigations = async () => {
     // console.log("first", data)
     // return
-    const androidsubtype = Platform.OS === 'android' &&  data?.subscriptionOfferDetails[0]?.basePlanId == "year" ? "yearly" : "monthly"
-    const iosSubType = Platform.OS === 'ios' && data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly'
-// return console.log('hello world',iosSubType)
+    const androidsubtype =
+      Platform.OS === 'android' &&
+      data?.subscriptionOfferDetails[0]?.basePlanId == 'year'
+        ? 'yearly'
+        : 'monthly';
+    const iosSubType =
+      Platform.OS === 'ios' && data?.packageType === 'ANNUAL'
+        ? 'yearly'
+        : 'monthly';
+    // return console.log('hello world',iosSubType)
     let datatoBeAppend = new FormData();
-    datatoBeAppend.append('sub_type', Platform.OS == "android" ? androidsubtype : iosSubType);
+    datatoBeAppend.append(
+      'sub_type',
+      Platform.OS == 'android' ? androidsubtype : iosSubType,
+    );
 
     let config = {
       method: 'post',
@@ -345,13 +350,16 @@ const PackageDetail = ({route}) => {
 
     axios
       .request(config)
-      .then(async (response) => {
+      .then(async response => {
         const updatedExpiry = response?.data?.user?.expired_at;
         if (updatedExpiry) {
           if (context?.token) {
-              await AsyncStorage.setItem('token', context?.token);
-              await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-              await AsyncStorage.setItem('user', JSON.stringify(response?.data?.user));
+            await AsyncStorage.setItem('token', context?.token);
+            await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+            await AsyncStorage.setItem(
+              'user',
+              JSON.stringify(response?.data?.user),
+            );
 
             setContext({
               ...context,
@@ -361,10 +369,9 @@ const PackageDetail = ({route}) => {
             });
             setLoading(false);
             navigation.navigate('Home');
-          }else{
+          } else {
             setLoading(false);
           }
-
         }
       })
       .catch(error => {
@@ -373,138 +380,129 @@ const PackageDetail = ({route}) => {
       });
   };
 
-   const nextScreen = (nav) => {
-          Animated.timing(slideAnimation, {
-              toValue: hp('100%'),
-              duration: 1000,
-              useNativeDriver: true,
-          }).start(() => {
-              nav();
-          });
-      };
-
-
-  
-
-
- 
+  const nextScreen = nav => {
+    Animated.timing(slideAnimation, {
+      toValue: hp('100%'),
+      duration: 1000,
+      useNativeDriver: true,
+    }).start(() => {
+      nav();
+    });
+  };
 
   return (
     <View style={{flex: 1, backgroundColor: Color('text')}}>
-      {
-        Platform.OS == "android" ?
+      {Platform.OS == 'android' ? (
         <>
-      <Background
-        translucent={false}
-        noScroll={true}
-        statusBarColor={Color('homeBg')}
-        noBackground>
-        <AndroidTopBar />
-        <View style={styles.container}>
-          <Text style={styles.heading}>Package Details</Text>
+          <Background
+            translucent={false}
+            noScroll={true}
+            statusBarColor={Color('homeBg')}
+            noBackground>
+            <AndroidTopBar />
+            <View style={styles.container}>
+              <Text style={styles.heading}>Package Details</Text>
+              <View
+                style={{
+                  flexDirection: 'column',
+                  gap: hp(2),
+                  paddingTop: hp(3),
+                }}>
+                {packageDetails.map(item => (
+                  <View
+                    key={item.id}
+                    style={{
+                      flexDirection: 'row',
+                      gap: wp(3),
+                    }}>
+                    <View style={styles.circleView} />
+                    <Text style={styles.detail}>{item.text}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </Background>
           <View
             style={{
-              flexDirection: 'column',
-              gap: hp(2),
-              paddingTop: hp(3),
+              flex: 1,
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              marginBottom: hp(7),
             }}>
-            {packageDetails.map(item => (
-              <View
-                key={item.id}
-                style={{
-                  flexDirection: 'row',
-                  gap: wp(3),
-                }}>
-                <View style={styles.circleView} />
-                <Text style={styles.detail}>{item.text}</Text>
-              </View>
-            ))}
+            <Btn
+              loading={loading}
+              label={'Purchase'}
+              onPress={() => onConfirmPurchase()}
+              btnStyle={{backgroundColor: Color('drawerBg'), width: '90%'}}
+            />
+            <Btn
+              label={'Restore Purchase'}
+              onPress={() => onRestorePurchase()}
+              btnStyle={{
+                backgroundColor: Color('drawerBg'),
+                width: '90%',
+                marginTop: hp(1),
+              }}
+            />
           </View>
-        </View>
-      </Background>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          marginBottom: hp(7),
-        }}>
-        <Btn
-          loading={loading}
-          label={'Purchase'}
-          onPress={() => onConfirmPurchase()}
-          btnStyle={{backgroundColor: Color('drawerBg'), width: '90%'}}
-        />
-        <Btn
-          label={'Restore Purchase'}
-          onPress={() => onRestorePurchase()}
-          btnStyle={{
-            backgroundColor: Color('drawerBg'),
-            width: '90%',
-            marginTop: hp(1),
-          }}
-        />
-      </View>
-        
         </>
-        :
+      ) : (
         <>
-      <Background
-        translucent={false}
-        noScroll={true}
-        statusBarColor={Color('homeBg')}
-        noBackground>
-        <TopBar />
-        <View style={styles.container}>
-          <Text style={styles.heading}>Package Details</Text>
-          <View
-            style={{
-              flexDirection: 'column',
-              gap: hp(2),
-              paddingTop: hp(3),
-            }}>
-            {packageDetails.map(item => (
+          <Background
+            translucent={false}
+            noScroll={true}
+            statusBarColor={Color('homeBg')}
+            noBackground>
+            <TopBar />
+            <View style={styles.container}>
+              <Text style={styles.heading}>Package Details</Text>
               <View
-                key={item.id}
                 style={{
-                  flexDirection: 'row',
-                  gap: wp(3),
+                  flexDirection: 'column',
+                  gap: hp(2),
+                  paddingTop: hp(3),
                 }}>
-                <View style={styles.circleView} />
-                <Text style={styles.detail}>{item.text}</Text>
+                {packageDetails.map(item => (
+                  <View
+                    key={item.id}
+                    style={{
+                      flexDirection: 'row',
+                      gap: wp(3),
+                    }}>
+                    <View style={styles.circleView} />
+                    <Text style={styles.detail}>{item.text}</Text>
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
-        </View>
-      </Background>
+            </View>
+          </Background>
 
-      
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          marginBottom: hp(7),
-        }}>
-        <Btn
-          // loading={loading}
-          label={'Purchase'}
-          onPress={() => onConfirmPurchase()}
-          btnStyle={{backgroundColor: Color('drawerBg'), width: '90%'}}
-        />
-        <Btn
-          label={'Restore Purchase'}
-          onPress={() => onRestorePurchase()}
-          btnStyle={{
-            backgroundColor: Color('drawerBg'),
-            width: '90%',
-            marginTop: hp(1),
-          }}
-        />
-       <LoaderOverlay visible={loading} />
-      </View>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              marginBottom: hp(7),
+            }}>
+            <Btn
+              // loading={loading}
+              label={'Purchase'}
+              onPress={() => onConfirmPurchase()}
+              btnStyle={{backgroundColor: Color('drawerBg'), width: '90%'}}
+            />
+            <Btn
+              label={'Restore Purchase'}
+              onPress={() => onRestorePurchase()}
+              btnStyle={{
+                backgroundColor: Color('drawerBg'),
+                width: '90%',
+                marginTop: hp(1),
+              }}
+            />
+            <LoaderOverlay visible={loading} />
+          </View>
         </>
-      }
+      )}
     </View>
   );
 };
@@ -515,6 +513,7 @@ const styles = StyleSheet.create({
   topbar: {
     backgroundColor: Color('homeBg'),
     paddingVertical: hp('2.5%'),
+    padding: hp(2),
     // width: hp('100%'),
     // alignItems: 'center',
     flexDirection: 'row',

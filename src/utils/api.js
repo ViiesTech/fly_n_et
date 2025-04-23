@@ -32,7 +32,10 @@ export const errHandler = async (err, callBack, navigation) => {
             note('Request Failed', errors[0]);
         }else if (error?.error) {
             if (error?.error === 'Token expired.') {
-                navigation.replace('Logout');
+            // note(
+            //     'Session Expired',
+            //     'You have been logged out because your account was logged in on another device.'
+            // );
             }
             note('Request Failed', error?.error);
         }else if (error?.status === 'error') {

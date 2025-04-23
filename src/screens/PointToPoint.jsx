@@ -137,7 +137,7 @@ const PointToPoint = ({ navigation }) => {
                         } else {
                             navigation.navigate('Notifications')
                         }
-                } }>
+                }}>
                         <Notification
                             size={hp('2.5%')}
                             color={Color('text')}

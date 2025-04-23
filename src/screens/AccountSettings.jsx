@@ -150,9 +150,9 @@ const AccountSettings = ({navigation}) => {
           <Wrapper>
             <Br space={5} />
             <Image
-              source={{
+              source={profile != 'https://praetorstestnet.com/flyneat/undefined' ? {
                 uri: profile
-              }}
+              } : require('../assets/images/userProfile.jpeg')}
               style={{
                 borderWidth: 1,
                 borderColor: Color('shadow'),

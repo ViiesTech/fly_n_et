@@ -67,9 +67,25 @@ const Message = ({ navigation, route }) => {
                 note('Account Delete',res.data.message);
                 setLoading(false)
             }
+        } else if (title === 'Logout') {
+            setContext({
+                ...context,
+                token: false,
+                isVerified: false,
+                user: null,
+                notifications: null,
+                restuarents: null,
+                savedRestuarents: null,
+                restuarent: null,
+                about: null,
+                terms: null,
+                serviceImages: null,
+                returnFromDetail: false,
+            })
+            navigation.navigate(screen);
         } else {
             navigation.navigate(screen || 'Home');
-        } 
+        }
         });
     };
 
