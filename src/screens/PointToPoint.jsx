@@ -3,7 +3,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Background from '../utils/Background';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Br from '../components/Br';
@@ -18,12 +18,39 @@ import { api, errHandler, note } from '../utils/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { calculateDistance, nauticalMilesToMeters } from '../utils/global';
+import Orientation from 'react-native-orientation-locker';
 
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 
 const PointToPoint = ({ navigation }) => {
     const { context,setContext } = useContext(DataContext);
     const [location, setLocation] = useState();
+
+    const [width, setScreenWidth] = useState(Dimensions.get('window').width);
+    const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+
+
+    useEffect(() => {
+        const updateDimensions = () => {
+          const { width, height } = Dimensions.get('window');
+          setScreenWidth(width);
+          setScreenHeight(height);
+        };
+    
+        // Listen for orientation changes
+        Orientation.addOrientationListener(updateDimensions);
+    
+        // Listen for dimension changes (e.g. on rotation)
+        const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+    
+        // Cleanup both listeners
+        return () => {
+          Orientation.removeOrientationListener(updateDimensions);
+          dimensionSubscription?.remove(); // modern API
+        };
+      }, []);
+    
+
 
     // console.log('user',context?.isPoint)
 
@@ -96,8 +123,8 @@ const PointToPoint = ({ navigation }) => {
     }
     const TopBar = () => {
         return (
-            <View style={styles.topbar}>
-                <View style={{ width: wp('20%'), alignItems: 'center' }}>
+            <View style={[styles.topbar,{width: width}]}>
+                <View style={{ width: width * 0.2, alignItems: 'center' }}>
                     <TouchableOpacity style={{
                         backgroundColor: Color('btnColor'),
                         width: hp('5%'),
@@ -112,7 +139,7 @@ const PointToPoint = ({ navigation }) => {
                         />
                     </TouchableOpacity>
                 </View>
-                <View style={{ width: wp('60%'), alignItems: 'center' }}>
+                <View style={{ width: width * 0.6, alignItems: 'center' }}>
                      {context?.token &&
                                        <>
                                         <Small heading font="medium">Current Location</Small>
@@ -464,6 +491,7 @@ const styles = StyleSheet.create({
     },
     inputField: {
         borderRadius: hp('50%'),
+        width: '100%',
         paddingHorizontal: wp('5%'),
         color: Color('homeBg'),
         paddingVertical: Platform.OS === 'android' && 0,

@@ -18,6 +18,8 @@ import { api, errHandler, note } from '../utils/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Purchases from 'react-native-purchases';
+import { Dimensions } from 'react-native';
+import Orientation from 'react-native-orientation-locker';
 
 // const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
@@ -26,12 +28,36 @@ const Home = ({ navigation }) => {
     const { context,setContext } = useContext(DataContext);
     const [location, setLocation] = useState();
 
+    const [width, setScreenWidth] = useState(Dimensions.get('window').width);
+    const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+
+
+    useEffect(() => {
+        const updateDimensions = () => {
+          const { width, height } = Dimensions.get('window');
+          setScreenWidth(width);
+          setScreenHeight(height);
+        };
+    
+        // Listen for orientation changes
+        Orientation.addOrientationListener(updateDimensions);
+    
+        // Listen for dimension changes (e.g. on rotation)
+        const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+    
+        // Cleanup both listeners
+        return () => {
+          Orientation.removeOrientationListener(updateDimensions);
+          dimensionSubscription?.remove(); // modern API
+        };
+      }, []);
+    
 
     const Latitude = context?.user?.latitude
     const longitude = context?.user?.longitude
 
-        console.log('helo3r',context?.user?.user_info?.address)
-        console.log('first',context?.token)
+        // console.log('helo3r',context?.user?.user_info?.address)
+        // console.log('first',context?.token)
     
 
     useEffect(() => {
@@ -130,8 +156,8 @@ const Home = ({ navigation }) => {
 
     const TopBar = () => {
         return (
-            <View style={styles.topbar}>
-                <View style={{ width: wp('20%'), alignItems: 'center' }}>
+            <View style={[styles.topbar,{width: width}]}>
+                <View style={{ width: width * 0.2, alignItems: 'center' }}>
                     <TouchableOpacity style={{
                         backgroundColor: Color('btnColor'),
                         width: hp('5%'),
@@ -146,7 +172,7 @@ const Home = ({ navigation }) => {
                         />
                     </TouchableOpacity>
                 </View>
-                <View style={{ width: wp('60%'), alignItems: 'center' }}>
+                <View style={{ width: width * 0.6, alignItems: 'center' }}>
                    {context?.token && 
                    <>
                     <Small heading font="medium">Current Location</Small>
@@ -349,6 +375,7 @@ const styles = StyleSheet.create({
     },
     inputField: {
         borderRadius: hp('50%'),
+        width: '100%',
         paddingHorizontal: wp('5%'),
         paddingVertical: Platform.OS === 'android' && 0,
         color: Color('homeBg'),

@@ -4,8 +4,10 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
   Image,
   Linking,
+  Modal,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -23,7 +25,7 @@ import {Color} from '../utils/Colors';
 import Btn from '../utils/Btn';
 import BackBtn from '../components/BackBtn';
 import Wrapper from '../components/Wrapper';
-import {Heart, Location} from 'iconsax-react-native';
+import {ArrowLeft, Heart, Location} from 'iconsax-react-native';
 import {api, errHandler, storageUrl} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import moment from 'moment';
@@ -33,11 +35,14 @@ import MapView, {Marker} from 'react-native-maps';
 import FastImage from 'react-native-fast-image';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 
+const {height, width} = Dimensions.get('window');
+
 const RestuarantDetails = ({navigation, route}) => {
   const IsFocused = useIsFocused();
   const {context, setContext} = useContext(DataContext);
   const [view, setView] = useState(1);
   const [showAll, setShowAll] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
   const reviews = context?.restuarent?.reviews || [];
   const displayedReviews = showAll ? reviews : reviews.slice(0, 2);
   useEffect(() => {
@@ -203,7 +208,7 @@ const RestuarantDetails = ({navigation, route}) => {
 
   return (
     <>
-      <StatusBar translucent barStyle="light-content" />
+      <StatusBar translucent={selectedImage ? false : true} barStyle="light-content" backgroundColor={selectedImage && 'black'} />
 
       {!context?.restuarent || context?.restuarent?.id !== route?.params?.id ? (
         <View style={{flex: 1, justifyContent: 'center'}}>
@@ -238,7 +243,7 @@ const RestuarantDetails = ({navigation, route}) => {
               style={{height: hp('40%'), width: wp('100%')}}
             />
           ) : (
-            <View style={{}}>
+            <View>
               <SwiperFlatList
                 index={0}
                 showPagination
@@ -251,7 +256,7 @@ const RestuarantDetails = ({navigation, route}) => {
                       alignSelf: 'center',
                       // flex: 1,
                       position: 'absolute',
-                      bottom: 10
+                      bottom: 10,
                     }}>
                     {context?.restuarent?.images.map((_, index) => (
                       <View
@@ -275,51 +280,40 @@ const RestuarantDetails = ({navigation, route}) => {
                 )}
                 data={context?.restuarent?.images}
                 renderItem={({item}) => (
-                  <FastImage
-                    style={{width: wp('100%'), height: hp('40%')}}
-                    source={{
-                      uri: `${storageUrl}${item.path}`,
-                      priority: FastImage.priority.normal,
-                    }}
-                    resizeMode={FastImage.resizeMode.cover}
-                  />
+                  <TouchableOpacity
+                    onPress={() =>
+                      setSelectedImage(`${storageUrl}${item.path}`)
+                    }>
+                    <FastImage
+                      style={{width: width, height: height * 0.4}}
+                      source={{
+                        uri: `${storageUrl}${item.path}`,
+                        priority: FastImage.priority.normal,
+                      }}
+                      resizeMode={FastImage.resizeMode.cover}
+                    />
+                  </TouchableOpacity>
                 )}
               />
-
-              {/* <SwiperFlatList
-                // autoplay
-                // autoplayDelay={2}
-                // autoplayLoop
-                index={0}
-                showPagination
-                paginationDefaultColor={Color('text')}
-                paginationActiveColor={Color('drawerBg')}
-                data={context?.restuarent?.images}
-                renderItem={({item}) => (
+              <Modal
+                visible={!!selectedImage}
+                transparent={true}
+                onRequestClose={() => setSelectedImage(null)}>
+                <View
+                  style={styles.modalBackground}>
+                      <TouchableOpacity style={styles.backIconContainer} onPress={() => setSelectedImage(null)}>
+                                <ArrowLeft
+                                    size={hp('3%')}
+                                    color={Color('text')}
+                                />
+                            </TouchableOpacity>
                   <FastImage
-                    style={{width: wp('100%'), height: hp('40%')}}
-                    source={{
-                      uri: `${storageUrl}${item.path}`,
-                      priority: FastImage.priority.normal,
-                    }}
-                    resizeMode={FastImage.resizeMode.cover}
+                    style={styles.fullscreenImage}
+                    source={{uri: selectedImage}}
+                    resizeMode={FastImage.resizeMode.contain}
                   />
-                )}
-              /> */}
-              {/* <Swiper>
-            {context?.restuarent?.images.map((item) => {
-              return (
-                <FastImage
-                style={{ width: wp('100%'), height: hp('40%') }}
-                source={{
-                    uri: `${storageUrl}${item.path}`,
-                    priority: FastImage.priority.normal,
-                }}
-                resizeMode={FastImage.resizeMode.contain}
-            />
-              )
-            })}
-          </Swiper> */}
+                </View>
+              </Modal>
             </View>
           )}
           <Br space={3} />
@@ -644,5 +638,36 @@ const styles = StyleSheet.create({
     height: hp('12%'),
     borderRadius: hp('1%'),
     marginBottom: hp('0.2%'),
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    position: 'absolute',
+    bottom: 10,
+  },
+  dot: {
+    width: 20,
+    height: 20,
+    borderRadius: 100,
+    marginHorizontal: 4,
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullscreenImage: {
+    width: '100%',
+    height: '100%',
+  },
+  backIconContainer: {
+    position: 'absolute',
+    top: 10,
+    left: 20,
+    zIndex: 10,
+    backgroundColor: Color('btnColor'),
+    padding: 10,
+    borderRadius: 30,
   },
 });

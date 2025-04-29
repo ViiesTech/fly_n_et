@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {Dimensions, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Color} from '../utils/Colors';
 import {
   heightPercentageToDP as hp,
@@ -9,12 +9,36 @@ import {
 import {Small} from '../utils/Text';
 import Br from './Br';
 import {DataContext} from '../utils/Context';
+import Orientation from 'react-native-orientation-locker';
 
 const Navigation = ({label, navigation, ...props}) => {
   const {context, setContext} = useContext(DataContext);
+    const [width, setScreenWidth] = useState(Dimensions.get('window').width);
+    const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+    useEffect(() => {
+      const updateDimensions = () => {
+        const { width, height } = Dimensions.get('window');
+        setScreenWidth(width);
+        setScreenHeight(height);
+      };
+  
+      // Listen for orientation changes
+      Orientation.addOrientationListener(updateDimensions);
+  
+      // Listen for dimension changes (e.g. on rotation)
+      const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+  
+      // Cleanup both listeners
+      return () => {
+        Orientation.removeOrientationListener(updateDimensions);
+        dimensionSubscription?.remove(); // modern API
+      };
+    }, []);
+  
+
   return (
     <>
-      <View style={styles.navigation}>
+      <View style={[styles.navigation,{width: width}]}>
         <TouchableOpacity
           style={{alignItems: 'center'}}
           onPress={() => navigation.navigate('Home')}>

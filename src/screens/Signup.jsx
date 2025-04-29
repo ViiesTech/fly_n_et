@@ -209,7 +209,8 @@ const Signup = ({navigation}) => {
         'Please select at least one option before continuing.',
       );
     } else {
-      note('Account Created', modal.data?.message);
+      //  alert(modal?.data?.token)
+      note('Account Created', modal.data?.message); 
       setContext({
         ...context,
         token: modal.data?.token,

@@ -4,6 +4,7 @@
 import React, {useContext, useEffect, useLayoutEffect, useState} from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
   Image,
   ImageBackground,
   Pressable,
@@ -38,6 +39,7 @@ import Background from '../utils/Background';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Model from '../components/Model';
 import {useIsFocused} from '@react-navigation/native';
+import Orientation from 'react-native-orientation-locker';
 
 const Profile = ({navigation}) => {
   const focused = useIsFocused();
@@ -48,9 +50,34 @@ const Profile = ({navigation}) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [images, setImages] = useState(context?.serviceImages || []);
   const [show, setShow] = useState();
+  const [width, setScreenWidth] = useState(Dimensions.get('window').width);
+  const [height, setScreenHeight] = useState(Dimensions.get('window').height);
   const translate = -hp('5%');
 
   console.log(context?.user);
+
+   
+  
+  useEffect(() => {
+    const updateDimensions = () => {
+      const { width, height } = Dimensions.get('window');
+      setScreenWidth(width);
+      setScreenHeight(height);
+    };
+
+    // Listen for orientation changes
+    Orientation.addOrientationListener(updateDimensions);
+
+    // Listen for dimension changes (e.g. on rotation)
+    const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+
+    // Cleanup both listeners
+    return () => {
+      Orientation.removeOrientationListener(updateDimensions);
+      dimensionSubscription?.remove(); // modern API
+    };
+  }, []);
+
 
   // useEffect(() => {
   //   getRestuarents();
@@ -161,10 +188,10 @@ const Profile = ({navigation}) => {
   const TopBar = () => {
     return (
       <>
-        <View style={styles.topbar}>
+        <View style={[styles.topbar,{width: width}]}>
           <ImageBackground
             style={{
-              width: wp('100%'),
+              width: width,
             }}
             source={require('../assets/images/splash.png')}>
             <View
@@ -174,7 +201,7 @@ const Profile = ({navigation}) => {
                 height: hp('20%'),
                 marginTop: hp('2%'),
               }}>
-              <View style={{width: wp('20%'), alignItems: 'center'}}>
+              <View style={{width: width * 0.2, alignItems: 'center'}}>
                 <TouchableOpacity
                   style={{
                     backgroundColor: Color('btnColor'),
@@ -188,8 +215,8 @@ const Profile = ({navigation}) => {
                   <ArrowLeft size={hp('2.5%')} color={Color('text')} />
                 </TouchableOpacity>
               </View>
-              <View style={{width: wp('60%'), alignItems: 'center'}} />
-              <View style={{width: wp('20%'), alignItems: 'center'}}>
+              <View style={{width: width * 0.6, alignItems: 'center'}} />
+              <View style={{width: width * 0.2, alignItems: 'center'}}>
                 <TouchableOpacity
                   style={{
                     backgroundColor: Color('btnColor'),

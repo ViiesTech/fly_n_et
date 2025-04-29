@@ -34,6 +34,8 @@ import AndroidPackageCard from '../components/AndroidPackageCard';
 import {baseUrl, note} from '../utils/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Orientation from 'react-native-orientation-locker';
+import { Dimensions } from 'react-native';
 
 // const packages = [
 //   {
@@ -64,6 +66,31 @@ const Packages = () => {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [PremiumCode, setPremiumCode] = useState('');
   const [codeLoader, setCodeLoader] = useState(false);
+
+  const [width, setScreenWidth] = useState(Dimensions.get('window').width);
+  const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      const { width, height } = Dimensions.get('window');
+      setScreenWidth(width);
+      setScreenHeight(height);
+    };
+
+    // Listen for orientation changes
+    Orientation.addOrientationListener(updateDimensions);
+
+    // Listen for dimension changes (e.g. on rotation)
+    const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+
+    // Cleanup both listeners
+    return () => {
+      Orientation.removeOrientationListener(updateDimensions);
+      dimensionSubscription?.remove(); // modern API
+    };
+  }, []);
+
 
   // const routes = navigation.getState().routes;
   // const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
@@ -370,8 +397,8 @@ const Packages = () => {
               position: 'absolute',
               zIndex: 100,
               backgroundColor: 'white',
-              height: hp('100%'),
-              width: wp('100%'),
+              height: height,
+              width: width,
               alignItems: 'center',
               justifyContent: 'center',
               padding: 20,

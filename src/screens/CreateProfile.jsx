@@ -121,6 +121,9 @@ const CreateProfile = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [age, setAge] = useState(0);
 
+  // console.log(context?.token)
+
+
   useEffect(() => {
     Animated.timing(slideAnimation, {
       toValue: hp('1%'),
@@ -168,7 +171,7 @@ const CreateProfile = ({navigation}) => {
       maxWidth: 300,
       maxHeight: 300,
     });
-    console.log('hhh',result)
+    // console.log('hhh',result)
     if (result?.assets) {
       // if (bannerImg) {
       //   setBanner(result.assets[0]);
@@ -202,6 +205,7 @@ const CreateProfile = ({navigation}) => {
         note('Validation Error', 'Please upload your profile image!');
         return false;
       }
+      // await AsyncStorage.setItem('token2',context?.token)
       setLoading(true);
       Keyboard.dismiss();
       const date_of_birth = moment(dob).format('YYYY-MM-DD');
@@ -234,6 +238,7 @@ const CreateProfile = ({navigation}) => {
           'Content-Type': 'multipart/form-data',
         },
       });
+       console.log('first',res.data)
       const token = await AsyncStorage.getItem('token');
       const user = {
         ...context?.user,
@@ -242,10 +247,17 @@ const CreateProfile = ({navigation}) => {
       if (token) {
         await AsyncStorage.setItem('user', JSON.stringify(user));
       }
+      //  console.log('token',context)
       setContext({
         ...context,
         user: user,
       });
+      // setContext(prevContext => ({
+      //   ...prevContext,
+      //   user: user,
+      //   token: prevContext.token
+      // }));
+      
     } catch (err) {
       await errHandler(err, null, navigation);
     } finally {

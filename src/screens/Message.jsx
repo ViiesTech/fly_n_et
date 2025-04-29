@@ -13,6 +13,7 @@ import BackBtn from '../components/BackBtn';
 import { isIOS } from '../utils/global';
 import { api, note } from '../utils/api';
 import { DataContext } from '../utils/Context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Message = ({ navigation, route }) => {
     const theme = route?.params?.theme;
@@ -62,12 +63,13 @@ const Message = ({ navigation, route }) => {
                     serviceImages: null,
                     returnFromDetail: false,
                 })
+                await AsyncStorage.clear()
                 navigation.navigate(screen);
             } else {
                 note('Account Delete',res.data.message);
                 setLoading(false)
             }
-        } else if (title === 'Logout') {
+        }  else if (title === 'Logout') {
             setContext({
                 ...context,
                 token: false,
@@ -82,6 +84,7 @@ const Message = ({ navigation, route }) => {
                 serviceImages: null,
                 returnFromDetail: false,
             })
+            await AsyncStorage.clear()
             navigation.navigate(screen);
         } else {
             navigation.navigate(screen || 'Home');

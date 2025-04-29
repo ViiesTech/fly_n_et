@@ -41,6 +41,8 @@ const Login = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [location, setLocation] = useState();
 
+    // console.log('first',context)
+
 
     useEffect(() => {
         Animated.timing(slideAnimation, {
@@ -49,6 +51,8 @@ const Login = ({ navigation }) => {
             useNativeDriver: true,
         }).start();
     }, [IsFocused]);
+
+    console.log('hh',context?.user)
 
     useEffect(() => {
         if (!context?.skipNavigationCheck && context?.token && context?.isVerified) {
@@ -81,12 +85,17 @@ const Login = ({ navigation }) => {
             
           nextScreen(() => navigation.navigate('Packages'));
         } else if (context?.user?.user_info) {
+
           if (context.user.user_info.address) {
             nextScreen(() => navigation.navigate('Home'));
           } else {
+
             nextScreen(() => navigation.replace('SelectLocation'));
           }
+
         } else {
+        //   alert('hello world')
+
           nextScreen(() => navigation.replace('UserType'));
         }
         setContext({
@@ -175,11 +184,14 @@ const Login = ({ navigation }) => {
     }
 
     const onUserLogin = async () => {
+        // await AsyncStorage.clear()
         try {
             // if (!location) {
             //     note('Location is Required', 'You need to allow the app to get your location in order to use fly n eat!', [{ text: 'Request Again', onPress: async () => await requestLocationPermission() }]);
             //     return;
             // }
+
+        // return  await  AsyncStorage.clear()
             setLoading(true);
             Keyboard.dismiss();
             const obj = {
@@ -193,19 +205,23 @@ const Login = ({ navigation }) => {
 
             await validationSchema.validate(obj, { abortEarly: false });
             const res = await api.post('/user/login', obj);
-
+            console.log('api response =======>',res.data)
+            if(res.data?.status ===  'error') {
+                note('Login',res.data?.message)
+            } 
             if (true) {
                 await AsyncStorage.setItem('token', res?.data?.token);
                 await AsyncStorage.setItem('isVerified', res?.data?.verified);
                 await AsyncStorage.setItem('user', JSON.stringify(res?.data?.user));
             }
 
-            setContext({
-                ...context,
+            
+            setContext(prev => ({
+                ...prev,
                 token: res?.data?.token,
                 isVerified: res?.data?.verified ? true : false,
                 user: res?.data?.user,
-            });
+            }));
         } catch (err) {
             await errHandler(err, null, navigation);
         } finally {

@@ -2,6 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useEffect, useState} from 'react';
 import {
+  Dimensions,
     FlatList,
     Pressable,
   StatusBar,
@@ -24,6 +25,7 @@ import {api, errHandler, note} from '../utils/api';
 import axios from 'axios';
 import {DataContext} from '../utils/Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Orientation from 'react-native-orientation-locker';
 
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 
@@ -33,10 +35,39 @@ const SelectLocation = ({navigation, route}) => {
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState();
   const [places, setPlaces] = useState([]);
+  const [width, setScreenWidth] = useState(Dimensions.get('window').width);
+  const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+
+    console.log('from select location',context?.token)
+  
 
   useEffect(() => {
     getLocation();
   }, []);
+
+
+  // console.log('token ===>',context?.token)
+
+  useEffect(() => {
+      const updateDimensions = () => {
+        const { width, height } = Dimensions.get('window');
+        setScreenWidth(width);
+        setScreenHeight(height);
+      };
+  
+      // Listen for orientation changes
+      Orientation.addOrientationListener(updateDimensions);
+  
+      // Listen for dimension changes (e.g. on rotation)
+      const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+  
+      // Cleanup both listeners
+      return () => {
+        Orientation.removeOrientationListener(updateDimensions);
+        dimensionSubscription?.remove(); // modern API
+      };
+    }, []);
+  
 
 //   useEffect(() => {
 //     if (
@@ -83,6 +114,7 @@ const SelectLocation = ({navigation, route}) => {
 
   const onSaveLocation = async () => {
     try {
+      // const token = await AsyncStorage.getItem('token2')
       setLoading(true);
       const obj = {
         latitude: baseLocation?.latitude?.toString(),
@@ -91,6 +123,7 @@ const SelectLocation = ({navigation, route}) => {
       const res = await api.post('/user/user-location', obj, {
         headers: {Authorization: `Bearer ${context?.token}`},
       });
+      console.log('response',res.data)
       note('Base Location Saved', res?.data?.message);
 
       const user = await AsyncStorage.getItem('user');
@@ -125,15 +158,18 @@ const SelectLocation = ({navigation, route}) => {
   };
   const onSelectLocation = async (item) => {
     try {
+      // const token = await AsyncStorage.getItem('token2')
+      // return alert(token)
       setLoading(true);
       const obj = {
         latitude: item?.geometry?.location?.lat?.toString(),
         longitude: item?.geometry?.location?.lng?.toString(),
       };
-      console.log("obj..................", obj)
+      // console.log("obj..................", obj)
       const res = await api.post('/user/user-location', obj, {
         headers: {Authorization: `Bearer ${context?.token}`},
       });
+      console.log('api =====>',res.data)
       note('Base Location Saved', res?.data?.message);
 
       const user = await AsyncStorage.getItem('user');
@@ -213,7 +249,7 @@ const SelectLocation = ({navigation, route}) => {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
-        style={{...StyleSheet.absoluteFillObject, flex: 1,}}
+        style={{...StyleSheet.absoluteFillObject, flex: 1}}
         zoomLevel={12}
         mapType="standard"
         onPress={e => {

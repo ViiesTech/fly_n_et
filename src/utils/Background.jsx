@@ -60,26 +60,24 @@ const Background = ({
 
   useEffect(() => {
     const updateDimensions = () => {
-      const {width, height} = Dimensions.get('window');
+      const { width, height } = Dimensions.get('window');
       setScreenWidth(width);
       setScreenHeight(height);
     };
+
+    // Listen for orientation changes
     Orientation.addOrientationListener(updateDimensions);
+
+    // Listen for dimension changes (e.g. on rotation)
+    const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+
+    // Cleanup both listeners
     return () => {
       Orientation.removeOrientationListener(updateDimensions);
+      dimensionSubscription?.remove(); // modern API
     };
   }, []);
-  useEffect(() => {
-    const updateDimensions = () => {
-      const {width, height} = Dimensions.get('window');
-      setScreenWidth(width);
-      setScreenHeight(height);
-    };
-    Dimensions.addEventListener('change', updateDimensions);
-    return () => {
-      Dimensions.removeEventListener('change', updateDimensions);
-    };
-  }, []);
+
 
   return (
     <>

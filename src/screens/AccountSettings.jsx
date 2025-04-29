@@ -50,7 +50,7 @@ const AccountSettings = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const translate = -heightPercentageToDP('5%');
 
-  console.log('hh',profile);
+  // console.log('hh',profile);
 
   const onSaveChanges = async () => {
     try {
@@ -104,7 +104,7 @@ const AccountSettings = ({navigation}) => {
       maxWidth: 300,
       maxHeight: 300,
     });
-    console.log('hhh', result);
+    // console.log('hhh', result);
     if (result?.assets) {
       // if (bannerImg) {
       //   setBanner(result.assets[0]);

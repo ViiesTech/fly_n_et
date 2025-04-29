@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
   Text,
+  ScrollView,
 } from 'react-native';
 import Background from '../utils/Background';
 import {
@@ -64,7 +65,7 @@ const Feedback = ({navigation,route}) => {
   const [imageUri, setImageUri] = useState(data?.image_path ? `${storageUrl}${data.image_path}` : null);
   const {context} = useContext(DataContext);
 
-  console.log('data of feedback fields ====>',imageUri)
+  // console.log('data of feedback fields ====>',data)
 
   const starCount = images?.filter(img => img.id === '8ggStxqyboK5').length;
 
@@ -132,14 +133,17 @@ const Feedback = ({navigation,route}) => {
       //     name: 'feedback_image.jpg', 
       //   });
       // }
-  
+      // console.log('formdata',formData)
       
       await validationSchema.validate(obj, { abortEarly: false });
 
      if(!data) { 
+      // alert('hello')
       const res = await api.post('/review/store', formData, {
-        headers: { Authorization: `Bearer ${context?.token}` },
+        headers: { Authorization: `Bearer ${context?.token}`,'Content-Type': 'multipart/form-data' },
       });
+
+      // console.log('api responnse',res.data)
       
       note('Feedback send successful', res?.data?.message, [
         { text: 'Okay', onPress: () => navigation.goBack() },
@@ -155,6 +159,7 @@ const Feedback = ({navigation,route}) => {
       ]);
     }
     } catch (err) {
+      console.log('error',err)
       await errHandler(err, null, navigation);
     } finally {
       setLoading(false);
@@ -207,7 +212,7 @@ const Feedback = ({navigation,route}) => {
         barStyle="dark-content"
         noBackground
         translucent={false}>
-        <View style={{height: hp('100%')}}>
+        <ScrollView contentContainerStyle={{paddingBottom: hp(10)}}>
           <Br space={isIOS ? 0.5 : 2.5} />
           <Pera
             style={{textAlign: 'center'}}
@@ -380,7 +385,7 @@ const Feedback = ({navigation,route}) => {
               label={data ? "Update Feedback" : "Send Feedback"}
             />
           </Wrapper>
-        </View>
+        </ScrollView>
       </Background>
     </>
   );

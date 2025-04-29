@@ -37,6 +37,8 @@ import Btn from '../utils/Btn';
 import {api, errHandler, storageUrl} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import {calcCrow, capitalize} from '../utils/global';
+import { Dimensions } from 'react-native';
+import Orientation from 'react-native-orientation-locker';
 
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 
@@ -54,6 +56,31 @@ const CFISearch = ({navigation}) => {
   const inputRef = useRef(null);
 
   console.log('conntexttt =====>',context?.pro_users)
+
+  const [width, setScreenWidth] = useState(Dimensions.get('window').width);
+  const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      const { width, height } = Dimensions.get('window');
+      setScreenWidth(width);
+      setScreenHeight(height);
+    };
+
+    // Listen for orientation changes
+    Orientation.addOrientationListener(updateDimensions);
+
+    // Listen for dimension changes (e.g. on rotation)
+    const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+
+    // Cleanup both listeners
+    return () => {
+      Orientation.removeOrientationListener(updateDimensions);
+      dimensionSubscription?.remove(); // modern API
+    };
+  }, []);
+
 
   useEffect(() => { 
     getLocation();
@@ -155,7 +182,7 @@ const CFISearch = ({navigation}) => {
   const getPlaceLocation = async (place_id) => {
     const BASE_URL = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${API_KEY}&fields=geometry`;
         const response = await axios.get(BASE_URL);
-        console.log('hhhhh ====>',response.data?.result?.geometry?.location)
+        // console.log('hhhhh ====>',response.data?.result?.geometry?.location)
         setNauticalLocation(response?.data?.result?.geometry?.location)
   }
 
@@ -200,8 +227,8 @@ const CFISearch = ({navigation}) => {
 
   const TopBar = () => {
     return (
-      <View style={styles.topbar}>
-        <View style={{width: wp('20%'), alignItems: 'center'}}>
+      <View style={[styles.topbar,{width: width , justifyContent: 'space-between',paddingHorizontal: 50}]}>
+        {/* <View style={{width: width * 0.2, alignItems: 'center'}}> */}
           <TouchableOpacity
             style={{
               backgroundColor: Color('btnColor'),
@@ -214,7 +241,7 @@ const CFISearch = ({navigation}) => {
             onPress={() => navigation.goBack()}>
             <ArrowLeft size={hp('2.5%')} color={Color('text')} />
           </TouchableOpacity>
-        </View>
+        {/* </View> */}
         {/* <View style={{ width: wp('60%'), alignItems: 'center' }}>
                         <Small heading font="medium">Current Location</Small>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>
@@ -222,7 +249,7 @@ const CFISearch = ({navigation}) => {
                             <Small heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address}</Small>
                         </View>
                     </View> */}
-        <View style={{width: wp('140%'), alignItems: 'center'}}>
+        {/* <View style={{width: width * 0.6,alignItems: 'center'}}> */}
           <TouchableOpacity
             style={{
               backgroundColor: Color('btnColor'),
@@ -236,7 +263,7 @@ const CFISearch = ({navigation}) => {
             <Notification size={hp('2.5%')} color={Color('text')} />
           </TouchableOpacity>
         </View>
-      </View>
+      //  </View>
     );
   };
 
@@ -294,7 +321,7 @@ const CFISearch = ({navigation}) => {
               style={{
                 padding: 0,
                 height: hp('3%'),
-                width: wp('75%'),
+                width: width * 0.75,
                 color: Color('shadow'),
               }}
             />
@@ -303,7 +330,7 @@ const CFISearch = ({navigation}) => {
                 style={{
                   position: 'absolute',
                   top: hp(5),
-                  width: wp('90%'),
+                  width: width * 0.75,
                   backgroundColor: Color('inputSearch'),
                   shadowColor: Color('shadow'),
                   shadowOffset: {
@@ -347,7 +374,7 @@ const CFISearch = ({navigation}) => {
           </View>
           </View>
          <View> 
-         <View style={{flexDirection: 'row',alignItems: 'center',gap: 20}}> 
+         <View style={{flexDirection: 'row',alignItems: 'center',gap: 10}}> 
           <View
             style={{
             //   flexDirection: 'row',
@@ -355,7 +382,7 @@ const CFISearch = ({navigation}) => {
               alignItems: 'center',
             //   gap: hp('1%'),s
               padding: hp('1%'),
-              width: wp(65),
+              // width: width * 0.68,
               backgroundColor: Color('inputSearch'),
               marginTop: predictions?.length < 1 ? hp(2) : hp(12),
             }}>
@@ -375,8 +402,8 @@ const CFISearch = ({navigation}) => {
               style={{
                 padding: 0,
                 height: hp('3%'),
-                width: wp('45%'),
-                color: Color('shadow'),
+                width: width * 0.7,
+                color: Color('shadow')
               }}
             />
           </View>
@@ -388,7 +415,7 @@ const CFISearch = ({navigation}) => {
               btnStyle={{
                 backgroundColor: Color('homeBg'),
                 marginTop: predictions?.length < 1 ? hp(2) : hp(12),
-                width: wp(21)
+                width: width * 0.16
               }}
             />
             </View>
@@ -558,7 +585,7 @@ const styles = StyleSheet.create({
   topbar: {
     backgroundColor: Color('homeBg'),
     paddingVertical: hp('2%'),
-    width: wp('100%'),
+    // width: wp('100%'),
     flexDirection: 'row',
     borderBottomLeftRadius: hp('4%'),
     borderBottomRightRadius: hp('4%'),

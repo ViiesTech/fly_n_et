@@ -1,10 +1,10 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/react-in-jsx-scope */
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Suspense,  useContext,  useEffect } from 'react';
+import { Suspense,  useContext,  useEffect, useState } from 'react';
 import Orientation from 'react-native-orientation-locker';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { Alert, LogBox } from 'react-native';
+import { Alert, AppState, LogBox } from 'react-native';
 import Splash from './src/screens/Splash';
 import Loading from './src/screens/Loading';
 import GetStarted from './src/screens/GetStarted';
@@ -54,8 +54,10 @@ const Stack = createNativeStackNavigator();
 
 function MainApp() {
   const {context,setContext} = useContext(DataContext)
+  const [isPremium, setIsPremium] = useState(false);
+  const [appState, setAppState] = useState(AppState.currentState);
 
-  console.log('from c==>',context?.token);
+  // console.log('from c==>',context?.token);
 
 
  
@@ -87,7 +89,7 @@ function MainApp() {
           Authorization: `Bearer ${context?.token}`,
         },
       });
-      console.log('response of check token:', res.data);
+      // console.log('response of check token:', res.data);
       if(res.data.error === 'Invalid token.' || res.data.error === 'Token is expired') {
         Alert.alert(
           'Session Expired',
@@ -129,6 +131,8 @@ function MainApp() {
     };
   
     configurePurchases();
+
+
   
     return () => {
       try {
@@ -137,8 +141,46 @@ function MainApp() {
         console.log('Error during Purchases logOut:', error);
       }
     };
-  }, []);
    
+   
+  }, []);
+
+  // useEffect(() => {
+
+  //   const checkEntitlement = (customerInfo) => {
+  //     console.log('first', customerInfo);
+  //     const entitlement = customerInfo.entitlements.active['Premium'];
+  //     if (entitlement) {
+  //       console.log('✅ User has premium access:', entitlement);
+  //       setIsPremium(true);
+  //     } else {
+  //       console.log('❌ No premium access');
+  //       setIsPremium(false);
+  //     }
+  //   };
+  
+  //   const appStateListener = AppState.addEventListener('change', async (nextAppState) => {
+  //     if (appState.match(/inactive|background/) && nextAppState === 'active') {
+  //       // App came to foreground, check for offer code redemption
+  //       try {
+  //         alert('Checking Offer Code Redemption...');
+  //         const customerInfo = await Purchases.getCustomerInfo();
+  //         checkEntitlement(customerInfo);
+  //       } catch (e) {
+  //         console.error('Error refreshing customer info', e);
+  //       }
+  //     }
+  //     setAppState(nextAppState);
+  //   });
+  
+  //   return () => {
+  //     appStateListener.remove();
+  //   };
+  
+  // }, [appState]);
+  
+
+  
 
   const Sus = ({ component }) => {
     return <Suspense fallback={<Loading />}>{component}</Suspense>;
@@ -269,7 +311,7 @@ function App() {
   return (
     <AppContext>
       <MainApp />
-    </AppContext>
+     </AppContext>
   );
 }
 
