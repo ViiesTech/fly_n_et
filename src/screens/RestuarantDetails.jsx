@@ -589,14 +589,14 @@ const RestuarantDetails = ({navigation, route}) => {
                   btnStyle={{backgroundColor: Color('homeBg')}}
                   label="Send Feedback"
                 />
-                <Br space={2} />
+              </>
+            )}
+             <Br space={2} />
                 <Btn
                   onPress={() => onVisitWebsite()}
                   btnStyle={{backgroundColor: Color('homeBg')}}
                   label="View Website"
                 />
-              </>
-            )}
             <Br space={2} />
           </Wrapper>
         </ScrollView>

@@ -151,7 +151,7 @@ const Feedback = ({navigation,route}) => {
     } else {
     //  return console.log('hello world',formData)
       const res = await api.post(`/review/${data?.id}`, formData,{
-        headers: { Authorization: `Bearer ${context?.token}`}
+        headers: { Authorization: `Bearer ${context?.token}`,"Content-Type": 'multipart/form-data'}
       });
       // return console.log('response',res.data);
       note('Feedback updated successfully!',res?.data?.message,[

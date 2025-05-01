@@ -54,8 +54,8 @@ const Stack = createNativeStackNavigator();
 
 function MainApp() {
   const {context,setContext} = useContext(DataContext)
-  const [isPremium, setIsPremium] = useState(false);
-  const [appState, setAppState] = useState(AppState.currentState);
+  // const [isPremium, setIsPremium] = useState(false);
+  // const [appState, setAppState] = useState(AppState.currentState);
 
   // console.log('from c==>',context?.token);
 

@@ -41,7 +41,7 @@ const SideMenu = ({navigation}) => {
       message: context?.token
         ? 'Are you sure you want to delete your account?'
         : 'Please login to continue',
-      screen: context?.token ? 'GetStarted' : 'Login',
+      screen: 'Login',
     });
   };
 

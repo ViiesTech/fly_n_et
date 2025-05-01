@@ -45,20 +45,20 @@ const validationSchema = Yup.object().shape({
   // age: Yup.number()
   //   .required('Please enter your exact age in years.')
   //   .min(18, 'You must be at least 18 years old'),
-  dob: Yup.string()
-    .required('Please enter your date of birth.')
-    .matches(
-      /^\d{4}-\d{2}-\d{2}$/,
-      'Date of Birth must be in the format YYYY-MM-DD',
-    )
-    .test('is-18-years-old', 'You must be at least 18 years old', value => {
-      if (!value) {
-        return false;
-      }
-      const today = moment();
-      const dob = moment(value, 'YYYY-MM-DD');
-      return today.diff(dob, 'years') >= 18;
-    }),
+  // dob: Yup.string()
+  //   .required('Please enter your date of birth.')
+  //   .matches(
+  //     /^\d{4}-\d{2}-\d{2}$/,
+  //     'Date of Birth must be in the format YYYY-MM-DD',
+  //   )
+  //   .test('is-18-years-old', 'You must be at least 18 years old', value => {
+  //     if (!value) {
+  //       return false;
+  //     }
+  //     const today = moment();
+  //     const dob = moment(value, 'YYYY-MM-DD');
+  //     return today.diff(dob, 'years') >= 18;
+  //   }),
   aircraft_type: Yup.string().required(
     'Please select the aircraft type from the dropdown.',
   ),
@@ -249,7 +249,7 @@ const CreateProProfile = ({navigation}) => {
       const date_of_birth = moment(dob).format('YYYY-MM-DD');
       const obj = {
         // age: age,
-        dob: date_of_birth,
+        // dob: date_of_birth,
         aircraft_type: type,
         profile_image: profile,
         // banner_image: banner,
@@ -261,7 +261,7 @@ const CreateProProfile = ({navigation}) => {
       };
       const formData = new FormData();
       // formData.append('age', age);
-      formData.append('dob', date_of_birth);
+      // formData.append('dob', date_of_birth);
       formData.append('aircraft_type', type);
       formData.append('phone', phone);
       // formData.append('address', region);
@@ -429,8 +429,8 @@ const CreateProProfile = ({navigation}) => {
                 style={{textAlign: 'center'}}>
                 {context?.user?.email}
               </Small>
-              <Br space={5} />
-              <DOB dob={dob} setDob={setDob} />
+              {/* <Br space={5} /> */}
+              {/* <DOB dob={dob} setDob={setDob} /> */}
               {/* <Br space={2} /> */}
               {/* <Input
                 value={age.toString()}

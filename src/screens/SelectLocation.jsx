@@ -144,7 +144,7 @@ const SelectLocation = ({navigation, route}) => {
         });
 
         if (route?.params?.change || !route?.params?.change) {
-          // alert('hello')
+          alert('hello')
           setTimeout(() => {
             navigation.replace('Home');
           }, 1000);
@@ -173,6 +173,7 @@ const SelectLocation = ({navigation, route}) => {
       note('Base Location Saved', res?.data?.message);
 
       const user = await AsyncStorage.getItem('user');
+      console.log('kia yeh chl rha hai',user)
       if (user) {
         const objj = JSON.parse(user);
         const data = {
