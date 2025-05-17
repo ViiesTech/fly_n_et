@@ -37,13 +37,13 @@ const validationSchema = Yup.object().shape({
     'Please select atleast one option from service speed section.',
   ),
   restaurant_id: Yup.string().required('Invalid Restaurant id'),
-  imageUri: Yup.string()
-    .required('Please upload an image.')
-    .test(
-      'is-valid-uri',
-      'Please upload a valid image.',
-      (value) => value && value.startsWith('file://') || value.startsWith('http')
-    ),
+  // imageUri: Yup.string()
+  //   .required('Please upload an image.')
+  //   .test(
+  //     'is-valid-uri',
+  //     'Please upload a valid image.',
+  //     (value) => value && value.startsWith('file://') || value.startsWith('http')
+  //   ),
 });
 
 const Feedback = ({navigation,route}) => {
@@ -104,7 +104,7 @@ const Feedback = ({navigation,route}) => {
         service_speed: serviceSpeed,
         overall_satisfaction: overallSatisfaction,
         restaurant_id: data?.restaurant_id ? data?.restaurant_id : context?.restuarent?.id || 'default_restaurant_id', 
-        imageUri: imageUri || '', 
+        // imageUri: imageUri || '', 
       };
 
       const formData = new FormData();

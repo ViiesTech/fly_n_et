@@ -52,7 +52,7 @@ const Login = ({ navigation }) => {
         }).start();
     }, [IsFocused]);
 
-    console.log('hh',context?.user)
+    console.log('hh',context)
 
     useEffect(() => {
         if (!context?.skipNavigationCheck && context?.token && context?.isVerified) {
@@ -86,13 +86,12 @@ const Login = ({ navigation }) => {
           nextScreen(() => navigation.navigate('Packages'));
         } else if (context?.user?.user_info) {
 
-          if (context.user.user_info.address) {
-            nextScreen(() => navigation.navigate('Home'));
-          } else {
-
-            nextScreen(() => navigation.replace('SelectLocation'));
-          }
-
+        //   if (context.user.user_info.address) {
+        // } else {
+        //     nextScreen(() => navigation.replace('SelectLocation'));
+        // }
+        nextScreen(() => navigation.navigate('Home'));
+        
         } else {
         //   alert('hello world')
 
@@ -211,7 +210,7 @@ const Login = ({ navigation }) => {
             } 
             if (true) {
                 await AsyncStorage.setItem('token', res?.data?.token);
-                await AsyncStorage.setItem('isVerified', res?.data?.verified);
+                await AsyncStorage.setItem('isVerified', res?.data?.verified || 'false');
                 await AsyncStorage.setItem('user', JSON.stringify(res?.data?.user));
             }
 
@@ -269,10 +268,10 @@ const Login = ({ navigation }) => {
                                     <Small heading font="regular">Forgot Password?</Small>
                                 </TouchableOpacity>
                             </View>
-                            <Btn loading={loading} label="Login" onPress={onUserLogin} />
+                            <Btn  loading={loading} label="Login" onPress={onUserLogin} />
                             <Br space={3} />
                             <TouchableOpacity onPress={() => nextScreen(() => navigation.navigate('Signup'))}>
-                                <Small style={{ textAlign: 'center' }} heading font="regular">Don’t have an account? Signup</Small>
+                                <Small style={{ textAlign: 'center',fontSize: hp(2) }} heading font="regular">Don’t have an account? Signup</Small>
                             </TouchableOpacity>
                         </View>
             {/* </KeyboardAvoidingView> */}

@@ -267,11 +267,11 @@ const Signup = ({navigation}) => {
                 secureTextEntry
               />
               <Br space={2.5} />
-              <Btn loading={loading} label="Signup" onPress={onUserSignup} />
+              <Btn  loading={loading} label="Signup" onPress={onUserSignup} />
               <Br space={3} />
               <TouchableOpacity
                 onPress={() => nextScreen(() => navigation.navigate('Login'))}>
-                <Small style={{textAlign: 'center'}} heading font="regular">
+                <Small style={{textAlign: 'center',fontSize: hp(2)}} heading font="regular">
                   Already have an account ? Login
                 </Small>
               </TouchableOpacity>

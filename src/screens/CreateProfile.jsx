@@ -53,7 +53,7 @@ const validationSchema = Yup.object().shape({
   aircraft_type: Yup.string().required(
     'Please select the aircraft type from the dropdown.',
   ),
-  profile_image: Yup.object().required('Please upload your profile image.'),
+  // profile_image: Yup.object().required('Please upload your profile image.'),
 });
 
 const CreateProfile = ({navigation}) => {
@@ -150,7 +150,7 @@ const CreateProfile = ({navigation}) => {
         navigation.replace('Message', {
           title: 'All Done',
           message: 'Your profile has been created successfully.',
-          screen: 'SelectLocation',
+          screen: 'Home',
         }),
       );
     }
@@ -201,10 +201,10 @@ const CreateProfile = ({navigation}) => {
         note('Validation Error', 'Please accept our terms of service.');
         return false;
       }
-      if (!profile) {
-        note('Validation Error', 'Please upload your profile image!');
-        return false;
-      }
+      // if (!profile) {
+      //   note('Validation Error', 'Please upload your profile image!');
+      //   return false;
+      // }
       // await AsyncStorage.setItem('token2',context?.token)
       setLoading(true);
       Keyboard.dismiss();
@@ -213,7 +213,7 @@ const CreateProfile = ({navigation}) => {
         // age: age,
         // dob: date_of_birth,
         aircraft_type: type,
-        profile_image: profile,
+        // profile_image: profile,
         // banner_image: banner,
       };
 

@@ -5,6 +5,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import { createNavigationContainerRef, StackActions } from '@react-navigation/native';
+import Purchases from 'react-native-purchases';
 
 
 export const drawerStyle = {
@@ -204,3 +205,6 @@ export function replace(name, params) {
     navigationRef.dispatch(StackActions.replace(name, params));
   }
 }
+
+
+

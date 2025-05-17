@@ -29,6 +29,7 @@ import {
   flushFailedPurchasesCachedAsPendingAndroid,
   getSubscriptions,
   Subscription,
+  presentCodeRedemptionSheetIOS,
 } from 'react-native-iap';
 import AndroidPackageCard from '../components/AndroidPackageCard';
 import {baseUrl, note} from '../utils/api';
@@ -36,6 +37,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Orientation from 'react-native-orientation-locker';
 import { Dimensions } from 'react-native';
+import { trackOfferRedemption } from '../utils/global';
 
 // const packages = [
 //   {
@@ -56,6 +58,7 @@ const Packages = () => {
   const [offerings, setOfferings] = useState(null);
   const navigation = useNavigation();
   const [products, setProducts] = useState([]);
+  const [loading,setLoading] = useState(false)
   const {context, setContext} = useContext(DataContext);
 
   const isAndroid = Platform.OS === 'android'; // check platform is android or not
@@ -97,7 +100,7 @@ const Packages = () => {
 
   console.log('offerings', context?.user?.expired_at);
 
-  const productIds = ['flyneat_month', 'flyneat_year2'];
+  // const productIds = ['flyneat_month', 'flyneat_year2'];
   const androidsubscriptionsId = ['flyneat_month', 'flyneat_year2'];
 
   useEffect(() => {
@@ -269,6 +272,108 @@ const Packages = () => {
     }
   };
 
+
+const onOpenSheet = async () => {
+  try {
+    const prevCustomerInfo = await Purchases.getCustomerInfo();
+    const prevEntitlement = prevCustomerInfo.entitlements.active['Premium'];
+    console.log('previous info',prevCustomerInfo?.identifier)
+    let isHandled = false;
+
+    const customerInfoListener = async (customerInfo) => {
+      const newEntitlement = customerInfo.entitlements.active['Premium'];
+
+      if (newEntitlement && newEntitlement.productIdentifier !== prevEntitlement?.productIdentifier) {
+        console.log('Entitlement changed via offer code!');
+        isHandled = true;
+        Purchases.removeCustomerInfoUpdateListener(customerInfoListener);
+        await handlingNavigations();
+      }
+    };
+
+    Purchases.addCustomerInfoUpdateListener(customerInfoListener);
+
+    await presentCodeRedemptionSheetIOS();
+
+    setTimeout(async () => {
+      if (!isHandled) {
+        const latestInfo = await Purchases.getCustomerInfo();
+        const latestEntitlement = latestInfo.entitlements.active['Premium'];
+        console.log('latest info',latestEntitlement.periodType)
+        if (
+       latestEntitlement?.periodType === 'TRIAL'
+        ) {
+          console.log('Entitlement changed after delay fallback');
+          await handlingNavigations();
+        } else {
+          console.log('No entitlement change — likely canceled or invalid code');
+        }
+
+        Purchases.removeCustomerInfoUpdateListener(customerInfoListener);
+      }
+    }, 2000);
+  } catch (error) {
+    console.log('Error in redemption flow:', error);
+  }
+};
+
+
+   const handlingNavigations = async () => {
+    // console.log("first", data)
+    // return
+    setLoading(true)
+    const iosSubType = 'monthly';
+    // return console.log('hello world',iosSubType)
+    let datatoBeAppend = new FormData();
+    datatoBeAppend.append(
+      'sub_type',
+      iosSubType,
+    );
+
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `${baseUrl}/user/subscribe`,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        Authorization: `Bearer ${context.token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      data: datatoBeAppend,
+    };
+
+    axios
+      .request(config)
+      .then(async response => {
+        const updatedExpiry = response?.data?.user?.expired_at;
+        if (updatedExpiry) {
+          if (context?.token) {
+            await AsyncStorage.setItem('token', context?.token);
+            await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+            await AsyncStorage.setItem(
+              'user',
+              JSON.stringify(response?.data?.user),
+            );
+
+            setContext({
+              ...context,
+              token: context?.token,
+              isVerified: true,
+              user: response?.data?.user,
+            });
+            setLoading(false);
+            navigation.navigate('Home');
+          } else {
+            setLoading(false);
+          }
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        setLoading(false);
+      });
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <Background
@@ -315,7 +420,7 @@ const Packages = () => {
             and seamless access with our subscription packages.
           </Text>
 
-          {context?.token &&      
+          {context?.token && Platform.OS === 'android' &&     
           <TouchableOpacity
             // disabled={context?.user?.freetrial_status}
             onPress={() => {
@@ -390,6 +495,14 @@ const Packages = () => {
               </>
             )}
           </View>
+         {Platform.OS === 'ios' && 
+           loading ?
+            <ActivityIndicator color={'blue'} size={'large'} style={{alignSelf: 'center',marginTop: 20}} />
+            :
+          <TouchableOpacity style={{marginTop: 20}} onPress={onOpenSheet}>
+                <Text style={{textAlign: 'center',color: 'blue',fontWeight: 'bold',fontSize: hp(2)}}>Redeem Code</Text>
+          </TouchableOpacity>
+          }
         </View>
         {showPremiumModal && (
           <View

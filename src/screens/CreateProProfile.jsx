@@ -62,7 +62,7 @@ const validationSchema = Yup.object().shape({
   aircraft_type: Yup.string().required(
     'Please select the aircraft type from the dropdown.',
   ),
-  profile_image: Yup.object().required('Please upload your profile image.'),
+  // profile_image: Yup.object().required('Please upload your profile image.'),
   phone: Yup.string().required('Please enter your valid phone number.'),
   // address: Yup.string().required(
   //   'Please enter your full address.',
@@ -182,7 +182,7 @@ const CreateProProfile = ({navigation}) => {
         navigation.replace('Message', {
           title: 'All Done',
           message: 'Your profile has been created successfully.',
-          screen: 'SelectLocation',
+          screen: 'Home',
         }),
       );
     }
@@ -240,10 +240,10 @@ const CreateProProfile = ({navigation}) => {
         note('Validation Error', 'Please accept our terms of service.');
         return false;
       }
-      if (!profile) {
-        note('Validation Error', 'Please upload your profile image!');
-        return false;
-      }
+      // if (!profile) {
+      //   note('Validation Error', 'Please upload your profile image!');
+      //   return false;
+      // }
       setLoading(true);
       Keyboard.dismiss();
       const date_of_birth = moment(dob).format('YYYY-MM-DD');
@@ -251,7 +251,7 @@ const CreateProProfile = ({navigation}) => {
         // age: age,
         // dob: date_of_birth,
         aircraft_type: type,
-        profile_image: profile,
+        // profile_image: profile,
         // banner_image: banner,
         phone: phone,
         // address: region,
