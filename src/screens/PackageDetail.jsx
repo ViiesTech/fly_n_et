@@ -28,23 +28,23 @@ import LoaderOverlay from '../components/LoaderOverlay';
 const packageDetails = [
   {
     id: 1,
-    text: 'Your choice of trip planning options: fly-eat-back to home base for short hops, or point-to-point when traveling   longer distances or even cross country',
+    text: 'Your choice of trip planning options: fly-eat-back to home base for short hops, or point-to-point when traveling   longer distances or even cross country.',
   },
   {
     id: 2,
-    text: 'airport locations (city/state/region) and call letters',
+    text: 'Airport locations (city/state/region) and call letters.',
   },
   {
     id: 3,
-    text: 'restaurant names, addresses, phone numbers',
+    text: 'Restaurant names, addresses, phone numbers.',
   },
   {
     id: 4,
-    text: 'hours of operation and descriptions of décor, ambience, and other amenities',
+    text: 'Hours of operation and descriptions of décor, ambience, and other amenities.',
   },
   {
     id: 5,
-    text: 'links to restaurant websites and menus',
+    text: 'Links to restaurant websites and menus.',
   },
 ];
 

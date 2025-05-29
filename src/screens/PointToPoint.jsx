@@ -25,7 +25,7 @@ const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 const PointToPoint = ({ navigation }) => {
     const { context,setContext } = useContext(DataContext);
     const [location, setLocation] = useState();
-
+    const [premium,setPremium] = useState(null)
     const [width, setScreenWidth] = useState(Dimensions.get('window').width);
     const [height, setScreenHeight] = useState(Dimensions.get('window').height);
 
@@ -51,6 +51,14 @@ const PointToPoint = ({ navigation }) => {
       }, []);
     
 
+       useEffect(() => {
+    const checkPremium = async () => {
+      const result = await AsyncStorage.getItem('isPremium');
+      setPremium(result);
+    };
+
+    checkPremium();
+  }, []);
 
     // console.log('user',context?.isPoint)
 
@@ -142,7 +150,7 @@ const PointToPoint = ({ navigation }) => {
                 <View style={{ width: width * 0.6, alignItems: 'center' }}>
                      {context?.token &&
                                        <>
-                                        <Small heading font="medium">Current Location</Small>
+                                        <Small heading font="medium">Home Airport</Small>
                                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>
                                             <Loc size={hp('2%')} color={Color('text')} />
                                             <Small heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address}</Small>
@@ -324,7 +332,7 @@ const PointToPoint = ({ navigation }) => {
         const onSearch = async () => {
             await AsyncStorage.removeItem('search')
               const firstSearch = await AsyncStorage.getItem('search')
-            if(!context?.user?.expired_at && !firstSearch || context?.user?.expired_at && new Date(context?.user?.expired_at) > new Date()) {
+            if(!context?.user?.expired_at && !firstSearch || context?.user?.expired_at && new Date(context?.user?.expired_at) > new Date() || premium) {
                 // alert('why is hapenning')
             try {
                 setLoading(true);

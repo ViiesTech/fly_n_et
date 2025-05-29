@@ -18,7 +18,7 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import {H5, Pera, Small} from '../utils/Text';
+import {H1, H2, H5, Pera, Small} from '../utils/Text';
 import Br from '../components/Br';
 import Btn from '../utils/Btn';
 import Background from '../utils/Background';
@@ -77,64 +77,66 @@ const validationSchema = Yup.object().shape({
 });
 
 const CreateProProfile = ({navigation}) => {
-  const typeData = [
-    'None',
-    'Single Engine',
-    'Beechcraft (the one Rick has)',
-    'Cessna',
-    'Piper',
-    'Mooney',
-    'Cirrus',
-    'Diamond',
-    'Bristell',
-    'JMB',
-    'American Champion',
-    'Aviat',
-    'Bellanca',
-    'Boeing',
-    'Dehavilland',
-    'Game Composites',
-    'Tecnam',
-    'Waco',
-    'Columbia',
-    'Cubcrafters',
-    'TBM',
-    'Grumman/American General',
-    'Maule',
-    'Siai',
-    'Turbo Prop Aircraft',
-    'Daher TBM',
-    'Mitsubishi',
-    'Pilatus',
-    'Socata TBM',
-    'Piaggio',
-    'Lockheed',
-    'Antonov',
-    'Commander',
-    'Dornier',
-    'Epic',
-    'Fairchild',
-    'ATR',
-    'Light Sport Aircraft',
-    'Icon',
-    'Pipestrel',
-    'Aero',
-    'Czech Sport',
-    'Tecnam',
-    'Tomark Aero',
-    'Vashon',
-    'American Legend',
-    'Gogetair',
-    'Evektor',
-    'Flight Design',
-  ];
+ const typeData = [
+  'None',
+  'Aero',
+  'American Champion',
+  'American Legend',
+  'Antonov',
+  'ATR',
+  'Aviat',
+  'Beechcraft (the one Rick has)',
+  'Bellanca',
+  'Boeing',
+  'Bristell',
+  'Cessna',
+  'Cirrus',
+  'Columbia',
+  'Commander',
+  'Cubcrafters',
+  'Czech Sport',
+  'Daher TBM',
+  'Dehavilland',
+  'Diamond',
+  'Dornier',
+  'Epic',
+  'Evektor',
+  'Fairchild',
+  'Flight Design',
+  'Game Composites',
+  'Gogetair',
+  'Grumman/American General',
+  'Helicopter',
+  'Icon',
+  'JMB',
+  'Light Sport Aircraft',
+  'Lockheed',
+  'Maule',
+  'Mitsubishi',
+  'Mooney',
+  'Piper',
+  'Pilatus',
+  'Piaggio',
+  'Pipestrel',
+  'Siai',
+  'Single Engine',
+  'Socata TBM',
+  'TBM',
+  'Tecnam',
+  'Tecnam',
+  'Tomark Aero',
+  'Turbo Prop Aircraft',
+  'Vashon',
+  'Waco',
+];
+
 
   const {context, setContext} = useContext(DataContext);
   const IsFocused = useIsFocused();
   const [slideAnimation] = useState(new Animated.Value(hp('100%')));
   const [profile, setProfile] = useState(null);
   const [banner, setBanner] = useState(null);
-  const [dob, setDob] = useState('');
+  const [expiry, setExpiry] = useState('');
   const [show, setShow] = useState(false);
   const [type, setType] = useState('');
   const [agree, setAgree] = useState(false);
@@ -152,6 +154,8 @@ const CreateProProfile = ({navigation}) => {
     requestLocationPermission();
   }, []);
 
+  console.log('phone field',phone)
+
   useEffect(() => {
     Animated.timing(slideAnimation, {
       toValue: hp('1%'),
@@ -168,13 +172,13 @@ const CreateProProfile = ({navigation}) => {
     setShow1(false);
   }, [userType]);
 
-  useEffect(() => {
-    if (dob?.length > 0) {
-      const date_of_birth = moment(dob).format('YYYY-MM-DD');
-      const years = moment().diff(date_of_birth, 'years', false);
-      setAge(years);
-    }
-  }, [dob]);
+  // useEffect(() => {
+  //   if (dob?.length > 0) {
+  //     const date_of_birth = moment(dob).format('YYYY-MM-DD');
+  //     const years = moment().diff(date_of_birth, 'years', false);
+  //     setAge(years);
+  //   }
+  // }, [dob]);
 
   useEffect(() => {
     if (context?.user && context?.user?.user_info) {
@@ -246,7 +250,7 @@ const CreateProProfile = ({navigation}) => {
       // }
       setLoading(true);
       Keyboard.dismiss();
-      const date_of_birth = moment(dob).format('YYYY-MM-DD');
+      const licenseExpiry = moment(expiry).format('YYYY-MM-DD');
       const obj = {
         // age: age,
         // dob: date_of_birth,
@@ -265,8 +269,8 @@ const CreateProProfile = ({navigation}) => {
       formData.append('aircraft_type', type);
       formData.append('phone', phone);
       // formData.append('address', region);
-      // formData.append('bio', bio);
-      formData.append('user_type', userType);
+      formData.append('licence_expiry', licenseExpiry);
+      formData.append('user_type', userType?.toLowerCase());
       // formData.append('operation_time', time);
       formData.append('profile_image', {
         uri: profile.uri,
@@ -370,7 +374,7 @@ const CreateProProfile = ({navigation}) => {
             ]}>
             <ScrollView style={[drawerInner, {zIndex: 1, height: null}]}>
               <H5 style={{textAlign: 'center'}} heading font="bold">
-                Signup Pro User
+                Signup CFI/CFII
               </H5>
               <Br space={0.5} />
               <Small style={{textAlign: 'center'}} font="light">
@@ -429,8 +433,8 @@ const CreateProProfile = ({navigation}) => {
                 style={{textAlign: 'center'}}>
                 {context?.user?.email}
               </Small>
-              {/* <Br space={5} /> */}
-              {/* <DOB dob={dob} setDob={setDob} /> */}
+               <Br space={5} /> 
+              <DOB  dob={expiry} setDob={setExpiry} /> 
               {/* <Br space={2} /> */}
               {/* <Input
                 value={age.toString()}
@@ -593,17 +597,18 @@ const CreateProProfile = ({navigation}) => {
             borderBottomColor: Color('borderColor'),
             borderBottomWidth: 1,
           }}
-          onPress={() => setUserType('cfi')}>
-          <Pera color={Color('shadow')}>CFI</Pera>
+          onPress={() => setUserType('CFI')}>
+          <H1 size={23} color={Color('shadow')}>CFI</H1>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
             paddingVertical: heightPercentageToDP('0.5%'),
             borderBottomColor: Color('borderColor'),
             borderBottomWidth: 1,
+            marginTop: 10,
           }}
-          onPress={() => setUserType('cfii')}>
-          <Pera color={Color('shadow')}>CFII</Pera>
+          onPress={() => setUserType('CFII')}>
+          <H2 size={23} color={Color('shadow')}>CFII</H2>
         </TouchableOpacity>
       </Model>
     </>

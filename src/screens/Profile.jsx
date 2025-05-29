@@ -40,6 +40,7 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import Model from '../components/Model';
 import {useIsFocused} from '@react-navigation/native';
 import Orientation from 'react-native-orientation-locker';
+import DOB from '../components/DOB';
 
 const Profile = ({navigation}) => {
   const focused = useIsFocused();
@@ -56,11 +57,9 @@ const Profile = ({navigation}) => {
 
   console.log(context?.user);
 
-   
-  
   useEffect(() => {
     const updateDimensions = () => {
-      const { width, height } = Dimensions.get('window');
+      const {width, height} = Dimensions.get('window');
       setScreenWidth(width);
       setScreenHeight(height);
     };
@@ -69,7 +68,10 @@ const Profile = ({navigation}) => {
     Orientation.addOrientationListener(updateDimensions);
 
     // Listen for dimension changes (e.g. on rotation)
-    const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+    const dimensionSubscription = Dimensions.addEventListener(
+      'change',
+      updateDimensions,
+    );
 
     // Cleanup both listeners
     return () => {
@@ -77,7 +79,6 @@ const Profile = ({navigation}) => {
       dimensionSubscription?.remove(); // modern API
     };
   }, []);
-
 
   // useEffect(() => {
   //   getRestuarents();
@@ -188,7 +189,7 @@ const Profile = ({navigation}) => {
   const TopBar = () => {
     return (
       <>
-        <View style={[styles.topbar,{width: width}]}>
+        <View style={[styles.topbar, {width: width}]}>
           <ImageBackground
             style={{
               width: width,
@@ -272,60 +273,144 @@ const Profile = ({navigation}) => {
             font="medium">
             {context?.user?.email}
           </Small>
-          <View
-            style={{
-              borderWidth: 0.5,
-              padding: hp(0.7),
-              width: wp(90),
-              alignSelf: 'center',
-              paddingHorizontal: wp('5%'),
-              borderColor: Color('shadow'),
-              borderRadius: hp('50%'),
-            }}>
-            <Text
+          {context?.user?.user_info?.bio && (
+            <View
               style={{
-                color: Color('shadow'),
-                fontSize: hp('1.2%'),
+                borderWidth: 0.5,
+                padding: hp(0.7),
+                width: wp(90),
+                alignSelf: 'center',
+                paddingHorizontal: wp('5%'),
+                borderColor: Color('shadow'),
+                borderRadius: hp('50%'),
               }}>
-              Bio
-            </Text>
-            <Text
+              <Text
+                style={{
+                  color: Color('shadow'),
+                  fontSize: hp('1.2%'),
+                }}>
+                Bio
+              </Text>
+              <Text
+                style={{
+                  color: Color('shadow'),
+                  fontSize: hp('1.5%'),
+                  marginTop: hp(0.7),
+                }}>
+                {context?.user?.user_info?.bio}
+              </Text>
+            </View>
+          )}
+          {context?.user?.user_info?.experience && (
+            <View
               style={{
-                color: Color('shadow'),
-                fontSize: hp('1.5%'),
-                marginTop: hp(0.7),
+                borderWidth: 0.5,
+                padding: hp(0.7),
+                width: wp(90),
+                marginTop: hp(2),
+                alignSelf: 'center',
+                paddingHorizontal: wp('5%'),
+                borderColor: Color('shadow'),
+                borderRadius: hp('50%'),
               }}>
-              {context?.user?.user_info?.bio && context?.user?.user_info?.bio}
-            </Text>
-          </View>
-          <View
-            style={{
-              borderWidth: 0.5,
-              padding: hp(0.7),
-              width: wp(90),
-              marginTop: hp(2),
-              alignSelf: 'center',
-              paddingHorizontal: wp('5%'),
-              borderColor: Color('shadow'),
-              borderRadius: hp('50%'),
-            }}>
-            <Text
+              <Text
+                style={{
+                  color: Color('shadow'),
+                  fontSize: hp('1.2%'),
+                }}>
+                Experience
+              </Text>
+              <Text
+                style={{
+                  color: Color('shadow'),
+                  fontSize: hp('1.5%'),
+                  marginTop: hp(0.7),
+                }}>
+                {context?.user?.user_info?.experience}
+              </Text>
+            </View>
+          )}
+          {context?.user?.phone && (
+            <View
               style={{
-                color: Color('shadow'),
-                fontSize: hp('1.2%'),
+                borderWidth: 0.5,
+                padding: hp(0.7),
+                width: wp(90),
+                marginTop: hp(2),
+                alignSelf: 'center',
+                paddingHorizontal: wp('5%'),
+                borderColor: Color('shadow'),
+                borderRadius: hp('50%'),
               }}>
-              Experience
-            </Text>
-            <Text
+              <Text
+                style={{
+                  color: Color('shadow'),
+                  fontSize: hp('1.2%'),
+                }}>
+                Phone
+              </Text>
+              <Text
+                style={{
+                  color: Color('shadow'),
+                  fontSize: hp('1.5%'),
+                  marginTop: hp(0.7),
+                }}>
+                {context?.user?.phone}
+              </Text>
+            </View>
+          )}
+          {context?.user?.user_info?.address && (
+            <View
               style={{
-                color: Color('shadow'),
-                fontSize: hp('1.5%'),
-                marginTop: hp(0.7),
+                borderWidth: 0.5,
+                padding: hp(0.7),
+                marginTop: hp(2),
+                width: wp(90),
+                alignSelf: 'center',
+                paddingHorizontal: wp('5%'),
+                borderColor: Color('shadow'),
+                borderRadius: hp('50%'),
               }}>
-              {context?.user?.user_info?.experience &&
-                context?.user?.user_info?.experience}
-            </Text>
-          </View>
+              <Text
+                style={{
+                  color: Color('shadow'),
+                  fontSize: hp('1.2%'),
+                }}>
+                Home Airport
+              </Text>
+              <Text
+                style={{
+                  color: Color('shadow'),
+                  fontSize: hp('1.5%'),
+                  marginTop: hp(0.7),
+                }}>
+                {context?.user?.user_info?.address}
+              </Text>
+            </View>
+          )}
+          {(context?.user?.user_type === 'cfi' ||
+            context?.user?.user_type === 'cfii') &&
+            context?.user?.user_info?.licence_expiry && (
+              <>
+             <View style={{
+                paddingHorizontal: wp('5%'),
+                marginTop: hp(1.7)
+             }}>
+                <DOB
+                  labelSize={13}
+                  editable={false}
+                  labelColor={Color('modelDark')}
+                  innerInput={{color: Color('shadow')}}
+                  inputCss={{
+                    backgroundColor: 'transparent',
+                    borderColor: Color('modelDark'),
+                  }}
+                  dob={context?.user?.user_info?.licence_expiry}
+                  setDob={() => null}
+                />
+                </View>
+              </>
+            )}
           {/* <Small
             style={{
               textAlign: 'center',

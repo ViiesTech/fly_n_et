@@ -12,11 +12,11 @@ import Br from '../components/Br';
 import {Pera, Small} from '../utils/Text';
 import {Color} from '../utils/Colors';
 import {
-  AirplaneSquare,
   ArrowRight,
   Bookmark,
   Crown1,
   Home,
+  Information,
   LogoutCurve,
   Notification,
   ProfileDelete,
@@ -161,6 +161,26 @@ const SideMenu = ({navigation}) => {
             <ProfileDelete size={hp('3%')} color={Color('drawerBg')} />
             <Small color={Color('drawerBg')} heading font="bold">
               Delete Account
+            </Small>
+          </View>
+          <ArrowRight size={hp('3%')} color={Color('lightText')} />
+        </TouchableOpacity>
+           <TouchableOpacity
+          style={styles.option}
+          onPress={() => navigation.navigate('ContactUs')}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: hp('1.5%'),
+            }}>
+            {/* <AirplaneSquare
+                            size={hp('3%')}
+                            color={Color('drawerBg')}
+                        /> */}
+            <Information size={hp('3%')} color={Color('drawerBg')} />
+            <Small color={Color('drawerBg')} heading font="bold">
+              Contact Us
             </Small>
           </View>
           <ArrowRight size={hp('3%')} color={Color('lightText')} />

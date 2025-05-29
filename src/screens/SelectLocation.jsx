@@ -144,9 +144,9 @@ const SelectLocation = ({navigation, route}) => {
         });
 
         if (route?.params?.change || !route?.params?.change) {
-          alert('hello')
+          // alert('hello')
           setTimeout(() => {
-            navigation.replace('Home');
+            navigation.goBack();
           }, 1000);
         }
       }
@@ -193,7 +193,7 @@ const SelectLocation = ({navigation, route}) => {
         // alert(route?.params?.change)
         if (route?.params?.change || !route?.params?.change) {
           setTimeout(() => {
-            navigation.replace('Home');
+            navigation.goBack();
           }, 2000);
         }
       }

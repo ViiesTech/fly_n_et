@@ -27,7 +27,7 @@ const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 const Home = ({ navigation }) => {
     const { context,setContext } = useContext(DataContext);
     const [location, setLocation] = useState();
-
+    const [premium,setPremium] = useState(null)
     const [width, setScreenWidth] = useState(Dimensions.get('window').width);
     const [height, setScreenHeight] = useState(Dimensions.get('window').height);
 
@@ -52,6 +52,14 @@ const Home = ({ navigation }) => {
         };
       }, []);
     
+       useEffect(() => {
+    const checkPremium = async () => {
+      const result = await AsyncStorage.getItem('isPremium');
+      setPremium(result);
+    };
+
+    checkPremium();
+  }, []);
 
     const Latitude = context?.user?.latitude
     const longitude = context?.user?.longitude
@@ -175,7 +183,7 @@ const Home = ({ navigation }) => {
                 <View style={{ width: width * 0.6, alignItems: 'center' }}>
                    {context?.token && 
                    <>
-                    <Small heading font="medium">Current Location</Small>
+                    <Small heading font="medium">Home Airport</Small>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>
                         <Loc size={hp('2%')} color={Color('text')} />
                         <Small heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address || location?.locationName}</Small>
@@ -289,7 +297,7 @@ const Home = ({ navigation }) => {
         const [loading, setLoading] = useState(false);
         const onSearch = async () => {
         const firstsearch =  await AsyncStorage.getItem('firstSearch') 
-            if(!context?.user?.expired_at && !firstsearch || context?.user?.expired_at && new Date(context?.user?.expired_at) > new Date()) {  
+            if(!context?.user?.expired_at && !firstsearch || context?.user?.expired_at && new Date(context?.user?.expired_at) > new Date() || premium) {  
             try {
                 setLoading(true);
                 const locationDetails = await AsyncStorage.getItem('locationDetails');

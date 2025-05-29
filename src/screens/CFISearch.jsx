@@ -20,6 +20,7 @@ import axios from 'axios';
 import {Pera, Small} from '../utils/Text';
 import {
   ArrowLeft,
+  Calendar,
   Location,
   Notification,
   SearchNormal,
@@ -501,6 +502,10 @@ const CFISearch = ({navigation}) => {
                                                 <Small color={Color('shadow')}>{!val?.avg_rating ? 0 : parseFloat(val?.avg_rating).toFixed(1)}</Small>
                                                 <Small color={Color('modelDark')}>({val?.rating_count || 0})</Small>
                                             </View>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('0.5%') }}>
+                                              <Calendar size={hp('2.5%')} color={Color('modelDark')} />
+                                                <Small color={Color('modelDark')}>{val?.user_info?.licence_expiry}</Small>
+                                                </View>
                                         </View>
                                         <Small color={Color('modelDark')}>
                                             {isNaN(distance) ? 0 : Math.round(distance)} km

@@ -6,7 +6,7 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-nat
 import { Color } from '../utils/Colors';
 import { Pera } from '../utils/Text';
 
-const DOB = ({dob, setDob}) => {
+const DOB = ({dob, setDob,inputCss,innerInput,labelColor,labelSize,editable}) => {
     const [ day, setDay ] = useState('');
     const [ month, setMonth ] = useState('');
     const [ year, setYear ] = useState('');
@@ -69,7 +69,7 @@ const DOB = ({dob, setDob}) => {
 
     return (
         <>
-            <Pera style={{marginBottom: hp('0.5%'), paddingLeft: wp('1%')}}>Date of Birth</Pera>
+            <Pera size={labelSize} color={labelColor} style={{marginBottom: hp('0.5%'), paddingLeft: wp('1%')}}>License Expiry Date</Pera>
             <View
                 style={{
                     flexDirection: 'row',
@@ -77,33 +77,36 @@ const DOB = ({dob, setDob}) => {
                     gap: 10,
                 }}
             >
-                <View style={viewStyle}>
+                <View style={[viewStyle,inputCss]}>
                     <TextInput
                         keyboardType="numeric"
-                        style={inputStyle}
+                        style={[inputStyle,innerInput]}
                         defaultValue={day}
+                        editable={editable}
                         onChangeText={onDaysChange}
                         placeholder="DD"
                         ref={daysRef}
                         placeholderTextColor={Color('borderColor')}
                     />
                 </View>
-                <View style={viewStyle}>
+                <View style={[viewStyle,inputCss]}>
                     <TextInput
                         keyboardType="numeric"
-                        style={inputStyle}
+                        style={[inputStyle,innerInput]}
                         defaultValue={month}
                         onChangeText={onMonthsChange}
                         ref={monthsRef}
+                        editable={editable}
                         placeholder="MM"
                         placeholderTextColor={Color('borderColor')}
                     />
                 </View>
-                <View style={viewStyle}>
+                <View style={[viewStyle,inputCss]}>
                     <TextInput
                         keyboardType="numeric"
-                        style={inputStyle}
+                        style={[inputStyle,innerInput]}
                         defaultValue={year}
+                        editable={editable}
                         onChangeText={onYearsChange}
                         ref={yearRef}
                         placeholder="YYYY"

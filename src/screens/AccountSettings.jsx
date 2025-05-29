@@ -20,6 +20,8 @@ import {
 } from 'react-native-responsive-screen';
 import {Edit2} from 'iconsax-react-native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import DOB from '../components/DOB';
+import moment from 'moment';
 
 // const validationSchema = Yup.object().shape({
 //   name: Yup.string()
@@ -42,25 +44,33 @@ const AccountSettings = ({navigation}) => {
   const [email, setEmail] = useState(context?.user?.email || '');
   const [name, setName] = useState(context?.user?.name || '');
   const [phone, setPhone] = useState(context?.user?.phone || '');
-  const [profile, setProfile] = useState(`${storageUrl}${context?.user?.user_info?.profile_image}` || '');
+  const [profile, setProfile] = useState(
+    `${storageUrl}${context?.user?.user_info?.profile_image}` || '',
+  );
   const [experience, setExperience] = useState(
     context?.user?.user_info?.experience || '',
   );
   const [bio, setBio] = useState(context?.user?.user_info?.bio || '');
   const [loading, setLoading] = useState(false);
   const translate = -heightPercentageToDP('5%');
+  const [expiry, setExpiry] = useState(
+    context?.user?.user_info?.licence_expiry || '',
+  );
 
-  // console.log('hh',profile);
+  console.log('hh', profile);
 
   const onSaveChanges = async () => {
     try {
       setLoading(true);
+
+      const licenseExpiry = moment(expiry).format('YYYY-MM-DD');
 
       var data = new FormData();
       data.append('name', name);
       data.append('phone', phone);
       data.append('experience', experience);
       data.append('bio', bio);
+      data.append('licence_expiry', licenseExpiry);
       data.append('profile_image', {
         uri: profile,
         type: 'image/jpg',
@@ -150,9 +160,13 @@ const AccountSettings = ({navigation}) => {
           <Wrapper>
             <Br space={5} />
             <Image
-              source={profile != 'https://praetorstestnet.com/flyneat/undefined' ? {
-                uri: profile
-              } : require('../assets/images/userProfile.jpeg')}
+              source={
+                profile != 'https://fly-n-eat.com/admin/undefined'
+                  ? {
+                      uri: profile,
+                    }
+                  : require('../assets/images/userProfile.jpeg')
+              }
               style={{
                 borderWidth: 1,
                 borderColor: Color('shadow'),
@@ -169,7 +183,7 @@ const AccountSettings = ({navigation}) => {
                 position: 'absolute',
                 alignSelf: 'center',
                 transform: [
-                  {translateY: -heightPercentageToDP('2.5%')},
+                  {translateY: -heightPercentageToDP('3%')},
                   {translateX: -heightPercentageToDP('-2%')},
                 ],
                 top: '22%',
@@ -217,6 +231,7 @@ const AccountSettings = ({navigation}) => {
               keyboardType={'numeric'}
               label="Phone Number"
             />
+
             <Br space={1.2} />
             <Input
               value={experience}
@@ -270,7 +285,25 @@ const AccountSettings = ({navigation}) => {
               mode="light"
               label="Bio"
             />
+            {(context?.user?.user_type === 'cfi' ||
+              context?.user?.user_type === 'cfii') &&
+                <>
+                  <Br space={1.2} />
+                  <DOB
+                    labelSize={13}
+                    labelColor={Color('modelDark')}
+                    innerInput={{color: Color('shadow')}}
+                    inputCss={{
+                      backgroundColor: 'transparent',
+                      borderColor: Color('modelDark'),
+                    }}
+                    dob={expiry}
+                    setDob={setExpiry}
+                  />
+                </>
+              }
           </Wrapper>
+
           <Br space={2} />
           <TouchableOpacity
             onPress={() => navigation.navigate('ChangePassword')}>

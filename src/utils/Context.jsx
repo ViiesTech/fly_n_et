@@ -25,6 +25,7 @@ export const AppContext = ({ children }) => {
 
     useEffect(() => {
         if (!context?.token || !context?.user) {
+            // alert('gretting token')
             checkRememberData();
         }
     }, []);

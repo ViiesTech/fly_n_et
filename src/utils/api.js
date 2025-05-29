@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { Alert } from 'react-native';
 
-export const baseUrl = 'https://praetorstestnet.com/flyneat/api';
-// https://fly-n-eat.com/admin/api
-export const storageUrl = 'https://praetorstestnet.com/flyneat/';
+// export const baseUrl = 'https://praetorstestnet.com/flyneat/api';
+export const baseUrl = 'https://fly-n-eat.com/admin/api';
+// export const storageUrl = 'https://praetorstestnet.com/flyneat/';
+export const storageUrl = 'https://fly-n-eat.com/admin/'
 export const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 export const api = axios.create({
     baseURL: baseUrl,

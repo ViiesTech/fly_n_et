@@ -36,8 +36,8 @@ import {baseUrl, note} from '../utils/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Orientation from 'react-native-orientation-locker';
-import { Dimensions } from 'react-native';
-import { trackOfferRedemption } from '../utils/global';
+import {Dimensions} from 'react-native';
+import {trackOfferRedemption} from '../utils/global';
 
 // const packages = [
 //   {
@@ -58,7 +58,7 @@ const Packages = () => {
   const [offerings, setOfferings] = useState(null);
   const navigation = useNavigation();
   const [products, setProducts] = useState([]);
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const {context, setContext} = useContext(DataContext);
 
   const isAndroid = Platform.OS === 'android'; // check platform is android or not
@@ -73,10 +73,9 @@ const Packages = () => {
   const [width, setScreenWidth] = useState(Dimensions.get('window').width);
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
 
-
   useEffect(() => {
     const updateDimensions = () => {
-      const { width, height } = Dimensions.get('window');
+      const {width, height} = Dimensions.get('window');
       setScreenWidth(width);
       setScreenHeight(height);
     };
@@ -85,7 +84,10 @@ const Packages = () => {
     Orientation.addOrientationListener(updateDimensions);
 
     // Listen for dimension changes (e.g. on rotation)
-    const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+    const dimensionSubscription = Dimensions.addEventListener(
+      'change',
+      updateDimensions,
+    );
 
     // Cleanup both listeners
     return () => {
@@ -93,7 +95,6 @@ const Packages = () => {
       dimensionSubscription?.remove(); // modern API
     };
   }, []);
-
 
   // const routes = navigation.getState().routes;
   // const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
@@ -272,106 +273,119 @@ const Packages = () => {
     }
   };
 
+  const onOpenSheet = async () => {
+    try {
+      const prevCustomerInfo = await Purchases.getCustomerInfo();
+      const prevEntitlement = prevCustomerInfo.entitlements.active['Premium'];
+      console.log('previous info', prevCustomerInfo?.identifier);
+      let isHandled = false;
 
-const onOpenSheet = async () => {
-  try {
-    const prevCustomerInfo = await Purchases.getCustomerInfo();
-    const prevEntitlement = prevCustomerInfo.entitlements.active['Premium'];
-    console.log('previous info',prevCustomerInfo?.identifier)
-    let isHandled = false;
+      const customerInfoListener = async customerInfo => {
+        const newEntitlement = customerInfo.entitlements.active['Premium'];
 
-    const customerInfoListener = async (customerInfo) => {
-      const newEntitlement = customerInfo.entitlements.active['Premium'];
-
-      if (newEntitlement && newEntitlement.productIdentifier !== prevEntitlement?.productIdentifier) {
-        console.log('Entitlement changed via offer code!');
-        isHandled = true;
-        Purchases.removeCustomerInfoUpdateListener(customerInfoListener);
-        await handlingNavigations();
-      }
-    };
-
-    Purchases.addCustomerInfoUpdateListener(customerInfoListener);
-
-    await presentCodeRedemptionSheetIOS();
-
-    setTimeout(async () => {
-      if (!isHandled) {
-        const latestInfo = await Purchases.getCustomerInfo();
-        const latestEntitlement = latestInfo.entitlements.active['Premium'];
-        console.log('latest info',latestEntitlement.periodType)
         if (
-       latestEntitlement?.periodType === 'TRIAL'
+          newEntitlement &&
+          newEntitlement.productIdentifier !==
+            prevEntitlement?.productIdentifier
         ) {
-          console.log('Entitlement changed after delay fallback');
+          console.log('Entitlement changed via offer code!');
+          isHandled = true;
+          Purchases.removeCustomerInfoUpdateListener(customerInfoListener);
           await handlingNavigations();
-        } else {
-          console.log('No entitlement change — likely canceled or invalid code');
         }
+      };
 
-        Purchases.removeCustomerInfoUpdateListener(customerInfoListener);
-      }
-    }, 2000);
-  } catch (error) {
-    console.log('Error in redemption flow:', error);
-  }
-};
+      Purchases.addCustomerInfoUpdateListener(customerInfoListener);
 
+      await presentCodeRedemptionSheetIOS();
 
-   const handlingNavigations = async () => {
+      setTimeout(async () => {
+        if (!isHandled) {
+          const latestInfo = await Purchases.getCustomerInfo();
+          const latestEntitlement = latestInfo.entitlements.active['Premium'];
+          console.log('latest info', latestEntitlement.periodType);
+          if (latestEntitlement?.periodType === 'TRIAL') {
+            console.log('Entitlement changed after delay fallback');
+            await handlingNavigations();
+          } else {
+            console.log(
+              'No entitlement change — likely canceled or invalid code',
+            );
+          }
+
+          Purchases.removeCustomerInfoUpdateListener(customerInfoListener);
+        }
+      }, 2000);
+    } catch (error) {
+      console.log('Error in redemption flow:', error);
+    }
+  };
+
+  const handlingNavigations = async () => {
     // console.log("first", data)
     // return
-    setLoading(true)
-    const iosSubType = 'monthly';
-    // return console.log('hello world',iosSubType)
-    let datatoBeAppend = new FormData();
-    datatoBeAppend.append(
-      'sub_type',
-      iosSubType,
-    );
+    if (!context?.token) {
+      setLoading(true);
+      await AsyncStorage.setItem('isPremium', 'true');
+      setLoading(false);
+       navigation.navigate('Message', {
+            theme: 'light',
+            title: 'Login Required',
+            message:
+              'To access your subscription benefits, please create or log in to your account',
+            screen: 'Login',
+          });
+    } else {
+      setLoading(true);
+      await AsyncStorage.removeItem('isPremium');
+      const iosSubType = 'monthly';
+      // return console.log('hello world',iosSubType)
+      let datatoBeAppend = new FormData();
+      datatoBeAppend.append('sub_type', iosSubType);
 
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: `${baseUrl}/user/subscribe`,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        Authorization: `Bearer ${context.token}`,
-        'Content-Type': 'multipart/form-data',
-      },
-      data: datatoBeAppend,
-    };
+      let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${baseUrl}/user/subscribe`,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          Authorization: `Bearer ${context.token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+        data: datatoBeAppend,
+      };
 
-    axios
-      .request(config)
-      .then(async response => {
-        const updatedExpiry = response?.data?.user?.expired_at;
-        if (updatedExpiry) {
-          if (context?.token) {
-            await AsyncStorage.setItem('token', context?.token);
-            await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-            await AsyncStorage.setItem(
-              'user',
-              JSON.stringify(response?.data?.user),
-            );
+      axios
+        .request(config)
+        .then(async response => {
+          const updatedExpiry = response?.data?.user?.expired_at;
+          if (updatedExpiry) {
+            if (context?.token) {
+              await AsyncStorage.setItem('token', context?.token);
+              await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+              await AsyncStorage.setItem(
+                'user',
+                JSON.stringify(response?.data?.user),
+              );
 
-            setContext({
-              ...context,
-              token: context?.token,
-              isVerified: true,
-              user: response?.data?.user,
-            });
-            setLoading(false);
-            navigation.navigate('Home');
-          } else {
-            setLoading(false);
+              setContext({
+                ...context,
+                token: context?.token,
+                isVerified: true,
+                user: response?.data?.user,
+              });
+              setLoading(false);
+              navigation.navigate('Home');
+            } else {
+              setLoading(false);
+            }
           }
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        setLoading(false);
-      });
+        })
+        .catch(error => {
+          console.log(error);
+          setLoading(false);
+        });
+    }
   };
 
   return (
@@ -420,41 +434,41 @@ const onOpenSheet = async () => {
             and seamless access with our subscription packages.
           </Text>
 
-          {context?.token && Platform.OS === 'android' &&     
-          <TouchableOpacity
-            // disabled={context?.user?.freetrial_status}
-            onPress={() => {
-              context?.token ? setShowPremiumModal(true) : goToLogin();
-            }}
-            style={{
-              // height: hp(7),
-              padding: hp(2.5),
-              backgroundColor: Color('drawerBg'),
-              width: wp(85),
-              alignSelf: 'center',
-              borderRadius: 10,
-              alignItems: 'center',
-              gap: 10,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              // justifyContent: 'center',
-              marginTop: hp(5),
-            }}>
-            <View style={{flexDirection: 'row', gap: 10}}>
-              <View style={styles.circleView} />
-              <Text
-                style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'}}>
-                Premium User
-              </Text>
-            </View>
-            {context?.user?.freetrial_status && (
-              <Text
-                style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'}}>
-                {context?.user?.freetrial_status}
-              </Text>
-            )}
-          </TouchableOpacity>
-          }
+          {context?.token && Platform.OS === 'android' && (
+            <TouchableOpacity
+              // disabled={context?.user?.freetrial_status}
+              onPress={() => {
+                context?.token ? setShowPremiumModal(true) : goToLogin();
+              }}
+              style={{
+                // height: hp(7),
+                padding: hp(2.5),
+                backgroundColor: Color('drawerBg'),
+                width: wp(85),
+                alignSelf: 'center',
+                borderRadius: 10,
+                alignItems: 'center',
+                gap: 10,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                // justifyContent: 'center',
+                marginTop: hp(5),
+              }}>
+              <View style={{flexDirection: 'row', gap: 10}}>
+                <View style={styles.circleView} />
+                <Text
+                  style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'}}>
+                  Premium User
+                </Text>
+              </View>
+              {context?.user?.freetrial_status && (
+                <Text
+                  style={{color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'}}>
+                  {context?.user?.freetrial_status}
+                </Text>
+              )}
+            </TouchableOpacity>
+          )}
           <View style={{marginTop: 20}}>
             {subscription.length > 0 ? (
               <>
@@ -495,14 +509,27 @@ const onOpenSheet = async () => {
               </>
             )}
           </View>
-         {Platform.OS === 'ios' && 
-           loading ?
-            <ActivityIndicator color={'blue'} size={'large'} style={{alignSelf: 'center',marginTop: 20}} />
-            :
-          <TouchableOpacity style={{marginTop: 20}} onPress={onOpenSheet}>
-                <Text style={{textAlign: 'center',color: 'blue',fontWeight: 'bold',fontSize: hp(2)}}>Redeem Code</Text>
-          </TouchableOpacity>
-          }
+          {Platform.OS === 'ios' ? (
+            loading ? (
+              <ActivityIndicator
+                color={'blue'}
+                size={'large'}
+                style={{alignSelf: 'center', marginTop: 20}}
+              />
+            ) : (
+              <TouchableOpacity style={{marginTop: 20}} onPress={onOpenSheet}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: 'blue',
+                    fontWeight: 'bold',
+                    fontSize: hp(2),
+                  }}>
+                  Redeem Code
+                </Text>
+              </TouchableOpacity>
+            )
+          ) : null}
         </View>
         {showPremiumModal && (
           <View

@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useEffect, useState} from 'react';
-import {Dimensions, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {Color} from '../utils/Colors';
 import {
   heightPercentageToDP as hp,
@@ -13,32 +19,46 @@ import Orientation from 'react-native-orientation-locker';
 
 const Navigation = ({label, navigation, ...props}) => {
   const {context, setContext} = useContext(DataContext);
-    const [width, setScreenWidth] = useState(Dimensions.get('window').width);
-    const [height, setScreenHeight] = useState(Dimensions.get('window').height);
-    useEffect(() => {
-      const updateDimensions = () => {
-        const { width, height } = Dimensions.get('window');
-        setScreenWidth(width);
-        setScreenHeight(height);
-      };
-  
-      // Listen for orientation changes
-      Orientation.addOrientationListener(updateDimensions);
-  
-      // Listen for dimension changes (e.g. on rotation)
-      const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
-  
-      // Cleanup both listeners
-      return () => {
-        Orientation.removeOrientationListener(updateDimensions);
-        dimensionSubscription?.remove(); // modern API
-      };
-    }, []);
-  
+  const [width, setScreenWidth] = useState(Dimensions.get('window').width);
+  const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+  // const [premium, setPremium] = useState(null);
+  useEffect(() => {
+    const updateDimensions = () => {
+      const {width, height} = Dimensions.get('window');
+      setScreenWidth(width);
+      setScreenHeight(height);
+    };
+
+    // console.log(premium);
+
+    // Listen for orientation changes
+    Orientation.addOrientationListener(updateDimensions);
+
+    // Listen for dimension changes (e.g. on rotation)
+    const dimensionSubscription = Dimensions.addEventListener(
+      'change',
+      updateDimensions,
+    );
+
+    // Cleanup both listeners
+    return () => {
+      Orientation.removeOrientationListener(updateDimensions);
+      dimensionSubscription?.remove(); // modern API
+    };
+  }, []);
+
+  // useEffect(() => {
+  //   const checkPremium = async () => {
+  //     const result = await AsyncStorage.getItem('isPremium');
+  //     setPremium(result);
+  //   };
+
+  //   checkPremium();
+  // }, []);
 
   return (
     <>
-      <View style={[styles.navigation,{width: width}]}>
+      <View style={[styles.navigation, {width: width}]}>
         <TouchableOpacity
           style={{alignItems: 'center'}}
           onPress={() => navigation.navigate('Home')}>
@@ -74,16 +94,26 @@ const Navigation = ({label, navigation, ...props}) => {
         <TouchableOpacity
           style={{alignItems: 'center'}}
           onPress={() => {
-            const expiryDate = context?.user?.expired_at
-              ? new Date(context.user.expired_at)
-              : null;
-            const currentDate = new Date();
-            if (
-              !expiryDate || (expiryDate && currentDate > expiryDate)
-            ) {
-              navigation.navigate('Packages');
+            if (context?.token) {
+              const expiryDate = context?.user?.expired_at
+                ? new Date(context.user.expired_at)
+                : null;
+              const currentDate = new Date();
+              const isExpired =
+                !expiryDate || (expiryDate && currentDate > expiryDate);
+              if (isExpired) {
+                navigation.navigate('Packages');
+              } else {
+                navigation.navigate('CFISearch');
+              }
             } else {
-              navigation.navigate('CFISearch');
+              navigation.navigate('Message', {
+                theme: 'light',
+                title: 'Login Required',
+                message:
+                  'To access your subscription benefits, please create or log in to your account',
+                screen: 'Login',
+              });
             }
           }}>
           <Image
