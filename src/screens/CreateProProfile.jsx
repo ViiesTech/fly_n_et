@@ -6,6 +6,7 @@ import {
   Animated,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
   PermissionsAndroid,
   Platform,
   ScrollView,
@@ -77,63 +78,62 @@ const validationSchema = Yup.object().shape({
 });
 
 const CreateProProfile = ({navigation}) => {
- const typeData = [
-  'None',
-  'Aero',
-  'American Champion',
-  'American Legend',
-  'Antonov',
-  'ATR',
-  'Aviat',
-  'Beechcraft (the one Rick has)',
-  'Bellanca',
-  'Boeing',
-  'Bristell',
-  'Cessna',
-  'Cirrus',
-  'Columbia',
-  'Commander',
-  'Cubcrafters',
-  'Czech Sport',
-  'Daher TBM',
-  'Dehavilland',
-  'Diamond',
-  'Dornier',
-  'Epic',
-  'Evektor',
-  'Fairchild',
-  'Flight Design',
-  'Game Composites',
-  'Gogetair',
-  'Grumman/American General',
-  'Helicopter',
-  'Icon',
-  'JMB',
-  'Light Sport Aircraft',
-  'Lockheed',
-  'Maule',
-  'Mitsubishi',
-  'Mooney',
-  'Piper',
-  'Pilatus',
-  'Piaggio',
-  'Pipestrel',
-  'Siai',
-  'Single Engine',
-  'Socata TBM',
-  'TBM',
-  'Tecnam',
-  'Tecnam',
-  'Tomark Aero',
-  'Turbo Prop Aircraft',
-  'Vashon',
-  'Waco',
-];
-
+  const typeData = [
+    'None',
+    'Aero',
+    'American Champion',
+    'American Legend',
+    'Antonov',
+    'ATR',
+    'Aviat',
+    'Beechcraft (the one Rick has)',
+    'Bellanca',
+    'Boeing',
+    'Bristell',
+    'Cessna',
+    'Cirrus',
+    'Columbia',
+    'Commander',
+    'Cubcrafters',
+    'Czech Sport',
+    'Daher TBM',
+    'Dehavilland',
+    'Diamond',
+    'Dornier',
+    'Epic',
+    'Evektor',
+    'Fairchild',
+    'Flight Design',
+    'Game Composites',
+    'Gogetair',
+    'Grumman/American General',
+    'Helicopter',
+    'Icon',
+    'JMB',
+    'Light Sport Aircraft',
+    'Lockheed',
+    'Maule',
+    'Mitsubishi',
+    'Mooney',
+    'Piper',
+    'Pilatus',
+    'Piaggio',
+    'Pipestrel',
+    'Siai',
+    'Single Engine',
+    'Socata TBM',
+    'TBM',
+    'Tecnam',
+    'Tecnam',
+    'Tomark Aero',
+    'Turbo Prop Aircraft',
+    'Vashon',
+    'Waco',
+  ];
 
   const {context, setContext} = useContext(DataContext);
   const IsFocused = useIsFocused();
-  const [slideAnimation] = useState(new Animated.Value(hp('100%')));
+  // const [slideAnimation] = useState(new Animated.Value(hp('100%')));
   const [profile, setProfile] = useState(null);
   const [banner, setBanner] = useState(null);
   const [expiry, setExpiry] = useState('');
@@ -154,15 +154,15 @@ const CreateProProfile = ({navigation}) => {
     requestLocationPermission();
   }, []);
 
-  console.log('phone field',phone)
+  console.log('phone field', phone);
 
-  useEffect(() => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('1%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, [IsFocused]);
+  // useEffect(() => {
+  //   Animated.timing(slideAnimation, {
+  //     toValue: hp('1%'),
+  //     duration: 1000,
+  //     useNativeDriver: true,
+  //   }).start();
+  // }, [IsFocused]);
 
   useEffect(() => {
     setShow(false);
@@ -195,13 +195,13 @@ const CreateProProfile = ({navigation}) => {
   console.log('hello', userType);
 
   const nextScreen = nav => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('100%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start(() => {
-      nav();
-    });
+    // Animated.timing(slideAnimation, {
+    //   toValue: hp('100%'),
+    //   duration: 1000,
+    //   useNativeDriver: true,
+    // }).start(() => {
+    nav();
+    // });
   };
   const uploadProfileImage = async bannerImg => {
     const result = await launchImageLibrary({
@@ -365,130 +365,151 @@ const CreateProProfile = ({navigation}) => {
   }
   return (
     <>
-      <Background translucent={false} statusBarColor={Color('drawerBg')}>
+      <Background
+        noScroll={true}
+        translucent={false}
+        statusBarColor={Color('drawerBg')}>
         <View style={{height: hp('97%'), justifyContent: 'space-between'}}>
-          <Animated.View
+          <View style={drawerStyle}>
+            {/* <Animated.View
             style={[
               {transform: [{translateY: slideAnimation}], zIndex: 100},
               drawerStyle,
-            ]}>
-            <ScrollView style={[drawerInner, {zIndex: 1, height: null}]}>
-              <H5 style={{textAlign: 'center'}} heading font="bold">
-                Signup CFI/CFII
-              </H5>
-              <Br space={0.5} />
-              <Small style={{textAlign: 'center'}} font="light">
-                Enter your details!
-              </Small>
-              <Br space={3} />
-              <View
-                style={{
-                  position: 'relative',
-                  width: hp('10%'),
-                  alignSelf: 'center',
-                }}>
-                <Image
-                  source={{
-                    uri: profile?.uri
-                      ? profile?.uri
-                      : 'https://as1.ftcdn.net/v2/jpg/03/39/45/96/1000_F_339459697_XAFacNQmwnvJRqe1Fe9VOptPWMUxlZP8.jpg',
-                  }}
+            ]}> */}
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+              <ScrollView
+                contentContainerStyle={[
+                  drawerInner,
+                  {zIndex: 1, height: null},
+                ]}>
+                <H5 style={{textAlign: 'center'}} heading font="bold">
+                  Signup CFI/CFII
+                </H5>
+                <Br space={0.5} />
+                <Small style={{textAlign: 'center'}} font="light">
+                  Enter your details!
+                </Small>
+                <Br space={3} />
+                <View
                   style={{
+                    position: 'relative',
                     width: hp('10%'),
-                    height: hp('10%'),
-                    borderRadius: hp('50%'),
-                  }}
-                />
-                <TouchableOpacity
-                  style={{
-                    position: 'absolute',
-                    borderRadius: hp('50%'),
-                    bottom: 0,
-                    right: 0,
-                    backgroundColor: Color('text'),
-                    padding: hp('0.5%'),
-                  }}
-                  onPress={() => {
-                    Alert.alert(
-                      'Select an Option',
-                      'Do you want to upload an image or click one from the camera?',
-                      [
-                        {text: 'Cancel'},
-                        {text: 'Camera', onPress: () => clickProfileImage()},
-                        {text: 'Upload', onPress: () => uploadProfileImage()},
-                      ],
-                    );
+                    alignSelf: 'center',
                   }}>
-                  <Add size={hp('3%')} color={Color('drawerBg')} />
-                </TouchableOpacity>
-              </View>
-              <Br space={1} />
-              <Pera heading font="bold" style={{textAlign: 'center'}}>
-                {capitalize(context?.user?.name)}
-              </Pera>
-              <Small
-                color={Color('lightText')}
-                heading
-                font="regular"
-                style={{textAlign: 'center'}}>
-                {context?.user?.email}
-              </Small>
-               <Br space={5} /> 
-              <DOB  dob={expiry} setDob={setExpiry} /> 
-              {/* <Br space={2} /> */}
-              {/* <Input
+                  <Image
+                    source={{
+                      uri: profile?.uri
+                        ? profile?.uri
+                        : 'https://as1.ftcdn.net/v2/jpg/03/39/45/96/1000_F_339459697_XAFacNQmwnvJRqe1Fe9VOptPWMUxlZP8.jpg',
+                    }}
+                    style={{
+                      width: hp('10%'),
+                      height: hp('10%'),
+                      borderRadius: hp('50%'),
+                    }}
+                  />
+                  <TouchableOpacity
+                    style={{
+                      position: 'absolute',
+                      borderRadius: hp('50%'),
+                      bottom: 0,
+                      right: 0,
+                      backgroundColor: Color('text'),
+                      padding: hp('0.5%'),
+                    }}
+                    onPress={() => {
+                      Alert.alert(
+                        'Select an Option',
+                        'Do you want to upload an image or click one from the camera?',
+                        [
+                          {text: 'Cancel'},
+                          {text: 'Camera', onPress: () => clickProfileImage()},
+                          {text: 'Upload', onPress: () => uploadProfileImage()},
+                        ],
+                      );
+                    }}>
+                    <Add size={hp('3%')} color={Color('drawerBg')} />
+                  </TouchableOpacity>
+                </View>
+                <Br space={1} />
+                <Pera heading font="bold" style={{textAlign: 'center'}}>
+                  {capitalize(context?.user?.name)}
+                </Pera>
+                <Small
+                  color={Color('lightText')}
+                  heading
+                  font="regular"
+                  style={{textAlign: 'center'}}>
+                  {context?.user?.email}
+                </Small>
+                <Br space={5} />
+                <DOB dob={expiry} setDob={setExpiry} />
+                {/* <Br space={2} /> */}
+                {/* <Input
                 value={age.toString()}
                 keyboardType="numeric"
                 label="Enter Age"
                 style={{ borderRadius: hp('1%') }}
                 readOnly
               /> */}
-              {/* <Br space={2} />
+                {/* <Br space={2} />
               <Input
                 defaultValue={location?.locationName}
                 label="Your Address"
                 style={{ borderRadius: hp('1%') }}
                 onChangeText={(text) => setRegion(text)}
               /> */}
-              <Br space={2} />
-              <Input
-                label="Your Phone Number"
-                style={{borderRadius: hp('1%')}}
-                onChangeText={text => setPhone(text)}
-              />
-              {/* <Br space={2} />
+                <Br space={2} />
+                <Input
+                  label="Your Phone Number"
+                  style={{borderRadius: hp('1%')}}
+                  onChangeText={text => setPhone(text)}
+                />
+                {/* <Br space={2} />
               <Input
                 label="Operational Time"
                 style={{ borderRadius: hp('1%') }}
                 onChangeText={(text) => setTime(text)}
               /> */}
-              <Br space={1.5} />
-              <Pera heading font="bold">
-                Aircraft Type
-              </Pera>
-              <Br space={1} />
-              <TouchableOpacity
-                style={{
-                  borderRadius: hp('1%'),
-                  padding: hp('2%'),
-                  borderWidth: 1,
-                  borderColor: Color('lightGray'),
-                }}
-                onPress={() => setShow(!show)}>
-                <Text style={{color: Color('lightGray')}}>{type ? type : 'Select Type'}</Text>
-                {/* <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly={false} /> */}
-              </TouchableOpacity>
-              <Br space={1} />
-              <Pera heading font="bold">
-                User Type
-              </Pera>
-              <Br space={1} />
-                  <TouchableOpacity style={{borderRadius: hp('1%'),padding: hp('2%'),borderWidth: 1,borderColor: Color('lightGray')}} onPress={() => setShow1(!show1)}>
-                                  <Text style={{color: Color('lightGray')}}>{!userType ? 'Select Type' : userType}</Text>
-                                {/* <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly={false} /> */}
-                              </TouchableOpacity>
-              <Br space={1} />
-              {/* <Pera heading font="bold">
+                <Br space={1.5} />
+                <Pera heading font="bold">
+                  Aircraft Type
+                </Pera>
+                <Br space={1} />
+                <TouchableOpacity
+                  style={{
+                    borderRadius: hp('1%'),
+                    padding: hp('2%'),
+                    borderWidth: 1,
+                    borderColor: Color('lightGray'),
+                  }}
+                  onPress={() => setShow(!show)}>
+                  <Text style={{color: Color('lightGray')}}>
+                    {type ? type : 'Select Type'}
+                  </Text>
+                  {/* <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly={false} /> */}
+                </TouchableOpacity>
+                <Br space={1} />
+                <Pera heading font="bold">
+                  User Type
+                </Pera>
+                <Br space={1} />
+                <TouchableOpacity
+                  style={{
+                    borderRadius: hp('1%'),
+                    padding: hp('2%'),
+                    borderWidth: 1,
+                    borderColor: Color('lightGray'),
+                  }}
+                  onPress={() => setShow1(!show1)}>
+                  <Text style={{color: Color('lightGray')}}>
+                    {!userType ? 'Select Type' : userType}
+                  </Text>
+                  {/* <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly={false} /> */}
+                </TouchableOpacity>
+                <Br space={1} />
+                {/* <Pera heading font="bold">
                 Banner Image
               </Pera>
               <Br space={1} />
@@ -517,7 +538,7 @@ const CreateProProfile = ({navigation}) => {
                   readOnly
                 />
               </TouchableOpacity> */}
-              {/* <Br space={2} />
+                {/* <Br space={2} />
               <Input
                 label="Enter Bio"
                 style={{ borderRadius: hp('1%'), height: hp('15%') }}
@@ -527,37 +548,39 @@ const CreateProProfile = ({navigation}) => {
                 multiline
               />
               <Br space={2} /> */}
-              <View
-                style={{
-                  marginTop: hp('1%'),
-                  marginBottom: hp('3%'),
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
                 <View
                   style={{
+                    marginTop: hp('1%'),
+                    marginBottom: hp('3%'),
                     flexDirection: 'row',
-                    gap: wp('2%'),
-                    alignItems: 'center',
+                    justifyContent: 'space-between',
                   }}>
-                  <RadioBtn
-                    radioClr={Color('text')}
-                    isChecked={agree}
-                    onPress={() => setAgree(!agree)}
-                  />
-                  <Small heading font="regular">
-                    I agree to the Terms of Service
-                  </Small>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      gap: wp('2%'),
+                      alignItems: 'center',
+                    }}>
+                    <RadioBtn
+                      radioClr={Color('text')}
+                      isChecked={agree}
+                      onPress={() => setAgree(!agree)}
+                    />
+                    <Small heading font="regular">
+                      I agree to the Terms of Service
+                    </Small>
+                  </View>
                 </View>
-              </View>
-              <Btn
-                onPress={onCreateProfile}
-                label="Create Now"
-                loading={loading}
-              />
-              <Br space={7} />
-            </ScrollView>
-          </Animated.View>
+                <Btn
+                  onPress={onCreateProfile}
+                  label="Create Now"
+                  loading={loading}
+                />
+                <Br space={7} />
+              </ScrollView>
+            </KeyboardAvoidingView>
+          </View>
+          {/* </Animated.View> */}
         </View>
       </Background>
       <Model show={show}>
@@ -598,7 +621,9 @@ const CreateProProfile = ({navigation}) => {
             borderBottomWidth: 1,
           }}
           onPress={() => setUserType('CFI')}>
-          <H1 size={23} color={Color('shadow')}>CFI</H1>
+          <H1 size={23} color={Color('shadow')}>
+            CFI
+          </H1>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
@@ -608,7 +633,9 @@ const CreateProProfile = ({navigation}) => {
             marginTop: 10,
           }}
           onPress={() => setUserType('CFII')}>
-          <H2 size={23} color={Color('shadow')}>CFII</H2>
+          <H2 size={23} color={Color('shadow')}>
+            CFII
+          </H2>
         </TouchableOpacity>
       </Model>
     </>

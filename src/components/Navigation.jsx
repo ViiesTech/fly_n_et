@@ -94,27 +94,28 @@ const Navigation = ({label, navigation, ...props}) => {
         <TouchableOpacity
           style={{alignItems: 'center'}}
           onPress={() => {
-            if (context?.token) {
-              const expiryDate = context?.user?.expired_at
-                ? new Date(context.user.expired_at)
-                : null;
-              const currentDate = new Date();
-              const isExpired =
-                !expiryDate || (expiryDate && currentDate > expiryDate);
-              if (isExpired) {
-                navigation.navigate('Packages');
-              } else {
-                navigation.navigate('CFISearch');
-              }
-            } else {
-              navigation.navigate('Message', {
-                theme: 'light',
-                title: 'Login Required',
-                message:
-                  'To access your subscription benefits, please create or log in to your account',
-                screen: 'Login',
-              });
-            }
+               navigation.navigate('CFISearch')
+            // if (context?.token) {
+            //   const expiryDate = context?.user?.expired_at
+            //     ? new Date(context.user.expired_at)
+            //     : null;
+            //   const currentDate = new Date();
+            //   const isExpired =
+            //     !expiryDate || (expiryDate && currentDate > expiryDate);
+            //   if (isExpired) {
+            //     navigation.navigate('Packages');
+            //   } else {
+            //     navigation.navigate('CFISearch')
+            //   }
+            // } else {
+            //   navigation.navigate('Message', {
+            //     theme: 'light',
+            //     title: 'Login Required',
+            //     message:
+            //       'To access your subscription benefits, please create or log in to your account',
+            //     screen: 'Login',
+            //   });
+            // }
           }}>
           <Image
             resizeMode="contain"

@@ -8,15 +8,15 @@ import Btn from '../utils/Btn';
 import Background from '../utils/Background';
 import { drawerInner } from '../utils/global';
 const CFISelection = ({ navigation }) => {
-  const [slideAnimation] = useState(new Animated.Value(hp('100%')));
+  // const [slideAnimation] = useState(new Animated.Value(hp('100%')));
   const nextScreen = nav => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('100%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start(() => {
+    // Animated.timing(slideAnimation, {
+    //   toValue: hp('100%'),
+    //   duration: 1000,
+    //   useNativeDriver: true,
+    // }).start(() => {
       nav();
-    });
+    // });
   };
   return (
     <>

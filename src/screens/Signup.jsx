@@ -59,7 +59,7 @@ const validationSchema = Yup.object().shape({
 const Signup = ({navigation}) => {
   const {context, setContext} = useContext(DataContext);
   const IsFocused = useIsFocused();
-  const [slideAnimation] = useState(new Animated.Value(hp('100%')));
+  // const [slideAnimation] = useState(new Animated.Value(hp('100%')));
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -86,13 +86,13 @@ const Signup = ({navigation}) => {
     requestLocationPermission();
   }, []);
 
-  useEffect(() => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('1%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, [IsFocused]);
+  // useEffect(() => {
+  //   Animated.timing(slideAnimation, {
+  //     toValue: hp('1%'),
+  //     duration: 1000,
+  //     useNativeDriver: true,
+  //   }).start();
+  // }, [IsFocused]);
 
   useEffect(() => {
     if (context?.token && !context?.isVerified) {
@@ -156,13 +156,13 @@ const Signup = ({navigation}) => {
   }
 
   const nextScreen = nav => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('100%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start(() => {
-      nav();
-    });
+    // Animated.timing(slideAnimation, {
+    //   toValue: hp('100%'),
+    //   duration: 1000,
+    //   useNativeDriver: true,
+    // }).start(() => {
+    nav();
+    // });
   };
 
   const onUserSignup = async () => {
@@ -210,7 +210,7 @@ const Signup = ({navigation}) => {
       );
     } else {
       //  alert(modal?.data?.token)
-      note('Account Created', modal.data?.message); 
+      note('Account Created', modal.data?.message);
       setContext({
         ...context,
         token: modal.data?.token,
@@ -224,58 +224,69 @@ const Signup = ({navigation}) => {
 
   return (
     <>
-      <Background translucent={true}>
+      <Background noScroll={true} translucent={true}>
         <View style={{height: hp('100%'), justifyContent: 'space-between'}}>
           <View />
-          <Animated.View
-            style={[{transform: [{translateY: slideAnimation}]}, drawerStyle]}>
-                    {/* <KeyboardAvoidingView keyboardVerticalOffset={10} behavior='padding'   >    */}
-            <View style={drawerInner}>
-              <H5 style={{textAlign: 'center'}} heading font="bold">
-                Create App account!
-              </H5>
-              <Br space={0.5} />
-              <Small style={{textAlign: 'center'}} font="light">
-                Create your amazing app account with us!
-              </Small>
-              <Br space={1.5} />
-              <Image
-                source={require('../assets/images/logo.png')}
-                style={{
-                  width: hp('20%'),
-                  height: hp('20%'),
-                  alignSelf: 'center',
-                }}
-              />
-              <Br space={1.5} />
-              <Input label="Full Name" onChangeText={text => setName(text)} />
-              <Br space={1.5} />
-              <Input
-                label="Email Address"
-                onChangeText={text => setEmail(text)}
-              />
-              <Br space={1.5} />
-              <Input
-                label="Password"
-                onChangeText={text => setPassword(text)}
-                secureTextEntry
-              />
-              <Br space={1.5} />
-              <Input
-                label="Re-Enter Password"
-                onChangeText={text => setConfirmPassword(text)}
-                secureTextEntry
-              />
-              <Br space={2.5} />
-              <Btn  loading={loading} label="Signup" onPress={onUserSignup} />
-              <Br space={3} />
-              <TouchableOpacity
-                onPress={() => nextScreen(() => navigation.navigate('Login'))}>
-                <Small style={{textAlign: 'center',fontSize: hp(2)}} heading font="regular">
-                  Already have an account ? Login
+          <View style={drawerStyle}>
+            {/* <Animated.View
+            style={[{transform: [{translateY: slideAnimation}]}, drawerStyle]}> */}
+            {/* <KeyboardAvoidingView keyboardVerticalOffset={10} behavior='padding'   >    */}
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+              <ScrollView
+                contentContainerStyle={drawerInner}
+                keyboardShouldPersistTaps={'handled'}>
+                <H5 style={{textAlign: 'center'}} heading font="bold">
+                  Create App account!
+                </H5>
+                <Br space={0.5} />
+                <Small style={{textAlign: 'center'}} font="light">
+                  Create your amazing app account with us!
                 </Small>
-              </TouchableOpacity>
-            </View>
+                <Br space={1.5} />
+                <Image
+                  source={require('../assets/images/logo.png')}
+                  style={{
+                    width: hp('20%'),
+                    height: hp('20%'),
+                    alignSelf: 'center',
+                  }}
+                />
+                <Br space={1.5} />
+                <Input label="Full Name" onChangeText={text => setName(text)} />
+                <Br space={1.5} />
+                <Input
+                  label="Email Address"
+                  onChangeText={text => setEmail(text)}
+                />
+                <Br space={1.5} />
+                <Input
+                  label="Password"
+                  onChangeText={text => setPassword(text)}
+                  secureTextEntry
+                />
+                <Br space={1.5} />
+                <Input
+                  label="Re-Enter Password"
+                  onChangeText={text => setConfirmPassword(text)}
+                  secureTextEntry
+                />
+                <Br space={2.5} />
+                <Btn loading={loading} label="Signup" onPress={onUserSignup} />
+                <Br space={3} />
+                <TouchableOpacity
+                  onPress={() =>
+                    nextScreen(() => navigation.navigate('Login'))
+                  }>
+                  <Small
+                    style={{textAlign: 'center', fontSize: hp(2)}}
+                    heading
+                    font="regular">
+                    Already have an account ? Login
+                  </Small>
+                </TouchableOpacity>
+              </ScrollView>
+            </KeyboardAvoidingView>
             <Modal
               transparent={true}
               visible={modal.visible}
@@ -347,7 +358,8 @@ const Signup = ({navigation}) => {
               </View>
             </Modal>
             {/* </KeyboardAvoidingView> */}
-          </Animated.View>
+          </View>
+          {/* </Animated.View> */}
         </View>
       </Background>
     </>

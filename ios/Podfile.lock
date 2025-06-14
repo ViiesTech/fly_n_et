@@ -1590,12 +1590,33 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
+  - RNGestureHandler (2.25.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RNIap (12.16.2):
     - React-Core
   - RNPurchases (8.9.4):
     - PurchasesHybridCommon (= 13.28.0)
     - React-Core
-  - RNScreens (4.10.0):
+  - RNScreens (4.11.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1702,6 +1723,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNFastImage (from `../node_modules/react-native-fast-image`)
+  - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNIap (from `../node_modules/react-native-iap`)
   - RNPurchases (from `../node_modules/react-native-purchases`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -1860,6 +1882,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNFastImage:
     :path: "../node_modules/react-native-fast-image"
+  RNGestureHandler:
+    :path: "../node_modules/react-native-gesture-handler"
   RNIap:
     :path: "../node_modules/react-native-iap"
   RNPurchases:
@@ -1945,9 +1969,10 @@ SPEC CHECKSUMS:
   RevenueCat: 57028a8673201fdaacd1354065e8adbcba5739a4
   RNCAsyncStorage: addfc2cb6511dbe199c56c6b26ede383b6c38919
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
+  RNGestureHandler: d11cebb14e1e0e9fb857ded703fa018258989206
   RNIap: 2fba6c91f79fb7c71fcc44465f606061653caf01
   RNPurchases: a4f7362d15254dedad3ff3084bb88e1faecd66be
-  RNScreens: 726a7ab8451c122ef11d5ae38e7f981092bf86de
+  RNScreens: b555f6bedb3b9df290d0ce7be5c240e8a96fb1bf
   RNSVG: 8b18fe2c2884a86e5e2e008acee0f3503dc19ff2
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d

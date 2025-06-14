@@ -275,9 +275,10 @@ const Packages = () => {
 
   const onOpenSheet = async () => {
     try {
+            setLoading(true)
       const prevCustomerInfo = await Purchases.getCustomerInfo();
       const prevEntitlement = prevCustomerInfo.entitlements.active['Premium'];
-      console.log('previous info', prevCustomerInfo?.identifier);
+      // console.log('previous info', prevCustomerInfo?.identifier);
       let isHandled = false;
 
       const customerInfoListener = async customerInfo => {
@@ -296,14 +297,15 @@ const Packages = () => {
       };
 
       Purchases.addCustomerInfoUpdateListener(customerInfoListener);
-
       await presentCodeRedemptionSheetIOS();
+
 
       setTimeout(async () => {
         if (!isHandled) {
+          // setLoading(true)
           const latestInfo = await Purchases.getCustomerInfo();
           const latestEntitlement = latestInfo.entitlements.active['Premium'];
-          console.log('latest info', latestEntitlement.periodType);
+          // console.log('latest info', latestEntitlement.periodType);
           if (latestEntitlement?.periodType === 'TRIAL') {
             console.log('Entitlement changed after delay fallback');
             await handlingNavigations();
@@ -311,13 +313,17 @@ const Packages = () => {
             console.log(
               'No entitlement change — likely canceled or invalid code',
             );
+            setLoading(false)
           }
+          // setLoading(false)
 
           Purchases.removeCustomerInfoUpdateListener(customerInfoListener);
+
         }
       }, 2000);
     } catch (error) {
       console.log('Error in redemption flow:', error);
+      setLoading(false)
     }
   };
 

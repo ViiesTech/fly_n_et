@@ -21,24 +21,24 @@ const Message = ({ navigation, route }) => {
     const message = route?.params?.message;
     const screen = route?.params?.screen;
     const isLightTheme = theme && theme === 'light';
-    const [popUpAnimation] = useState(new Animated.Value(0.8));
+    // const [popUpAnimation] = useState(new Animated.Value(0.8));
     const {context,setContext} = useContext(DataContext)
     const [loading,setLoading] = useState(false)
 
-    useEffect(() => {
-        Animated.timing(popUpAnimation, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-        }).start();
-    }, []);
+    // useEffect(() => {
+    //     Animated.timing(popUpAnimation, {
+    //         toValue: 1,
+    //         duration: 1000,
+    //         useNativeDriver: true,
+    //     }).start();
+    // }, []);
 
-    const onContinue = () => {
-        Animated.timing(popUpAnimation, {
-            toValue: 0.8,
-            duration: 1000,
-            useNativeDriver: true,
-        }).start(async () => {
+    const onContinue = async () => {
+        // Animated.timing(popUpAnimation, {
+        //     toValue: 0.8,
+        //     duration: 1000,
+        //     useNativeDriver: true,
+        // }).start(async () => {
            if(title === 'Account Deletion') { 
             setLoading(true)
             const res = await api.post('/user/delete-account',{},{
@@ -89,7 +89,7 @@ const Message = ({ navigation, route }) => {
         } else {
             navigation.navigate(screen || 'Home');
         }
-        });
+        // });
     };
 
     return (
@@ -97,7 +97,8 @@ const Message = ({ navigation, route }) => {
             {isLightTheme && <BackBtn navigation={navigation} translucent />}
             <Background translucent={true} noBackground={isLightTheme} barStyle={isLightTheme ? 'dark-content' : 'light-content'}>
                 <View style={{ height: isIOS ? hp('90%') : hp('95%'), alignItems: 'center', justifyContent: 'center' }}>
-                    <Animated.View style={{ transform: [{ scale: popUpAnimation }] }}>
+                    <View>
+                    {/* <Animated.View style={{ transform: [{ scale: popUpAnimation }] }}> */}
                         <View style={[styles.card, { backgroundColor: isLightTheme ? Color('homeBg') : Color('drawerBg') }]}>
                             <TickCircle
                                 size={hp('8%')}
@@ -110,7 +111,8 @@ const Message = ({ navigation, route }) => {
                             <Br space={2} />
                             <Btn loadingColor={Color('drawerBg')} loading={loading} textStyle={{color: Color(isLightTheme ? 'homeBg' : 'text')}} onPress={onContinue} label="Continue" btnStyle={{paddingHorizontal: wp('15%'), backgroundColor: Color(isLightTheme ? 'text' : 'btnColor')}} />
                         </View>
-                    </Animated.View>
+                        </View>
+                    {/* </Animated.View> */}
                 </View>
             </Background>
         </>

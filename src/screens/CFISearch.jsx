@@ -56,7 +56,7 @@ const CFISearch = ({navigation}) => {
   const [predictions, setPredictions] = useState([]);
   const inputRef = useRef(null);
 
-  console.log('conntexttt =====>',context?.pro_users)
+  // console.log('conntexttt =====>',context?.pro_users)
 
   const [width, setScreenWidth] = useState(Dimensions.get('window').width);
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
@@ -88,10 +88,10 @@ const CFISearch = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    if (location) {
+    // if (location) {
       getCFI();
-    }
-  }, [location]);
+    // }
+  }, []);
 
   // useEffect(() => {
   //   if (filter || nauticalLocation?.lat || distance) {
@@ -111,7 +111,7 @@ const CFISearch = ({navigation}) => {
         headers: {Authorization: `Bearer ${context?.token}`},
       });
 
-      // alert('is this even working ?')
+      console.log('is this even working ?',res.data)
 
       const newUsers = res?.data?.users?.data || [];
       
@@ -123,6 +123,7 @@ const CFISearch = ({navigation}) => {
       setCurrentPage(page);
       setHasMore(page < res?.data?.users?.last_page);
     } catch (err) {
+      console.log('error',err)
       await errHandler(err, null, navigation);
     } finally {
       setIsLoading(false);
@@ -188,6 +189,10 @@ const CFISearch = ({navigation}) => {
   }
 
   const onSearchCFI = async (page = 1) => {
+  
+    if(!distance || !nauticalLocation) {
+      return;
+    }
     if (isLoading || !hasMore) {
         return;
       }
@@ -490,7 +495,7 @@ const CFISearch = ({navigation}) => {
                                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('0.5%') }}>
                                                 <Location size={hp('2%')} color={Color('modelDark')} />
                                                 <Small color={Color('modelDark')} numberOfLines={1}>
-                                                    {val?.user_info?.address || 'No Location Found'}
+                                                    {val?.user_info?.city && val?.user_info?.state ? val?.user_info?.city + ',' + val?.user_info?.state : 'No Location Found'}
                                                 </Small>
                                             </View>
                                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('0.5%') }}>
@@ -504,7 +509,7 @@ const CFISearch = ({navigation}) => {
                                             </View>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('0.5%') }}>
                                               <Calendar size={hp('2.5%')} color={Color('modelDark')} />
-                                                <Small color={Color('modelDark')}>{val?.user_info?.licence_expiry}</Small>
+                                                <Small color={Color('modelDark')}>{val?.user_info?.licence_expiry ? val?.user_info?.licence_expiry : 'No Date Found'}</Small>
                                                 </View>
                                         </View>
                                         <Small color={Color('modelDark')}>

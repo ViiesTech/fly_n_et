@@ -35,24 +35,24 @@ const ResetPassword = ({ navigation, route }) => {
     const user_id = route.params?.user_id;
 
 
-    const [slideAnimation] = useState(new Animated.Value(hp('100%')));
+    // const [slideAnimation] = useState(new Animated.Value(hp('100%')));
 
-    useEffect(() => {
-        Animated.timing(slideAnimation, {
-            toValue: hp('1%'),
-            duration: 1000,
-            useNativeDriver: true,
-        }).start();
-    }, [IsFocused]);
+    // useEffect(() => {
+    //     Animated.timing(slideAnimation, {
+    //         toValue: hp('1%'),
+    //         duration: 1000,
+    //         useNativeDriver: true,
+    //     }).start();
+    // }, [IsFocused]);
 
     const nextScreen = (nav) => {
-        Animated.timing(slideAnimation, {
-            toValue: hp('100%'),
-            duration: 1000,
-            useNativeDriver: true,
-        }).start(() => {
+        // Animated.timing(slideAnimation, {
+        //     toValue: hp('100%'),
+        //     duration: 1000,
+        //     useNativeDriver: true,
+        // }).start(() => {
             nav();
-        });
+        // });
     };
 
 
@@ -81,7 +81,8 @@ const ResetPassword = ({ navigation, route }) => {
             <Background>
                 <View style={{ height: hp('100%'), justifyContent: 'space-between' }}>
                     <View />
-                    <Animated.View style={[{ transform: [{ translateY: slideAnimation }] }, drawerStyle]}>
+                    <View style={drawerStyle}>
+                    {/* <Animated.View style={[{ transform: [{ translateY: slideAnimation }] }, drawerStyle]}> */}
                         <View
                             style={drawerInner}>
                             <H5 style={{ textAlign: 'center' }} heading font="bold">Enter New Password</H5>
@@ -99,7 +100,8 @@ const ResetPassword = ({ navigation, route }) => {
                             <Br space={2} />
                             <Btn loading={loading} onPress={onResetPassword} label="Continue" />
                         </View>
-                    </Animated.View>
+                        </View>
+                    {/* </Animated.View> */}
                 </View>
             </Background>
         </>

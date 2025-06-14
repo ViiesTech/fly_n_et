@@ -24,7 +24,7 @@ import {Add, Calendar, Clock, Location, Star1} from 'iconsax-react-native';
 import {H5, H6, Pera} from '../utils/Text';
 import Br from '../components/Br';
 import Navigation from '../components/Navigation';
-import {api, errHandler, storageUrl} from '../utils/api';
+import {api, errHandler, getCityAndState, storageUrl} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import {capitalize} from '../utils/global';
 import Model from '../components/Model';
@@ -33,6 +33,8 @@ import Toast from 'react-native-simple-toast';
 const CFIDetail = ({navigation, route}) => {
   const {context, setContext} = useContext(DataContext);
   const [show, setShow] = useState();
+
+  console.log('hello',context?.last_pro_user?.user_info)
 
   useEffect(() => {
     getCFI();
@@ -75,7 +77,7 @@ const CFIDetail = ({navigation, route}) => {
 
   return (
     <>
-      <BackBtn navigation={navigation} />
+        <BackBtn navigation={navigation} />
       <Background
         translucent={false}
         statusBarColor={Color('homeBg')}
@@ -94,7 +96,7 @@ const CFIDetail = ({navigation, route}) => {
                 font="bold"
                 color={Color('shadow')}>
                 {capitalize(context?.last_pro_user?.name)} -{' '}
-                {capitalize(context?.last_pro_user?.user_type)}
+                {capitalize(context?.last_pro_user?.user_type.toUpperCase())}
               </H5>
               <Br space={0.5} />
               <Image
@@ -117,10 +119,11 @@ const CFIDetail = ({navigation, route}) => {
                 }}>
                 <Location size={hp('2.5%')} color={Color('modelDark')} />
                 <Pera color={Color('modelDark')} numberOfLines={1}>
-                  {context?.last_pro_user?.user_info?.address || 'No Location Found'}
+                  {/* {context?.last_pro_user?.user_info?.address || 'No Location Found'} */}
+                  {context?.last_pro_user?.user_info?.city && context?.last_pro_user?.user_info?.state ? context?.last_pro_user?.user_info?.city + ',' + context?.last_pro_user?.user_info?.state : 'No Location Found'}
                 </Pera>
               </View>
-              <View
+              {/* <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -132,7 +135,7 @@ const CFIDetail = ({navigation, route}) => {
                   {context?.last_pro_user?.user_info?.operation_time ||
                     'No Operational Time Found'}
                 </Pera>
-              </View>
+              </View> */}
               <View
                 style={{
                   flexDirection: 'row',
@@ -156,14 +159,14 @@ const CFIDetail = ({navigation, route}) => {
                 }}>
                 <Calendar size={hp('2.5%')} color={Color('modelDark')} />
                 <Pera color={Color('modelDark')}>
-                  {context?.last_pro_user?.user_info?.licence_expiry}
+                  {context?.last_pro_user?.user_info?.licence_expiry ? 'Certificate Expires on:' + ' ' + context?.last_pro_user?.user_info?.licence_expiry : 'No Date Found'}
                 </Pera>
               </View>
             </Wrapper>
             <Br space={2} />
             <Wrapper>
               <H6 font="bold" heading color={Color('shadow')}>
-                Description
+                Bio
               </H6>
               <Br space={1} />
               <Pera color={Color('modelDark')}>

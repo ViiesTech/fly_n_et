@@ -381,13 +381,13 @@ const PackageDetail = ({route}) => {
   };
 
   const nextScreen = nav => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('100%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start(() => {
+    // Animated.timing(slideAnimation, {
+    //   toValue: hp('100%'),
+    //   duration: 1000,
+    //   useNativeDriver: true,
+    // }).start(() => {
       nav();
-    });
+    // });
   };
 
   return (

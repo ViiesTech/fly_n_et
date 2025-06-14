@@ -113,7 +113,7 @@ const CreateProfile = ({navigation}) => {
 
   const {context, setContext} = useContext(DataContext);
   const IsFocused = useIsFocused();
-  const [slideAnimation] = useState(new Animated.Value(hp('100%')));
+  // const [slideAnimation] = useState(new Animated.Value(hp('100%')));
   const [profile, setProfile] = useState(null);
   const [banner, setBanner] = useState(null);
   const [dob, setDob] = useState('');
@@ -126,13 +126,13 @@ const CreateProfile = ({navigation}) => {
   // console.log(context?.token)
 
 
-  useEffect(() => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('1%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, [IsFocused]);
+  // useEffect(() => {
+  //   Animated.timing(slideAnimation, {
+  //     toValue: hp('1%'),
+  //     duration: 1000,
+  //     useNativeDriver: true,
+  //   }).start();
+  // }, [IsFocused]);
 
   useEffect(() => {
     setShow(false);
@@ -159,13 +159,13 @@ const CreateProfile = ({navigation}) => {
   }, [context?.user]);
 
   const nextScreen = nav => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('100%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start(() => {
+    // Animated.timing(slideAnimation, {
+    //   toValue: hp('100%'),
+    //   duration: 1000,
+    //   useNativeDriver: true,
+    // }).start(() => {
       nav();
-    });
+    // });
   };
   const uploadProfileImage = async () => {
     const result = await launchImageLibrary({
@@ -269,14 +269,15 @@ const CreateProfile = ({navigation}) => {
   };
   return (
     <>
-      <Background translucent={true}>
+      <Background noScroll={true} translucent={true}>
         <View style={{height: hp('100%'), justifyContent: 'space-between'}}>
           <View />
-          <Animated.View
+          <View style={drawerStyle}>
+          {/* <Animated.View
             style={[
               {transform: [{translateY: slideAnimation}], zIndex: 100},
               drawerStyle,
-            ]}>
+            ]}> */}
             <View style={[drawerInner, {zIndex: 1, height: null}]}>
               <ScrollView style={{zIndex: 100}}>
                 <H5 style={{textAlign: 'center'}} heading font="bold">
@@ -426,7 +427,8 @@ const CreateProfile = ({navigation}) => {
                 />
               </ScrollView>
             </View>
-          </Animated.View>
+            </View>
+          {/* </Animated.View> */}
         </View>
       </Background>
       <Model show={show}>

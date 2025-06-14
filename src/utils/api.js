@@ -48,3 +48,15 @@ export const errHandler = async (err, callBack, navigation) => {
         callBack();
     }
 };
+
+export const getCityAndState = (address = '') => {
+  try {
+    const parts = address.split(',');
+    const city = parts[2]?.trim() || '';
+    const state = parts[3]?.trim().split(' ')[0] || '';
+    return `${city}, ${state}`;
+  } catch {
+    return '';
+  }
+};
+

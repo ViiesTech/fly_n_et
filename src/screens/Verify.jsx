@@ -25,15 +25,15 @@ const Verify = ({ navigation }) => {
   const IsFocused = useIsFocused();
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
-  const [slideAnimation] = useState(new Animated.Value(hp('100%')));
+  // const [slideAnimation] = useState(new Animated.Value(hp('100%')));
 
-  useEffect(() => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('1%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, [IsFocused]);
+  // useEffect(() => {
+  //   Animated.timing(slideAnimation, {
+  //     toValue: hp('1%'),
+  //     duration: 1000,
+  //     useNativeDriver: true,
+  //   }).start();
+  // }, [IsFocused]);
 
   useEffect(() => {
     if (context?.token && context?.isVerified) {
@@ -46,13 +46,13 @@ const Verify = ({ navigation }) => {
   }, [context?.token, context?.isVerified]);
 
   const nextScreen = nav => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('100%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start(() => {
+    // Animated.timing(slideAnimation, {
+    //   toValue: hp('100%'),
+    //   duration: 1000,
+    //   useNativeDriver: true,
+    // }).start(() => {
       nav();
-    });
+    // });
   };
   const onOtpVerify = async () => {
     try {
@@ -82,8 +82,9 @@ const Verify = ({ navigation }) => {
       <Background>
         <View style={{ height: hp('100%'), justifyContent: 'space-between' }}>
           <View />
-          <Animated.View
-            style={[{ transform: [{ translateY: slideAnimation }] }, drawerStyle]}>
+          <View style={drawerStyle}>
+          {/* <Animated.View
+            style={[{ transform: [{ translateY: slideAnimation }] }, drawerStyle]}> */}
             <View style={drawerInner}>
               <H5 style={{ textAlign: 'center' }} heading font="bold">
                 Enter Verification Code
@@ -111,7 +112,8 @@ const Verify = ({ navigation }) => {
               <Br space={2} />
               <Btn loading={loading} onPress={onOtpVerify} label="Continue" />
             </View>
-          </Animated.View>
+            </View>
+          {/* </Animated.View> */}
         </View>
       </Background>
     </>

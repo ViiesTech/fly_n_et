@@ -1,6 +1,6 @@
 // /* eslint-disable react/no-unstable-nested-components */
 // /* eslint-disable react/react-in-jsx-scope */
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+// import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Suspense, useContext, useEffect, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {
@@ -57,8 +57,9 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoaderOverlay from './src/components/LoaderOverlay';
 import ContactUs from './src/screens/ContactUs';
+import { createStackNavigator } from '@react-navigation/stack';
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 // function MainApp() {
 //   const {context, setContext} = useContext(DataContext);
@@ -566,7 +567,7 @@ function MainApp() {
     <>
       <LoaderOverlay visible={loading} />
       <Stack.Navigator
-        screenOptions={{headerShown: false, animation: 'fade_from_bottom'}}>
+        screenOptions={{headerShown: false}}>
         {/* <Stack.Screen name="Splash" component={Splash} />
       <Stack.Screen name="Logout" component={Logout} /> */}
         <Stack.Screen name="Splash" component={Splash} />

@@ -13,15 +13,15 @@ import { useIsFocused } from '@react-navigation/native';
 const UserType = ({ navigation, route }) => {
     const IsFocused = useIsFocused();
 
-    const [slideAnimation] = useState(new Animated.Value(hp('100%')));
+    // const [slideAnimation] = useState(new Animated.Value(hp('100%')));
 
-    useEffect(() => {
-        Animated.timing(slideAnimation, {
-            toValue: hp('1%'),
-            duration: 1000,
-            useNativeDriver: true,
-        }).start();
-    }, [IsFocused]);
+    // useEffect(() => {
+    //     Animated.timing(slideAnimation, {
+    //         toValue: hp('1%'),
+    //         duration: 1000,
+    //         useNativeDriver: true,
+    //     }).start();
+    // }, [IsFocused]);
 
     useEffect(() => {
         return () => {
@@ -34,7 +34,8 @@ const UserType = ({ navigation, route }) => {
             <Background translucent={true}>
                 <View style={{ height: hp('100%'), justifyContent: 'space-between' }}>
                     <View />
-                    <Animated.View style={[{ transform: [{ translateY: slideAnimation }] }, drawerStyle]}>
+                    <View style={drawerStyle}>
+                    {/* <Animated.View style={[{ transform: [{ translateY: slideAnimation }] }, drawerStyle]}> */}
                         <View
                             style={drawerInner}>
                             <H5 style={{ textAlign: 'center' }} heading font="bold">Signup</H5>
@@ -50,7 +51,8 @@ const UserType = ({ navigation, route }) => {
                             <Br space={2} />
                             <Btn onPress={() => navigation.navigate('CreateProProfile')} label="CFI/CFII" />
                         </View>
-                    </Animated.View>
+                        </View>
+                    {/* </Animated.View> */}
                 </View>
             </Background>
         </>

@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   PermissionsAndroid,
   Platform,
+  ScrollView,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -46,7 +47,7 @@ const validationSchema = Yup.object().shape({
 const Login = ({navigation}) => {
   const {context, setContext} = useContext(DataContext);
   const IsFocused = useIsFocused();
-  const [slideAnimation] = useState(new Animated.Value(hp('100%')));
+  // const [slideAnimation] = useState(new Animated.Value(hp('100%')));
   const [loading, setLoading] = useState(false);
   const [apiLoading, setApiLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -54,17 +55,20 @@ const Login = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [location, setLocation] = useState();
 
-  // console.log('first',context)
+  // console.log('user info ==>', context?.user?.user_info);
 
-  useEffect(() => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('1%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, [IsFocused]);
+  // useEffect(() => {
+  //   const timeout = setTimeout(() => {
+  //     Animated.timing(slideAnimation, {
+  //       toValue: hp('1%'),
+  //       duration: 1000,
+  //       useNativeDriver: true,
+  //     }).start();
+  //   }, 200);
+  //   return () => clearTimeout(timeout);
+  // }, [IsFocused]);
 
-  console.log('hh', context);
+  // console.log('hh', context);
 
   useEffect(() => {
     if (
@@ -104,6 +108,8 @@ const Login = ({navigation}) => {
     console.log('is premium', isPremium);
 
     const isExpired = !expiryDate || currentDate > expiryDate;
+
+    console.log('isExpired', isExpired);
 
     if (Platform.OS === 'ios') {
       if (isPremium) {
@@ -302,96 +308,108 @@ const Login = ({navigation}) => {
   };
 
   const nextScreen = nav => {
-    Animated.timing(slideAnimation, {
-      toValue: hp('100%'),
-      duration: 1000,
-      useNativeDriver: true,
-    }).start(() => {
-      nav();
-    });
+    // Animated.timing(slideAnimation, {
+    //   toValue: hp('100%'),
+    //   duration: 1000,
+    //   useNativeDriver: true,
+    // }).start(() => {
+    //   nav();
+    // });
+    nav();
   };
 
   return (
     <>
-      <Background translucent={true}>
-        <View style={{height: hp('100%'), justifyContent: 'space-between'}}>
+      <Background noScroll={true} translucent={true}>
+        <View style={{height: hp(100), justifyContent: 'space-between'}}>
           <View />
-          <Animated.View
-            style={[{transform: [{translateY: slideAnimation}]}, drawerStyle]}>
+          <View style={drawerStyle}>
+            {/* <Animated.View
+            style={[{transform: [{translateY: slideAnimation}]}, drawerStyle]}> */}
             {/* <KeyboardAvoidingView behavior='padding'>                */}
-            <View style={drawerInner}>
-              <H5 style={{textAlign: 'center'}} heading font="bold">
-                Login Account
-              </H5>
-              <Br space={0.5} />
-              <Small style={{textAlign: 'center'}} font="light">
-                Discover your social & Try to Login
-              </Small>
-              <Br space={1.5} />
-              <Image
-                source={require('../assets/images/logo.png')}
-                style={{
-                  width: hp('20%'),
-                  height: hp('20%'),
-                  alignSelf: 'center',
-                }}
-              />
-              <Br space={1.5} />
-              <Input
-                label="Email Address"
-                onChangeText={text => setEmail(text)}
-              />
-              <Br space={1.5} />
-              <Input
-                label="Password"
-                onChangeText={text => setPassword(text)}
-                secureTextEntry
-              />
-              <View
-                style={{
-                  marginTop: hp('2%'),
-                  marginBottom: hp('3%'),
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+              {/* Place the Background and ScrollView inside here */}
+              <ScrollView
+                keyboardShouldPersistTaps={'handled'}
+                contentContainerStyle={[drawerInner, {}]}>
+                <H5 style={{textAlign: 'center'}} heading font="bold">
+                  Login Account
+                </H5>
+                <Br space={0.5} />
+                <Small style={{textAlign: 'center'}} font="light">
+                  Discover your social & Try to Login
+                </Small>
+                <Br space={1.5} />
+                <Image
+                  source={require('../assets/images/logo.png')}
+                  style={{
+                    width: hp('20%'),
+                    height: hp('20%'),
+                    alignSelf: 'center',
+                  }}
+                />
+                <Br space={1.5} />
+                <Input
+                  label="Email Address"
+                  onChangeText={text => setEmail(text)}
+                />
+                <Br space={1.5} />
+                <Input
+                  label="Password"
+                  onChangeText={text => setPassword(text)}
+                  secureTextEntry
+                />
                 <View
                   style={{
+                    marginTop: hp('2%'),
+                    marginBottom: hp('3%'),
                     flexDirection: 'row',
-                    gap: wp('2%'),
-                    alignItems: 'center',
+                    justifyContent: 'space-between',
                   }}>
-                  <RadioBtn
-                    isChecked={rememberMe}
-                    radioClr={Color('text')}
-                    onPress={() => setRememberMe(!rememberMe)}
-                  />
-                  <Small heading font="regular">
-                    Remember Me
-                  </Small>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      gap: wp('2%'),
+                      alignItems: 'center',
+                    }}>
+                    <RadioBtn
+                      isChecked={rememberMe}
+                      radioClr={Color('text')}
+                      onPress={() => setRememberMe(!rememberMe)}
+                    />
+                    <Small heading font="regular">
+                      Remember Me
+                    </Small>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() =>
+                      nextScreen(() => navigation.navigate('ForgotPassword'))
+                    }>
+                    <Small heading font="regular">
+                      Forgot Password?
+                    </Small>
+                  </TouchableOpacity>
                 </View>
+                <Btn loading={loading} label="Login" onPress={onUserLogin} />
+                <Br space={3} />
                 <TouchableOpacity
                   onPress={() =>
-                    nextScreen(() => navigation.navigate('ForgotPassword'))
+                    nextScreen(() => navigation.navigate('Signup'))
                   }>
-                  <Small heading font="regular">
-                    Forgot Password?
+                  <Small
+                    style={{textAlign: 'center', fontSize: hp(2)}}
+                    heading
+                    font="regular">
+                    Don’t have an account? Signup
                   </Small>
                 </TouchableOpacity>
-              </View>
-              <Btn loading={loading} label="Login" onPress={onUserLogin} />
-              <Br space={3} />
-              <TouchableOpacity
-                onPress={() => nextScreen(() => navigation.navigate('Signup'))}>
-                <Small
-                  style={{textAlign: 'center', fontSize: hp(2)}}
-                  heading
-                  font="regular">
-                  Don’t have an account? Signup
-                </Small>
-              </TouchableOpacity>
-            </View>
+              </ScrollView>
+            </KeyboardAvoidingView>
+
             {/* </KeyboardAvoidingView> */}
-          </Animated.View>
+          </View>
+          {/* </Animated.View> */}
         </View>
       </Background>
       <LoaderOverlay visible={api} />

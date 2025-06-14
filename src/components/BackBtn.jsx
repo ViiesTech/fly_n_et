@@ -10,7 +10,7 @@ const BackBtn = ({ navigation, x, translucent }) => {
     const top = translucent ?
     isIOS ? hp('6.3%') : hp('5%')
     :
-    isIOS ? hp('6.3%') : hp('1.5%');
+    isIOS ? hp('8%') : hp('1.5%');
     return (
         <TouchableOpacity style={[styles.btn, {left: wp(`${width}%`), top: top}]} onPress={() => navigation.goBack()}>
             <ArrowLeft
