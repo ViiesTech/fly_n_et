@@ -435,6 +435,8 @@ function MainApp() {
         headers: {Authorization: `Bearer ${context?.token}`},
       });
 
+      console.log('token chek',res.data)
+
       if (
         res.data.error === 'Invalid token.' ||
         res.data.error === 'Token is expired'

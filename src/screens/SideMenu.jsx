@@ -265,6 +265,7 @@ const SideMenu = ({navigation}) => {
                   borderRadius: hp('50%'),
                   alignSelf: 'center',
                 }}
+                resizeMode='cover'
               />
               <Br space={1} />
               <Pera

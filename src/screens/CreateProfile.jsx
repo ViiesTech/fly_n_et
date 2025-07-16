@@ -278,7 +278,7 @@ const CreateProfile = ({navigation}) => {
               {transform: [{translateY: slideAnimation}], zIndex: 100},
               drawerStyle,
             ]}> */}
-            <View style={[drawerInner, {zIndex: 1, height: null}]}>
+            <View style={[drawerInner, {zIndex: 1}]}>
               <ScrollView style={{zIndex: 100}}>
                 <H5 style={{textAlign: 'center'}} heading font="bold">
                   Create Profile

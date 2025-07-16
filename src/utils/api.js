@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Alert } from 'react-native';
+import { replace } from './global';
 
 // export const baseUrl = 'https://praetorstestnet.com/flyneat/api';
 export const baseUrl = 'https://fly-n-eat.com/admin/api';
@@ -34,6 +35,33 @@ export const errHandler = async (err, callBack, navigation) => {
             note('Request Failed', errors[0]);
         }else if (error?.error) {
             if (error?.error === 'Token expired.') {
+                 Alert.alert(
+                          'Session Expired',
+                          'Please log in again to continue.',
+                          [
+                            {
+                              text: 'Log In',
+                              onPress: () => {
+                                // setContext({
+                                //   ...context,
+                                //   token: false,
+                                //   isVerified: false,
+                                //   user: null,
+                                //   notifications: null,
+                                //   restuarents: null,
+                                //   savedRestuarents: null,
+                                //   restuarent: null,
+                                //   about: null,
+                                //   terms: null,
+                                //   serviceImages: null,
+                                //   returnFromDetail: false,
+                                // });
+                                replace('Logout');
+                              },
+                            },
+                          ],
+                          {cancelable: false},
+                        );
             // note(
             //     'Session Expired',
             //     'You have been logged out because your account was logged in on another device.'

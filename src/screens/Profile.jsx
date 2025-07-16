@@ -235,6 +235,7 @@ const Profile = ({navigation}) => {
           </ImageBackground>
         </View>
         <Image
+          resizeMode='cover'
           source={
             context?.user?.user_info?.profile_image
               ? {

@@ -596,7 +596,7 @@
 					"@executable_path/Frameworks",
 					"\"${PODS_CONFIGURATION_BUILD_DIR}/DoubleConversion\"",
 				);
-				MARKETING_VERSION = 2.3;
+				MARKETING_VERSION = 2.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -630,7 +630,7 @@
 					"@executable_path/Frameworks",
 					"\"${PODS_CONFIGURATION_BUILD_DIR}/DoubleConversion\"",
 				);
-				MARKETING_VERSION = 2.3;
+				MARKETING_VERSION = 2.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
