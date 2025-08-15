@@ -46,7 +46,7 @@ const Input = ({
         <TextInput
           keyboardType={keyboardType}
           multiline={multiline}
-          secureTextEntry={isPasswordVisible}
+          secureTextEntry={secureTextEntry && isPasswordVisible}
           textAlignVertical={textAlign}
           style={[
             styles.inputField,

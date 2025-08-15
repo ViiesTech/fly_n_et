@@ -275,7 +275,7 @@ const Packages = () => {
 
   const onOpenSheet = async () => {
     try {
-            setLoading(true)
+      setLoading(true);
       const prevCustomerInfo = await Purchases.getCustomerInfo();
       const prevEntitlement = prevCustomerInfo.entitlements.active['Premium'];
       // console.log('previous info', prevCustomerInfo?.identifier);
@@ -299,7 +299,6 @@ const Packages = () => {
       Purchases.addCustomerInfoUpdateListener(customerInfoListener);
       await presentCodeRedemptionSheetIOS();
 
-
       setTimeout(async () => {
         if (!isHandled) {
           // setLoading(true)
@@ -313,17 +312,16 @@ const Packages = () => {
             console.log(
               'No entitlement change — likely canceled or invalid code',
             );
-            setLoading(false)
+            setLoading(false);
           }
           // setLoading(false)
 
           Purchases.removeCustomerInfoUpdateListener(customerInfoListener);
-
         }
       }, 2000);
     } catch (error) {
       console.log('Error in redemption flow:', error);
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -334,13 +332,13 @@ const Packages = () => {
       setLoading(true);
       await AsyncStorage.setItem('isPremium', 'true');
       setLoading(false);
-       navigation.navigate('Message', {
-            theme: 'light',
-            title: 'Login Required',
-            message:
-              'To access your subscription benefits, please create or log in to your account',
-            screen: 'Login',
-          });
+      navigation.navigate('Message', {
+        theme: 'light',
+        title: 'Login Required',
+        message:
+          'To access your subscription benefits, please create or log in to your account',
+        screen: 'Login',
+      });
     } else {
       setLoading(true);
       await AsyncStorage.removeItem('isPremium');
@@ -436,8 +434,12 @@ const Packages = () => {
           </View>
 
           <Text style={styles.desc}>
-            Choose the best plan that fits your needs. Enjoy premium features
-            and seamless access with our subscription packages.
+            {/* Choose the best plan that fits your needs. Enjoy premium features
+            and seamless access with our subscription packages. */}
+            Choose the plan that best fits your needs. Enjoy premium features
+            such as unlimited restaurant searches near any airport, customizable
+            search radius, and access to filter and connect with CFI/CFII pilots
+            — all through our seamless subscription packages.
           </Text>
 
           {context?.token && Platform.OS === 'android' && (
@@ -475,7 +477,7 @@ const Packages = () => {
               )}
             </TouchableOpacity>
           )}
-          <View style={{marginTop: 20}}>
+          <View style={{marginTop: 25}}>
             {subscription.length > 0 ? (
               <>
                 {subscription.map(item => {

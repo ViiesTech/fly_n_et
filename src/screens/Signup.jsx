@@ -227,12 +227,12 @@ const Signup = ({navigation}) => {
       <Background noScroll={true} translucent={true}>
         <View style={{height: hp('100%'), justifyContent: 'space-between'}}>
           <View />
+            <KeyboardAvoidingView
+              behavior={'padding'}>
           <View style={drawerStyle}>
             {/* <Animated.View
             style={[{transform: [{translateY: slideAnimation}]}, drawerStyle]}> */}
             {/* <KeyboardAvoidingView keyboardVerticalOffset={10} behavior='padding'   >    */}
-            <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
               <ScrollView
                 contentContainerStyle={drawerInner}
                 keyboardShouldPersistTaps={'handled'}>
@@ -286,7 +286,6 @@ const Signup = ({navigation}) => {
                   </Small>
                 </TouchableOpacity>
               </ScrollView>
-            </KeyboardAvoidingView>
             <Modal
               transparent={true}
               visible={modal.visible}
@@ -337,15 +336,15 @@ const Signup = ({navigation}) => {
                   <ScrollView style={{maxHeight: 250, paddingTop: hp(1)}}>
                     {sources.map((source, index) => (
                       <BouncyCheckbox
-                        key={index}
-                        text={source}
-                        textStyle={{fontSize: 16, color: Color('text')}}
-                        fillColor={Color('drawerBg')}
-                        unfillColor="#FFFFFF"
-                        innerIconStyle={{borderColor: Color('text')}}
-                        style={{marginBottom: 15}}
-                        isChecked={selectedSources.includes(source)}
-                        onPress={() => toggleCheckbox(source)}
+                      key={index}
+                      text={source}
+                      textStyle={{fontSize: 16, color: Color('text')}}
+                      fillColor={Color('drawerBg')}
+                      unfillColor="#FFFFFF"
+                      innerIconStyle={{borderColor: Color('text')}}
+                      style={{marginBottom: 15}}
+                      isChecked={selectedSources.includes(source)}
+                      onPress={() => toggleCheckbox(source)}
                       />
                     ))}
                   </ScrollView>
@@ -353,13 +352,14 @@ const Signup = ({navigation}) => {
                     btnStyle={{marginTop: hp(2.5)}}
                     label="Continue"
                     onPress={() => onContinuePress()}
-                  />
+                    />
                 </View>
               </View>
             </Modal>
             {/* </KeyboardAvoidingView> */}
           </View>
           {/* </Animated.View> */}
+                    </KeyboardAvoidingView>
         </View>
       </Background>
     </>

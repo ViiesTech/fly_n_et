@@ -30,7 +30,7 @@ import {api, baseUrl, errHandler, note} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-simple-toast';
-import Geolocation from '@react-native-community/geolocation';
+import Geolocation from 'react-native-geolocation-service';
 import axios from 'axios';
 import Purchases from 'react-native-purchases';
 import LoaderOverlay from '../components/LoaderOverlay';
@@ -221,7 +221,7 @@ const Login = ({navigation}) => {
           console.log('location permission denied');
         }
       } else if (Platform.OS === 'ios') {
-        Geolocation.requestAuthorization();
+        Geolocation.requestAuthorization('whenInUse');
         getLocation();
       }
     } catch (err) {
@@ -230,33 +230,66 @@ const Login = ({navigation}) => {
   }
 
   async function getLocation() {
-    Geolocation.setRNConfiguration({
-      enableHighAccuracy: false,
-      timeout: 20000,
-      maximumAge: 10000,
-    });
+    // Geolocation.setRNConfiguration({
+    //   enableHighAccuracy: false,
+    //   timeout: 20000,
+    //   maximumAge: 10000,
+    // });
     Geolocation.getCurrentPosition(
-      async pos => {
-        const crd = pos.coords;
+  async (pos) => {
+    console.log("Position received: ", pos);
+    const crd = pos.coords;
+    
+    const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`);
+    const data = response?.data;
+    const locationName = data?.results[0]?.formatted_address;
+    
+    console.log("Location Name: ", locationName);
+    if (locationName) {
+      setLocation({
+        latitude: crd?.latitude,
+        longitude: crd?.longitude,
+        latitudeDelta: 0.0421,
+        longitudeDelta: 0.0421,
+        locationName,
+      });
+    } else {
+      console.log("Could not get address from lat/lng");
+    }
+  },
+  (err) => {
+    console.log('Geolocation error: ', err);
+  },
+  {
+    enableHighAccuracy: true,
+    timeout: 15000,
+    maximumAge: 10000,
+    forceRequestLocation: true,
+    showLocationDialog: true,
+  }
+);
+    // Geolocation.getCurrentPosition(
+    //   async pos => {
+    //     const crd = pos.coords;
 
-        const response = await axios.get(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`,
-        );
-        const data = response?.data;
-        const locationName = data?.results[0]?.formatted_address;
+    //     const response = await axios.get(
+    //       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`,
+    //     );
+    //     const data = response?.data;
+    //     const locationName = data?.results[0]?.formatted_address;
 
-        setLocation({
-          latitude: crd?.latitude,
-          longitude: crd?.longitude,
-          latitudeDelta: 0.0421,
-          longitudeDelta: 0.0421,
-          locationName: locationName,
-        });
-      },
-      err => {
-        console.log(err);
-      },
-    );
+    //     setLocation({
+    //       latitude: crd?.latitude,
+    //       longitude: crd?.longitude,
+    //       latitudeDelta: 0.0421,
+    //       longitudeDelta: 0.0421,
+    //       locationName: locationName,
+    //     });
+    //   },
+    //   err => {
+    //     console.log(err);
+    //   },
+    // );
   }
 
   const onUserLogin = async () => {
@@ -323,12 +356,12 @@ const Login = ({navigation}) => {
       <Background noScroll={true} translucent={true}>
         <View style={{height: hp(100), justifyContent: 'space-between'}}>
           <View />
+            <KeyboardAvoidingView
+              behavior={'padding'}>
           <View style={drawerStyle}>
             {/* <Animated.View
             style={[{transform: [{translateY: slideAnimation}]}, drawerStyle]}> */}
             {/* <KeyboardAvoidingView behavior='padding'>                */}
-            <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
               {/* Place the Background and ScrollView inside here */}
               <ScrollView
                 keyboardShouldPersistTaps={'handled'}
@@ -405,10 +438,10 @@ const Login = ({navigation}) => {
                   </Small>
                 </TouchableOpacity>
               </ScrollView>
-            </KeyboardAvoidingView>
 
             {/* </KeyboardAvoidingView> */}
           </View>
+            </KeyboardAvoidingView>
           {/* </Animated.View> */}
         </View>
       </Background>
