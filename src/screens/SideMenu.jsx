@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Bookmark,
   Crown1,
+  Heart,
   Home,
   Information,
   LogoutCurve,
@@ -110,9 +111,9 @@ const SideMenu = ({navigation}) => {
               alignItems: 'center',
               gap: hp('1.5%'),
             }}>
-            <Bookmark size={hp('3%')} color={Color('drawerBg')} />
+            <Heart size={hp('3%')} color={Color('drawerBg')} />
             <Small color={Color('drawerBg')} heading font="bold">
-              Bookmarks
+              Favourites
             </Small>
           </View>
           <ArrowRight size={hp('3%')} color={Color('lightText')} />

@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
 import React, { useContext, useEffect } from 'react';
 import { ActivityIndicator, Image, Pressable, StyleSheet, View } from 'react-native';
 import Background from '../utils/Background';
@@ -40,7 +38,7 @@ const Bookmark = ({ navigation }) => {
             <Background barStyle={'dark-content'} translucent={false} noBackground>
                 <Br space={8} />
                 <Wrapper>
-                    <Pera color={Color('homeBg')} heading font="bold">Bookmark</Pera>
+                    <Pera color={Color('homeBg')} heading font="bold">Favourites</Pera>
                     <Br space={2} />
                     {
                         !context?.savedRestuarents
@@ -50,7 +48,7 @@ const Bookmark = ({ navigation }) => {
                         context?.savedRestuarents?.length === 0
                         ?
                         <Small style={{textAlign: 'center'}} color={Color('homeBg')}>
-                            No Bookmark Found
+                            No Favourites Found
                         </Small>
                         :
                         <View style={{flexDirection: 'row', flexWrap: 'wrap', columnGap: wp('5%'), rowGap: hp('2%')}}>

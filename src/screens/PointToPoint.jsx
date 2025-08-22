@@ -12,13 +12,16 @@ import { Color } from '../utils/Colors';
 import Btn from '../utils/Btn';
 import { Location as Loc, Notification, TextalignLeft } from 'iconsax-react-native';
 import Navigation from '../components/Navigation';
-import Geolocation from '@react-native-community/geolocation';
+// import Geolocation from '@react-native-community/geolocation';
 import { DataContext } from '../utils/Context';
 import { api, errHandler, note } from '../utils/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { calculateDistance, nauticalMilesToMeters } from '../utils/global';
 import Orientation from 'react-native-orientation-locker';
+import LoaderOverlay from '../components/LoaderOverlay';
+import Geolocation from 'react-native-geolocation-service';
+
 
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 
@@ -28,6 +31,7 @@ const PointToPoint = ({ navigation }) => {
     const [premium,setPremium] = useState(null)
     const [width, setScreenWidth] = useState(Dimensions.get('window').width);
     const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+    // const [locationLoader,setLocationLoader] = useState(false)
 
 
     useEffect(() => {
@@ -63,7 +67,10 @@ const PointToPoint = ({ navigation }) => {
     // console.log('user',context?.isPoint)
 
     useEffect(() => {
-        requestLocationPermission();
+      if(context?.token && context?.user.user_info.geometry_location) {  
+        getLocations()
+        // requestLocationPermission();
+        }
     }, []);
 
     const getLocation = async (place_id) => {
@@ -77,6 +84,7 @@ const PointToPoint = ({ navigation }) => {
         await AsyncStorage.setItem('p2p_locationDetails2', JSON.stringify(response.data?.result?.geometry?.location));
     };
     const onSelectLocation = async (value) => {
+        await AsyncStorage.setItem('typedLocation2',value?.structured_formatting?.main_text)
         await AsyncStorage.setItem('p2p_selectLocation', JSON.stringify(value));
         getLocation(value?.place_id);
     };
@@ -84,50 +92,131 @@ const PointToPoint = ({ navigation }) => {
         await AsyncStorage.setItem('p2p_selectLocation2', JSON.stringify(value));
         getLocation2(value?.place_id);
     };
-    async function requestLocationPermission() {
-        try {
-            if (Platform.OS === 'android') {
-                const granted = await PermissionsAndroid.request(
-                    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-                    {
-                        title: 'Fly n Eat',
-                        message: 'Fly n Eat App access to your location',
-                    }
-                );
+    // async function requestLocationPermission() {
+    //     try {
+    //         if (Platform.OS === 'android') {
+    //             const granted = await PermissionsAndroid.request(
+    //                 PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    //                 {
+    //                     title: 'Fly n Eat',
+    //                     message: 'Fly n Eat App access to your location',
+    //                 }
+    //             );
 
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    getLocations();
-                } else {
-                    console.log('location permission denied');
-                }
-            } else if (Platform.OS === 'ios') {
-                Geolocation.requestAuthorization();
-                getLocations();
-            }
-        } catch (err) {
-            console.warn(err);
-        }
-    }
+    //             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+    //                 getLocations();
+    //             } else {
+    //                 console.log('location permission denied');
+    //             }
+    //         } else if (Platform.OS === 'ios') {
+    //             Geolocation.requestAuthorization();
+    //             getLocations();
+    //         }
+    //     } catch (err) {
+    //         console.warn(err);
+    //     }
+    // }
+
+//  async function getNearestAirport(lat, lng) {
+//       // await AsyncStorage.removeItem('locationDetails')
+//       // await AsyncStorage.removeItem('selectLocation')
+
+//   try {
+//     const response = await axios.get(
+//       `https://maps.googleapis.com/maps/api/place/nearbysearch/json`,
+//       {
+//         params: {
+//           location: `${lat},${lng}`,
+//           radius: 50000, 
+//           type: 'airport',
+//           key: API_KEY,
+//         },
+//       },
+//     );
+
+//     const nearest = response?.data?.results?.[0];
+//     if (nearest) {
+//       console.log("Nearest Airport:", nearest.name);
+
+//       await AsyncStorage.setItem(
+//         'p2p_locationDetails',
+//         JSON.stringify(nearest.geometry.location),
+//       );
+
+//       await AsyncStorage.setItem(
+//         'p2p_selectLocation',
+//         JSON.stringify({
+//           description: nearest.name,
+//           place_id: nearest.place_id,
+//           structured_formatting: { main_text: nearest.name },
+//         }),
+//       );
+      
+//     }
+//   } catch (err) {
+//     console.log("Error fetching nearest airport:", err);
+//   }
+// }
+
 
     async function getLocations() {
-        Geolocation.setRNConfiguration({ enableHighAccuracy: false, timeout: 20000, maximumAge: 10000 });
-        Geolocation.getCurrentPosition(async (pos) => {
-            const crd = pos.coords;
+        // Geolocation.setRNConfiguration({ enableHighAccuracy: false, timeout: 20000, maximumAge: 10000 });
+        // Geolocation.getCurrentPosition(async (pos) => {
+        //     const crd = pos.coords;
 
-            const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`);
-            const data = response?.data;
-            const locationName = data?.results[0]?.formatted_address;
+        //     const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`);
+        //     const data = response?.data;
+        //     const locationName = data?.results[0]?.formatted_address;
 
-            setLocation({
-                latitude: crd?.latitude,
-                longitude: crd?.longitude,
-                latitudeDelta: 0.0421,
-                longitudeDelta: 0.0421,
-                locationName: locationName,
-            });
-        }, (err) => {
-            console.log(err);
-        });
+        //     setLocation({
+        //         latitude: crd?.latitude,
+        //         longitude: crd?.longitude,
+        //         latitudeDelta: 0.0421,
+        //         longitudeDelta: 0.0421,
+        //         locationName: locationName,
+        //     });
+        //          await getNearestAirport(crd.latitude,crd.longitude)
+        // }, (err) => {
+        //     console.log(err);
+        // });
+        // setLocationLoader(true)
+    //      Geolocation.getCurrentPosition(
+    //   async pos => {
+    //     console.log('Position received: ', pos);
+    //     const crd = pos.coords;
+
+    //     const response = await axios.get(
+    //       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`,
+    //     );
+    //     const data = response?.data;
+    //     const locationName = data?.results[0]?.formatted_address;
+
+    //     console.log('Location Name: ', locationName);
+    //       setLocation({
+    //         latitude: crd?.latitude,
+    //         longitude: crd?.longitude,
+    //         latitudeDelta: 0.0421,
+    //         longitudeDelta: 0.0421,
+    //         locationName,
+    //       });
+    //     //  await getNearestAirport(crd.latitude,crd.longitude)
+      
+    //     //   console.log('Could not get address from lat/lng');
+    //     // setLocationLoader(false)
+    //   },
+    //   err => {
+    //     console.log('Geolocation error: ', err);
+    //     // setLocationLoader(false)
+    //   },
+    //   {
+    //     enableHighAccuracy: true,
+    //     timeout: 15000,
+    //     maximumAge: 10000,
+    //     forceRequestLocation: true,
+    //     showLocationDialog: true,
+    //   },
+    // );
+    await AsyncStorage.setItem('p2p_locationDetails',JSON.stringify(context?.user.user_info.geometry_location))
     }
     const TopBar = () => {
         return (
@@ -186,7 +275,62 @@ const PointToPoint = ({ navigation }) => {
         const inputRef = useRef(null);
         const [predictions, setPredictions] = useState();
         const [selection, setSelection] = useState('');
+
+//          useEffect(() => { 
+//     const setNearestAirport = async () => {
+//       try {
+//         // const storedAirport = await AsyncStorage.getItem('p2p_selectLocation');
+//         // if (storedAirport) {
+//         //   const parsed = JSON.parse(storedAirport);
+//           if (inputRef.current) {
+//             inputRef.current.setNativeProps({
+//             //   text: parsed?.structured_formatting?.main_text?.toUpperCase(),
+//             text: context?.user.user_info.nearest_airport?.toUpperCase()
+//             });
+//           }
+//         // }
+//       } catch (err) {
+//         console.log("Error setting airport:", err);
+//       }
+//     };
+
+//    if(context.token && context?.user.user_info.nearest_airport) { 
+//     setNearestAirport();
+//     }
+//   }, []);
+
+
+    useEffect(() => {
+      const restoreSelection = async () => {
+        try {
+          const savedSelection = await AsyncStorage.getItem('typedLocation2');
+
+          const defaultAirport = context?.user?.user_info?.nearest_airport;
+
+          const valueToSet =
+            savedSelection !== null ? savedSelection : defaultAirport;
+
+          console.log(savedSelection);
+
+          if (valueToSet && inputRef.current) {
+            inputRef.current.setNativeProps({
+              text: valueToSet.toUpperCase(),
+            });
+            setSelection(valueToSet);
+          }
+        } catch (err) {
+          console.log('Error restoring location:', err);
+        }
+      };
+
+      if (context?.token) {
+        restoreSelection();
+      }
+    }, [context?.token]);
+
         const searchAirports = async (searchKey) => {
+            setSelection(searchKey)
+            await AsyncStorage.setItem('typedLocation2',searchKey)
             const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk&types=airport&components=country:us`;
             const response = await axios.get(BASE_URL, {
               params: {
@@ -473,6 +617,7 @@ const PointToPoint = ({ navigation }) => {
                 </View>
             </Background>
             <Navigation navigation={navigation} />
+            {/* <LoaderOverlay text={true} visible={locationLoader} /> */}
         </>
     );
 };

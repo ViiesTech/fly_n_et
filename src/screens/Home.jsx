@@ -1,7 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
-/* eslint-disable react/no-unstable-nested-components */
-/* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {
   PermissionsAndroid,
@@ -36,6 +32,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Dimensions} from 'react-native';
 import Orientation from 'react-native-orientation-locker';
+import {distance} from '@turf/turf';
+import LoaderOverlay from '../components/LoaderOverlay';
 
 // const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
@@ -46,6 +44,9 @@ const Home = ({navigation}) => {
   const [premium, setPremium] = useState(null);
   const [width, setScreenWidth] = useState(Dimensions.get('window').width);
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+  const [locationLoader, setLocationLoader] = useState(false);
+
+  console.log('context ===>', context?.user);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -82,17 +83,19 @@ const Home = ({navigation}) => {
   const Latitude = context?.user?.latitude;
   const longitude = context?.user?.longitude;
 
-  // console.log('helo3r',context?.user?.user_info?.address)
+  // console.log('helo3r', context?.user?.user_info.nearest_airport);
   // console.log('first',context?.token)
 
   useEffect(() => {
-    if (context?.token) {
+    if (context?.token && !context?.user.user_info?.address) {
       // alert('hello')
+      // clearLocationDetails()
+      // alert('sis')
       requestLocationPermission();
       // getSubscriptionInfo();
-    //   convertLatLngToAddr();
+      //   convertLatLngToAddr();
     }
-  }, []);
+  }, [context?.token]);
 
   const convertLatLngToAddr = async () => {
     const response = await axios.get(
@@ -112,6 +115,9 @@ const Home = ({navigation}) => {
     });
   };
 
+  // const clearLocationDetails = async () => {
+  // }
+
   const getLocation = async place_id => {
     const BASE_URL = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${API_KEY}&fields=geometry`;
     const response = await axios.get(BASE_URL);
@@ -122,10 +128,12 @@ const Home = ({navigation}) => {
   };
 
   const onSelectLocation = async value => {
+    await AsyncStorage.setItem('typedLocation', value?.structured_formatting?.main_text);
     await AsyncStorage.setItem('selectLocation', JSON.stringify(value));
     getLocation(value?.place_id);
   };
   async function requestLocationPermission() {
+    // alert('why')
     try {
       if (Platform.OS === 'android') {
         const granted = await PermissionsAndroid.request(
@@ -150,8 +158,67 @@ const Home = ({navigation}) => {
     }
   }
 
+  async function getNearestAirport(lat, lng, locationName) {
+    // await AsyncStorage.removeItem('locationDetails')
+    // await AsyncStorage.removeItem('selectLocation')
+
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json`,
+        {
+          params: {
+            location: `${lat},${lng}`,
+            radius: 50000,
+            type: 'airport',
+            key: API_KEY,
+          },
+        },
+      );
+
+      const nearest = response?.data?.results?.[0];
+      if (nearest) {
+        console.log('Nearest Airport:', nearest.name);
+
+        setContext(prev => {
+          const updatedUser = {
+            ...prev.user,
+            latitude: lat,
+            longitude: lng,
+            user_info: {
+              ...prev.user.user_info,
+              address: locationName,
+              nearest_airport: nearest.name,
+              geometry_location: nearest.geometry.location,
+            },
+          };
+
+          AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+
+          return {...prev, user: updatedUser};
+        });
+
+        await AsyncStorage.setItem(
+          'locationDetails',
+          JSON.stringify(nearest.geometry.location),
+        );
+
+        await AsyncStorage.setItem(
+          'selectLocation',
+          JSON.stringify({
+            description: nearest.name,
+            place_id: nearest.place_id,
+            structured_formatting: {main_text: nearest.name},
+          }),
+        );
+      }
+    } catch (err) {
+      console.log('Error fetching nearest airport:', err);
+    }
+  }
+
   async function getLocations() {
     // Geolocation.setRNConfiguration({ enableHighAccuracy: false, timeout: 20000, maximumAge: 10000 });
+    setLocationLoader(true);
     Geolocation.getCurrentPosition(
       async pos => {
         console.log('Position received: ', pos);
@@ -163,7 +230,7 @@ const Home = ({navigation}) => {
         const data = response?.data;
         const locationName = data?.results[0]?.formatted_address;
 
-        console.log('Location Name: ', locationName);
+        // console.log('Location Name: ', locationName);
         if (locationName) {
           setLocation({
             latitude: crd?.latitude,
@@ -172,13 +239,17 @@ const Home = ({navigation}) => {
             longitudeDelta: 0.0421,
             locationName,
           });
+          await getNearestAirport(crd.latitude, crd.longitude, locationName);
         } else {
-            convertLatLngToAddr()
-        //   console.log('Could not get address from lat/lng');
+          convertLatLngToAddr();
+          //   console.log('Could not get address from lat/lng');
         }
+        setLocationLoader(false);
       },
       err => {
         console.log('Geolocation error: ', err);
+        alert('failed to fetch location')
+        setLocationLoader(false);
       },
       {
         enableHighAccuracy: true,
@@ -233,24 +304,26 @@ const Home = ({navigation}) => {
           </TouchableOpacity>
         </View>
         <View style={{width: width * 0.6, alignItems: 'center'}}>
-          {context?.token && (
-            <>
-              <Small heading font="medium">
-                Home Airport
-              </Small>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: hp('.5%'),
-                }}>
-                <Loc size={hp('2%')} color={Color('text')} />
-                <Small heading font="bold" numberOfLines={1}>
-                  {context?.user?.user_info?.address || location?.locationName}
+          {context?.token &&
+            !locationLoader &&
+            context?.user.user_info?.address && (
+              <>
+                <Small heading font="medium">
+                  Home Airport
                 </Small>
-              </View>
-            </>
-          )}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: hp('.5%'),
+                  }}>
+                  <Loc size={hp('2%')} color={Color('text')} />
+                  <Small heading font="bold" numberOfLines={1}>
+                    {context?.user?.user_info?.address}
+                  </Small>
+                </View>
+              </>
+            )}
         </View>
         <View style={{width: wp('20%'), alignItems: 'center'}}>
           <TouchableOpacity
@@ -284,7 +357,62 @@ const Home = ({navigation}) => {
     const inputRef = useRef(null);
     const [predictions, setPredictions] = useState();
     const [selection, setSelection] = useState('');
+
+    //     useEffect(() => {
+    //   const setNearestAirport = async () => {
+    //     try {
+    //       // const storedAirport = await AsyncStorage.getItem('selectLocation');
+    //       // if (storedAirport) {
+    //       //   const parsed = JSON.parse(storedAirport);
+    //         if (inputRef.current) {
+    //           inputRef.current.setNativeProps({
+    //             // text: parsed?.structured_formatting?.main_text?.toUpperCase(),
+    //             text: context?.user.user_info?.nearest_airport?.toUpperCase()
+    //           });
+    //         }
+    //       // }
+    //     } catch (err) {
+    //       console.log("Error setting airport:", err);
+    //     }
+    //   };
+
+    //  if(context.token && !locationLoader && context?.user?.user_info?.nearest_airport) {
+    //   setNearestAirport();
+    //   }
+    // }, []);
+
+    useEffect(() => {
+      const restoreSelection = async () => {
+        try {
+          const savedSelection = await AsyncStorage.getItem('typedLocation');
+
+          const defaultAirport = context?.user?.user_info?.nearest_airport;
+
+          const valueToSet =
+            savedSelection !== null ? savedSelection : defaultAirport;
+
+          console.log(savedSelection);
+
+          if (valueToSet && inputRef.current) {
+            inputRef.current.setNativeProps({
+              text: valueToSet.toUpperCase(),
+            });
+            setSelection(valueToSet);
+          }
+        } catch (err) {
+          console.log('Error restoring location:', err);
+        }
+      };
+
+      if (context?.token && !locationLoader) {
+        restoreSelection();
+      }
+    }, [context?.token, locationLoader]);
+
     const searchAirports = async searchKey => {
+      // alert('hello')
+      setSelection(searchKey);
+      await AsyncStorage.setItem('typedLocation', searchKey);
       // const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk&types=airport&components=country:us`;
       const BASE_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${searchKey}&key=AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk&types=airport&components=country:us`;
       const response = await axios.get(BASE_URL, {
@@ -365,6 +493,7 @@ const Home = ({navigation}) => {
       </>
     );
   };
+  // console.log('hello',distance)
   const HomeInput = ({placeholder}) => {
     const setDistance = async text => {
       await AsyncStorage.setItem('distance', text);
@@ -482,6 +611,7 @@ const Home = ({navigation}) => {
         </View>
       </Background>
       <Navigation navigation={navigation} />
+      <LoaderOverlay text={true} visible={locationLoader} />
     </>
   );
 };

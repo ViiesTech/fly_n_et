@@ -30,6 +30,7 @@ import {
   getSubscriptions,
   Subscription,
   presentCodeRedemptionSheetIOS,
+  getAvailablePurchases,
 } from 'react-native-iap';
 import AndroidPackageCard from '../components/AndroidPackageCard';
 import {baseUrl, note} from '../utils/api';
@@ -38,6 +39,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Orientation from 'react-native-orientation-locker';
 import {Dimensions} from 'react-native';
 import {trackOfferRedemption} from '../utils/global';
+import moment from 'moment';
 
 // const packages = [
 //   {
@@ -72,6 +74,10 @@ const Packages = () => {
 
   const [width, setScreenWidth] = useState(Dimensions.get('window').width);
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+  const [activeSubscription, setActiveSubscription] = useState(null);
+  // const [activeSubscription,setActiveSubscription] = useState(null)
+
+  console.log('active subds', context?.user.sub_type);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -99,18 +105,41 @@ const Packages = () => {
   // const routes = navigation.getState().routes;
   // const previousScreen = routes.length > 1 ? routes[routes.length - 2].name === 'SideMenu' : false;
 
-  console.log('offerings', context?.user?.expired_at);
+  // console.log('offerings', moment(context?.user.expired_at).format('DD-MM-YYYY'))
 
   // const productIds = ['flyneat_month', 'flyneat_year2'];
   const androidsubscriptionsId = ['flyneat_month', 'flyneat_year2'];
+
+  useEffect(() => {
+    if (context?.user?.expired_at) {
+      const isActive = moment().isBefore(moment(context.user.expired_at));
+      if (isActive) {
+        setActiveSubscription(context.user.sub_type);
+      } else {
+        setActiveSubscription(null);
+      }
+    }
+  }, [context?.user?.expired_at]);
 
   useEffect(() => {
     if (!isAndroid) {
       const setupRevenueCat = async () => {
         try {
           const offerings = await Purchases.getOfferings();
+          // console.log(offerings.current.availablePackages)
           if (offerings.current) {
             setOfferings(offerings.current.availablePackages);
+          }
+          if (context?.token) {
+            const customerInfo = await Purchases.getCustomerInfo();
+
+            // Check if user has any active entitlement
+            if (customerInfo.entitlements.active) {
+              const activeEntitlement = Object.values(
+                customerInfo.entitlements.active,
+              )[0]; // first active entitlement
+              setActiveSubscription(activeEntitlement.productIdentifier);
+            }
           }
         } catch (error) {
           console.log('Error setting up RevenueCat:', error);
@@ -147,6 +176,24 @@ const Packages = () => {
     }
   }, [connection]);
 
+  // useEffect(() => {
+  //   const fetchActive = async () => {
+  //     const purchases = await getAvailablePurchases();
+  //     const active = purchases.find(p =>
+  //       ['flyneat_month', 'flyneat_year2'].includes(p.productId),
+  //     );
+  //     console.log('active', active.productId);
+  //     if (active) {
+  //       setActiveSubscription(active.productId);
+  //     }
+  //   };
+  //   if (Platform.OS === 'android') {
+  //     if (context?.token) {
+  //       // fetchActive();
+  //     }
+  //   }
+  // }, []);
+
   // To get Subscription information
   const getSubscriptionInfo = async () => {
     try {
@@ -155,7 +202,7 @@ const Packages = () => {
       });
       console.log('sussssb', subscriptions);
 
-      setSubscription(subscriptions); // set subscription information
+      setSubscription(subscriptions);
     } catch (error) {
       console.error('Error fetching products: ', error);
     }
@@ -452,7 +499,7 @@ const Packages = () => {
                 // height: hp(7),
                 padding: hp(2.5),
                 backgroundColor: Color('drawerBg'),
-                width: wp(85),
+                width: wp(90),
                 alignSelf: 'center',
                 borderRadius: 10,
                 alignItems: 'center',
@@ -481,12 +528,25 @@ const Packages = () => {
             {subscription.length > 0 ? (
               <>
                 {subscription.map(item => {
+                  console.log('item', item.productId);
                   // console.log("item", item.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
                   const priceString =
                     item.subscriptionOfferDetails[0].pricingPhases
                       .pricingPhaseList[0].formattedPrice;
                   return (
                     <AndroidPackageCard
+                      // isActive={activeSubscription === item.productId}
+                      isActive={
+                        (activeSubscription === 'monthly' &&
+                          item.productId === 'flyneat_month') ||
+                        (activeSubscription === 'yearly' &&
+                          item.productId === 'flyneat_year2')
+                      }
+                      //  isActive={item.productId.includes(activeSubscription)}
+                      // isActive={activeSubscription === context?.user?.sub_type}
+                      expiryDate={moment(context?.user?.expired_at).format(
+                        'DD-MM-YYYY',
+                      )}
                       onPress={() =>
                         navigation.navigate('PackageDetail', {detail: item})
                       }
@@ -500,9 +560,19 @@ const Packages = () => {
             ) : (
               <>
                 {offerings?.reverse().map(item => {
-                  // console.log('offerings', item);
+                  console.log('offerings', item.product.identifier);
                   return (
                     <PackageCard
+                      // isActive={item.product.identifier === activeSubscription}
+                      isActive={
+                        (activeSubscription === 'monthly' &&
+                          item.product.identifier === 'flyneat_month') ||
+                        (activeSubscription === 'yearly' &&
+                          item.product.identifier === 'flyneat_year2')
+                      }
+                      date={moment(context?.user?.expired_at).format(
+                        'DD-MM-YYYY',
+                      )}
                       onPress={() =>
                         navigation.navigate('PackageDetail', {detail: item})
                       }
