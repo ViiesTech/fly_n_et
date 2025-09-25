@@ -4,9 +4,12 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import { createNavigationContainerRef, StackActions } from '@react-navigation/native';
+import {
+  createNavigationContainerRef,
+  StackActions,
+} from '@react-navigation/native';
 import Purchases from 'react-native-purchases';
-
+import {AppEventsLogger} from 'react-native-fbsdk-next';
 
 export const drawerStyle = {
   backgroundColor: Color('drawerBg'),
@@ -107,7 +110,7 @@ export const generateEllipseCoordinates = (
   centerLng,
   radiusX, // Major axis (longer side)
   radiusY, // Minor axis (shorter side)
-  numPoints = 100
+  numPoints = 100,
 ) => {
   let coordinates = [];
   for (let i = 0; i < numPoints; i++) {
@@ -123,7 +126,6 @@ export const generateEllipseCoordinates = (
   }
   return coordinates;
 };
-
 
 export const getDistanceBetweenPoints = (lat1, lon1, lat2, lon2) => {
   const R = 6371000; // Radius of Earth in meters
@@ -160,14 +162,9 @@ function toRad(Value) {
   return (Value * Math.PI) / 180;
 }
 
-const percentageCalculation = (max, val) =>
-  max * (val / 100);
+const percentageCalculation = (max, val) => max * (val / 100);
 
-const fontCalculation = (
-  height,
-  width,
-  val,
-) => {
+const fontCalculation = (height, width, val) => {
   const widthDimension = height > width ? width : height;
   const aspectRatioBasedHeight = (16 / 9) * widthDimension;
   return percentageCalculation(
@@ -177,20 +174,18 @@ const fontCalculation = (
     val,
   );
 };
-export const responsiveFontSize = (f) => {
-  const { height, width } = Dimensions.get('window');
+export const responsiveFontSize = f => {
+  const {height, width} = Dimensions.get('window');
   return fontCalculation(height, width, f);
 };
-export const responsiveHeight = (h) => {
-  const { height } = Dimensions.get('window');
+export const responsiveHeight = h => {
+  const {height} = Dimensions.get('window');
   return height * (h / 100);
 };
-export const responsiveWidth = (w) => {
-  const { width } = Dimensions.get('window');
+export const responsiveWidth = w => {
+  const {width} = Dimensions.get('window');
   return width * (w / 100);
 };
-
-
 
 export const navigationRef = createNavigationContainerRef();
 
@@ -206,5 +201,7 @@ export function replace(name, params) {
   }
 }
 
-
-
+export const trackLaunch = () => {
+  AppEventsLogger.logEvent('Hello world');
+  
+};

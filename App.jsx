@@ -1,12 +1,8 @@
-// /* eslint-disable react/no-unstable-nested-components */
-// /* eslint-disable react/react-in-jsx-scope */
-// import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Suspense, useContext, useEffect, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {
   NavigationContainer,
   useIsFocused,
-  useNavigation,
 } from '@react-navigation/native';
 import {Alert, AppState, LogBox} from 'react-native';
 import Splash from './src/screens/Splash';
@@ -51,13 +47,14 @@ import PackageDetail from './src/screens/PackageDetail';
 import {Platform} from 'react-native';
 import Purchases from 'react-native-purchases';
 import {withIAPContext} from 'react-native-iap';
-import {api, baseUrl} from './src/utils/api';
-import {replace} from './src/utils/global';
+import {api, baseUrl, META_APP_ID} from './src/utils/api';
+import {replace, trackLaunch} from './src/utils/global';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoaderOverlay from './src/components/LoaderOverlay';
 import ContactUs from './src/screens/ContactUs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Settings as settings } from 'react-native-fbsdk-next';
 
 const Stack = createStackNavigator();
 
@@ -428,6 +425,24 @@ function MainApp() {
     if (!context?.token) return;
     checkToken();
   }, [context?.token]);
+
+  useEffect(() => {
+
+    settings.initializeSDK();
+    settings.setAppID(META_APP_ID); 
+    settings.setAdvertiserTrackingEnabled(true); 
+    settings.setAutoLogAppEventsEnabled(true);
+
+  },[])
+
+ useEffect(() => {
+  setTimeout(() => {
+    trackLaunch();
+    console.log("📡 AppLaunched event sent");
+  }, 2000); 
+}, []);
+
+  
 
   const checkToken = async () => {
     try {

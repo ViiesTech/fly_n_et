@@ -12,7 +12,7 @@ import Wrapper from '../components/Wrapper';
 import {Color} from '../utils/Colors';
 import Btn from '../utils/Btn';
 import {LoginCurve} from 'iconsax-react-native';
-import {isIOS} from '../utils/global';
+import {isIOS, trackLaunch} from '../utils/global';
 import Orientation from 'react-native-orientation-locker';
 import {presentCodeRedemptionSheetIOS} from 'react-native-iap';
 import Purchases from 'react-native-purchases';

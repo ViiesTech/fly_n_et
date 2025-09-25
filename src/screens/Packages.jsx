@@ -28,9 +28,7 @@ import {
   initConnection,
   flushFailedPurchasesCachedAsPendingAndroid,
   getSubscriptions,
-  Subscription,
   presentCodeRedemptionSheetIOS,
-  getAvailablePurchases,
 } from 'react-native-iap';
 import AndroidPackageCard from '../components/AndroidPackageCard';
 import {baseUrl, note} from '../utils/api';
@@ -77,7 +75,7 @@ const Packages = () => {
   const [activeSubscription, setActiveSubscription] = useState(null);
   // const [activeSubscription,setActiveSubscription] = useState(null)
 
-  console.log('active subds', context?.user.sub_type);
+  console.log('active subds', context?.user?.sub_type);
 
   useEffect(() => {
     const updateDimensions = () => {

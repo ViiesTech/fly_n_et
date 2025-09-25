@@ -57,7 +57,7 @@ const AccountSettings = ({navigation}) => {
     context?.user?.user_info?.licence_expiry || '',
   );
 
-  console.log('hh', profile);
+  console.log('hello ===>', context?.user?.user_info?.licence_expiry);
 
   const onSaveChanges = async () => {
     try {
@@ -70,12 +70,19 @@ const AccountSettings = ({navigation}) => {
       data.append('phone', phone);
       data.append('experience', experience);
       data.append('bio', bio);
-      data.append('licence_expiry', licenseExpiry);
+
       data.append('profile_image', {
         uri: profile,
         type: 'image/jpg',
         name: 'image',
       });
+      if (
+        context?.user?.user_type === 'cfi' ||
+        context?.user?.user_type === 'cfii'
+      )
+       {
+        data.append('licence_expiry', licenseExpiry);
+      }
 
       // return console.log('formdata',data)
 
@@ -286,22 +293,22 @@ const AccountSettings = ({navigation}) => {
               label="Bio"
             />
             {(context?.user?.user_type === 'cfi' ||
-              context?.user?.user_type === 'cfii') &&
-                <>
-                  <Br space={1.2} />
-                  <DOB
-                    labelSize={13}
-                    labelColor={Color('modelDark')}
-                    innerInput={{color: Color('shadow')}}
-                    inputCss={{
-                      backgroundColor: 'transparent',
-                      borderColor: Color('modelDark'),
-                    }}
-                    dob={expiry}
-                    setDob={setExpiry}
-                  />
-                </>
-              }
+              context?.user?.user_type === 'cfii') && (
+              <>
+                <Br space={1.2} />
+                <DOB
+                  labelSize={13}
+                  labelColor={Color('modelDark')}
+                  innerInput={{color: Color('shadow')}}
+                  inputCss={{
+                    backgroundColor: 'transparent',
+                    borderColor: Color('modelDark'),
+                  }}
+                  dob={expiry}
+                  setDob={setExpiry}
+                />
+              </>
+            )}
           </Wrapper>
 
           <Br space={2} />
