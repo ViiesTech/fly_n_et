@@ -7,7 +7,7 @@ import { H5, Small } from '../utils/Text';
 import Br from '../components/Br';
 import Btn from '../utils/Btn';
 import Background from '../utils/Background';
-import { drawerInner, drawerStyle } from '../utils/global';
+import { drawerInner, drawerStyle, trackCompleteRegisterationEvent } from '../utils/global';
 import Input from '../components/Input';
 import { api, errHandler, note } from '../utils/api';
 import * as Yup from 'yup';
@@ -71,6 +71,7 @@ const Verify = ({ navigation }) => {
         isVerified: res?.data?.verified ? true : false,
         user: res?.data?.user,
       });
+      trackCompleteRegisterationEvent()
     } catch (err) {
       await errHandler(err, null, navigation);
     } finally {

@@ -43,6 +43,12 @@
 	<string>We need access to save photos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Grant access to user to take your photo in order to create your profile.</string>
+	<!-- <key>FacebookAppID</key>
+<string>1111969450559335</string>
+<key>FacebookClientToken</key>
+<string>8e271c678e2bdc45a4dfd315e73445f3</string>
+<key>NSUserTrackingUsageDescription</key>
+<string>This identifier will be used to deliver personalized ads to you.</string> -->
 	<key>UIAppFonts</key>
 	<array>
 		<string>Manrope-Bold.ttf</string>

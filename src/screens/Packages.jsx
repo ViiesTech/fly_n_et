@@ -575,9 +575,7 @@ const Packages = () => {
                         navigation.navigate('PackageDetail', {detail: item})
                       }
                       style={{marginBottom: hp(2)}}
-                      package_name={
-                        item.packageType === 'ANNUAL' ? 'Yearly' : 'Monthly'
-                      }
+                      package_name={item.packageType === 'ANNUAL' ? 'Yearly' : 'Monthly'}
                       price={item.product.priceString}
                     />
                   );

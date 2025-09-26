@@ -1,9 +1,6 @@
 import {Suspense, useContext, useEffect, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
-import {
-  NavigationContainer,
-  useIsFocused,
-} from '@react-navigation/native';
+import {NavigationContainer, useIsFocused} from '@react-navigation/native';
 import {Alert, AppState, LogBox} from 'react-native';
 import Splash from './src/screens/Splash';
 import Loading from './src/screens/Loading';
@@ -53,8 +50,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoaderOverlay from './src/components/LoaderOverlay';
 import ContactUs from './src/screens/ContactUs';
-import { createStackNavigator } from '@react-navigation/stack';
-import { Settings as settings } from 'react-native-fbsdk-next';
+import {createStackNavigator} from '@react-navigation/stack';
+import {AppEventsLogger, Settings as settings} from 'react-native-fbsdk-next';
 
 const Stack = createStackNavigator();
 
@@ -408,7 +405,7 @@ function MainApp() {
   // const [appState, setAppState] = useState(AppState.currentState);
   const isFocused = useIsFocused();
 
-  console.log(context?.token)
+  console.log(context?.token);
 
   let APIKEY =
     Platform.OS === 'android'
@@ -427,22 +424,15 @@ function MainApp() {
   }, [context?.token]);
 
   useEffect(() => {
-
     settings.initializeSDK();
-    settings.setAppID(META_APP_ID); 
-    settings.setAdvertiserTrackingEnabled(true); 
-    settings.setAutoLogAppEventsEnabled(true);
+    settings.setAppID(META_APP_ID);
+    setTimeout(() => {
+      AppEventsLogger.logEvent('fb_mobile_activate_app');
+      // AppEventsLogger.logEvent('IOS')
+      console.log('📡 AppLaunched event sent');
+    }, 2000);
+  }, []);
 
-  },[])
-
- useEffect(() => {
-  setTimeout(() => {
-    trackLaunch();
-    console.log("📡 AppLaunched event sent");
-  }, 2000); 
-}, []);
-
-  
 
   const checkToken = async () => {
     try {
@@ -450,7 +440,7 @@ function MainApp() {
         headers: {Authorization: `Bearer ${context?.token}`},
       });
 
-      console.log('token chek',res.data)
+      console.log('token chek', res.data);
 
       if (
         res.data.error === 'Invalid token.' ||
@@ -505,29 +495,29 @@ function MainApp() {
   }, []);
 
   useEffect(() => {
-  if(Platform.OS === 'ios') {  
-    if (isFocused) {
-      let prevProductId = null;
+    if (Platform.OS === 'ios') {
+      if (isFocused) {
+        let prevProductId = null;
 
-      const fetchAndSaveEntitlement = async customerInfo => {
-        const premium = customerInfo.entitlements.active['Premium'];
-        console.log('first', premium);
-        if (premium) {
-          const currentProductId = premium.productIdentifier;
-          if (prevProductId !== currentProductId) {
-            prevProductId = currentProductId;
-            const token = await AsyncStorage.getItem('token');
-            await handlingNavigations(token);
+        const fetchAndSaveEntitlement = async customerInfo => {
+          const premium = customerInfo.entitlements.active['Premium'];
+          console.log('first', premium);
+          if (premium) {
+            const currentProductId = premium.productIdentifier;
+            if (prevProductId !== currentProductId) {
+              prevProductId = currentProductId;
+              const token = await AsyncStorage.getItem('token');
+              await handlingNavigations(token);
+            }
           }
-        }
-      };
+        };
 
-      Purchases.addCustomerInfoUpdateListener(fetchAndSaveEntitlement);
+        Purchases.addCustomerInfoUpdateListener(fetchAndSaveEntitlement);
 
-      return () => {
-        Purchases.removeCustomerInfoUpdateListener(fetchAndSaveEntitlement);
-      };
-    }
+        return () => {
+          Purchases.removeCustomerInfoUpdateListener(fetchAndSaveEntitlement);
+        };
+      }
     }
   }, [context.token, isFocused]);
 
@@ -583,8 +573,7 @@ function MainApp() {
   return (
     <>
       <LoaderOverlay visible={loading} />
-      <Stack.Navigator
-        screenOptions={{headerShown: false}}>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
         {/* <Stack.Screen name="Splash" component={Splash} />
       <Stack.Screen name="Logout" component={Logout} /> */}
         <Stack.Screen name="Splash" component={Splash} />
@@ -694,7 +683,7 @@ function MainApp() {
         <Stack.Screen name="PackageDetail">
           {props => <Sus component={<PackageDetail {...props} />} />}
         </Stack.Screen>
-              <Stack.Screen name="ContactUs">
+        <Stack.Screen name="ContactUs">
           {props => <Sus component={<ContactUs {...props} />} />}
         </Stack.Screen>
         {/* Add the rest of your screens similarly using <Sus component={<Component />} /> */}

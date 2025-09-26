@@ -24,6 +24,7 @@ import {getAvailablePurchases, requestSubscription} from 'react-native-iap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import LoaderOverlay from '../components/LoaderOverlay';
+import { trackPurchaseEvent } from '../utils/global';
 
 const packageDetails = [
   {
@@ -64,7 +65,7 @@ const PackageDetail = ({route}) => {
 
   // console.log("data",data)
 
-  // console.log("data", data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
+  console.log("data", data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
   const priceData =
     isAndroid &&
     data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0]
@@ -165,6 +166,7 @@ const PackageDetail = ({route}) => {
                 'To access your subscription benefits, please create or log in to your account',
               screen: 'Login',
             });
+            trackPurchaseEvent(data)
           } else {
             if (context.token) {
               console.log('going in navigatii func');
@@ -219,6 +221,7 @@ const PackageDetail = ({route}) => {
               'To access your subscription benefits, please create or log in to your account',
             screen: 'Login',
           });
+          trackPurchaseEvent(data)
         } else {
           if (context.token) {
             setLoading(false);
@@ -369,6 +372,7 @@ const PackageDetail = ({route}) => {
             });
             setLoading(false);
             navigation.navigate('Home');
+            trackPurchaseEvent(data)
           } else {
             setLoading(false);
           }
