@@ -46,7 +46,7 @@ const Home = ({navigation}) => {
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
   const [locationLoader, setLocationLoader] = useState(false);
 
-  console.log('context ===>', context?.user);
+  console.log('context ===>', context?.user?.expired_at);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -83,20 +83,66 @@ const Home = ({navigation}) => {
   const Latitude = context?.user?.latitude;
   const longitude = context?.user?.longitude;
 
-  // console.log('helo3r', context?.user?.user_info.nearest_airport);
-  // console.log('first',context?.token)
+  console.log('helo3r', context?.user?.user_info);
+  // console.log('expiry ',context?.subscribed_details)
 
-  useEffect(() => {
-    if (context?.token && !context?.user.user_info?.address) {
-      // alert('hello')
-      // clearLocationDetails()
-      // alert('sis')
+useEffect(() => {
+  if (context?.token) {
+    if (!context?.user?.location?.address) {
       requestLocationPermission();
-      // getSubscriptionInfo();
-      //   convertLatLngToAddr();
     }
-  }, [context?.token]);
 
+    checkSubscriptionAgain();
+  }
+}, [context?.token]);
+
+const checkSubscriptionAgain = async () => {
+  try {
+    // Step 1: Always call backend to refresh subscription status
+   const subData = await AsyncStorage.getItem('subscribed_details')
+   const updatedData = JSON.parse(subData)
+  //  console.log()  
+    if (updatedData) {
+      const obj = {
+        sub_type: updatedData?.sub_type,
+        purchase_date: updatedData?.purchased_date,
+      };
+
+      const response = await api.post("user/subscribe", obj, {
+        headers: { Authorization: `Bearer ${context?.token}` },
+      });
+
+      if (
+        response?.data?.status === "success" &&
+        response?.data?.user?.expired_at
+      ) {
+        const updatedExpiry = response.data.user.expired_at;
+        const subType = response.data.user.sub_type
+
+        // Step 2: Save latest subscription details locally
+        await AsyncStorage.setItem(
+          "subscribed_details",
+          JSON.stringify({
+            ...updatedData,
+            expired_at: updatedExpiry,
+          })
+        );
+
+        // Step 3: Update context user with refreshed expiry
+        setContext(prev => ({
+          ...prev,
+          user: { ...prev.user, expired_at: updatedExpiry,sub_type: subType },
+        }));
+
+        console.log("✅ Subscription refreshed:", updatedExpiry);
+      }
+    } else {
+      console.log("⚠️ No subscribed_details found in storage");
+    }
+  } catch (error) {
+    console.log("❌ Error refreshing subscription:", error);
+  }
+};
   const convertLatLngToAddr = async () => {
     const response = await axios.get(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${Latitude},${longitude}&key=${API_KEY}`,
@@ -184,8 +230,8 @@ const Home = ({navigation}) => {
             ...prev.user,
             latitude: lat,
             longitude: lng,
-            user_info: {
-              ...prev.user.user_info,
+            location: {
+              ...prev.user.location,
               address: locationName,
               nearest_airport: nearest.name,
               geometry_location: nearest.geometry.location,
@@ -306,7 +352,7 @@ const Home = ({navigation}) => {
         <View style={{width: width * 0.6, alignItems: 'center'}}>
           {context?.token &&
             !locationLoader &&
-            context?.user.user_info?.address && (
+            context?.user.location?.address && (
               <>
                 <Small heading font="medium">
                   Home Airport
@@ -319,7 +365,7 @@ const Home = ({navigation}) => {
                   }}>
                   <Loc size={hp('2%')} color={Color('text')} />
                   <Small heading font="bold" numberOfLines={1}>
-                    {context?.user?.user_info?.address}
+                    {context?.user?.location?.address}
                   </Small>
                 </View>
               </>
@@ -386,7 +432,7 @@ const Home = ({navigation}) => {
         try {
           const savedSelection = await AsyncStorage.getItem('typedLocation');
 
-          const defaultAirport = context?.user?.user_info?.nearest_airport;
+          const defaultAirport = context?.user?.location?.nearest_airport;
 
           const valueToSet =
             savedSelection !== null ? savedSelection : defaultAirport;
@@ -611,7 +657,9 @@ const Home = ({navigation}) => {
         </View>
       </Background>
       <Navigation navigation={navigation} />
+    {locationLoader &&  
       <LoaderOverlay text={true} visible={locationLoader} />
+      }
     </>
   );
 };

@@ -1,7 +1,7 @@
 import {Suspense, useContext, useEffect, useState} from 'react';
 import Orientation from 'react-native-orientation-locker';
 import {NavigationContainer, useIsFocused} from '@react-navigation/native';
-import {Alert, AppState, LogBox} from 'react-native';
+import {Alert, AppState, LogBox, SafeAreaView, Text} from 'react-native';
 import Splash from './src/screens/Splash';
 import Loading from './src/screens/Loading';
 import GetStarted from './src/screens/GetStarted';
@@ -52,6 +52,8 @@ import LoaderOverlay from './src/components/LoaderOverlay';
 import ContactUs from './src/screens/ContactUs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {AppEventsLogger, Settings as settings} from 'react-native-fbsdk-next';
+import { View } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 
 const Stack = createStackNavigator();
 
@@ -400,6 +402,7 @@ const Sus = ({component}) => {
 
 function MainApp() {
   const {context, setContext} = useContext(DataContext);
+  const [isConnected,setIsConnected] = useState(false)
   // const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(false);
   // const [appState, setAppState] = useState(AppState.currentState);
@@ -453,6 +456,7 @@ function MainApp() {
             {
               text: 'Log In',
               onPress: () => {
+                replace('Login');
                 setContext({
                   ...context,
                   token: false,
@@ -467,7 +471,6 @@ function MainApp() {
                   serviceImages: null,
                   returnFromDetail: false,
                 });
-                replace('Logout');
               },
             },
           ],
@@ -494,37 +497,73 @@ function MainApp() {
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (Platform.OS === 'ios') {
+  //     if (isFocused) {
+  //       let prevProductId = null;
+
+  //       const fetchAndSaveEntitlement = async customerInfo => {
+  //         const premium = customerInfo.entitlements.active['Premium'];
+  //         console.log('first', premium);
+  //         if (premium) {
+  //           const currentProductId = premium.productIdentifier;
+  //           if (prevProductId !== currentProductId) {
+  //             prevProductId = currentProductId;
+  //             const token = await AsyncStorage.getItem('token');
+  //             await handlingNavigations(token);
+  //           }
+  //         }
+  //       };
+
+  //       Purchases.addCustomerInfoUpdateListener(fetchAndSaveEntitlement);
+
+  //       return () => {
+  //         Purchases.removeCustomerInfoUpdateListener(fetchAndSaveEntitlement);
+  //       };
+  //     }
+  //   }
+  // }, [context.token, isFocused]);
+
+
   useEffect(() => {
-    if (Platform.OS === 'ios') {
-      if (isFocused) {
-        let prevProductId = null;
+  if (Platform.OS === 'ios' && isFocused) {
+    const prevProductIdRef = { current: null };
 
-        const fetchAndSaveEntitlement = async customerInfo => {
-          const premium = customerInfo.entitlements.active['Premium'];
-          console.log('first', premium);
-          if (premium) {
-            const currentProductId = premium.productIdentifier;
-            if (prevProductId !== currentProductId) {
-              prevProductId = currentProductId;
-              const token = await AsyncStorage.getItem('token');
-              await handlingNavigations(token);
-            }
-          }
-        };
+    const fetchAndSaveEntitlement = async customerInfo => {
+      const premium = customerInfo.entitlements.active['Premium'];
+      console.log('Entitlement Premium:', premium.periodType);
 
-        Purchases.addCustomerInfoUpdateListener(fetchAndSaveEntitlement);
+      if (premium) {
+        const currentProductId = premium.productIdentifier;
+        if (prevProductIdRef.current !== currentProductId) {
+          prevProductIdRef.current = currentProductId;
 
-        return () => {
-          Purchases.removeCustomerInfoUpdateListener(fetchAndSaveEntitlement);
-        };
+          const subType = currentProductId.includes('flyneat_month') ? 'monthly' : 'yearly';
+          const purchasedDate = premium.latestPurchaseDate;
+
+          const token = await AsyncStorage.getItem('token');
+          if (premium.isTrial === true || premium.willRenew === true) {
+          await handlingNavigations(token, subType, purchasedDate);
+          }  
+        }
       }
-    }
-  }, [context.token, isFocused]);
+    };
 
-  const handlingNavigations = async token => {
-    const iosSubType = 'monthly';
+    Purchases.addCustomerInfoUpdateListener(fetchAndSaveEntitlement);
+
+    return () => {
+      Purchases.removeCustomerInfoUpdateListener(fetchAndSaveEntitlement);
+    };
+  }
+}, [context.token, isFocused]);
+
+  const handlingNavigations = async (token,subType,purchasedDate) => {
+    // const iosSubType = 'monthly';
+  // const isFreeTrial = await AsyncStorage.getItem('isPremium')  
+  // return console.log('hello world',isFreeTrial)
+    console.log('subtype',subType)
     const formData = new FormData();
-    formData.append('sub_type', iosSubType);
+    formData.append('sub_type', subType);
 
     try {
       if (!token) {
@@ -532,6 +571,12 @@ function MainApp() {
         // console.log('hello token')
         setLoading(true);
         await AsyncStorage.setItem('isPremium', 'true');
+      //    if (purchasedDate) {
+      //   await AsyncStorage.setItem('subscribed_details', JSON.stringify({
+      //     purchased_date: purchasedDate,
+      //     sub_type: subType,
+      //   }));
+      // }
         setLoading(false);
       } else {
         // alert('token');
@@ -555,11 +600,21 @@ function MainApp() {
           await AsyncStorage.setItem('isVerified', JSON.stringify(true));
           await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
 
+
+        // if (purchasedDate) {
+        //   await AsyncStorage.setItem('subscribed_details', JSON.stringify({
+        //     purchased_date: purchasedDate,
+        //     sub_type: subType,
+        //   }));
+        // }
           setContext({
             ...context,
             token: token,
             isVerified: true,
             user: updatedUser,
+              subscribed_details: purchasedDate
+            ? { purchased_date: purchasedDate, sub_type: subType }
+            : context.subscribed_details,
           });
         }
         setLoading(false); // Stop loader after API + async calls
@@ -570,8 +625,19 @@ function MainApp() {
     }
   };
 
+    useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected && state.isInternetReachable);
+    });
+    return () => unsubscribe();
+  }, []);
+  
+
   return (
     <>
+        <View style={{flex: 1}}>
+  
+
       <LoaderOverlay visible={loading} />
       <Stack.Navigator screenOptions={{headerShown: false}}>
         {/* <Stack.Screen name="Splash" component={Splash} />
@@ -688,6 +754,17 @@ function MainApp() {
         </Stack.Screen>
         {/* Add the rest of your screens similarly using <Sus component={<Component />} /> */}
       </Stack.Navigator>
+        {!isConnected && (
+        <View style={{  position: 'absolute',
+            bottom: 0,
+            width: '100%',
+            backgroundColor: 'red',
+            paddingVertical: 1}}>
+          <Text style={{color: 'white',textAlign: 'center'}}>No Internet Connection</Text>
+        </View>
+      )}
+    </View>
+          
     </>
   );
 }

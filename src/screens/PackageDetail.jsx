@@ -24,7 +24,7 @@ import {getAvailablePurchases, requestSubscription} from 'react-native-iap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import LoaderOverlay from '../components/LoaderOverlay';
-import { trackPurchaseEvent } from '../utils/global';
+import {trackPurchaseEvent} from '../utils/global';
 
 const packageDetails = [
   {
@@ -54,18 +54,18 @@ const PackageDetail = ({route}) => {
   const {context, setContext} = useContext(DataContext);
   const navigation = useNavigation();
 
-  console.log('context', context);
+  console.log('context', context.token);
   // const [offering, setOffering] = useState(null);
 
   const data = route?.params?.detail;
-  console.log('user expiry', context?.user?.expired_at);
-  console.log('context', context?.subscribed_details);
+  // console.log('user expiry', context?.user?.expired_at);
+  // console.log('context', context?.subscribed_details);
 
   const isAndroid = Platform.OS === 'android';
 
   // console.log("data",data)
 
-  console.log("data", data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
+  // console.log("data", data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
   const priceData =
     isAndroid &&
     data.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0]
@@ -131,7 +131,7 @@ const PackageDetail = ({route}) => {
       </View>
     );
   };
-  console.log('cot..........,.,.,', context?.token);
+  // console.log('cot..........,.,.,', context?.token);
   const onConfirmPurchase = async () => {
     if (!data) {
       Alert.alert('Error', 'No available package for this plan.');
@@ -166,13 +166,13 @@ const PackageDetail = ({route}) => {
                 'To access your subscription benefits, please create or log in to your account',
               screen: 'Login',
             });
-            trackPurchaseEvent(data)
+            trackPurchaseEvent(data);
           } else {
             if (context.token) {
-              console.log('going in navigatii func');
-              await handlingNavigations();
-              return;
-            }
+            console.log('going in navigatii func');
+            await handlingNavigations();
+            return;
+          }
           }
 
           const subType = data?.productId.includes('year')
@@ -188,6 +188,13 @@ const PackageDetail = ({route}) => {
             },
             skipNavigationCheck: false,
           });
+          await AsyncStorage.setItem(
+            'subscribed_details',
+            JSON.stringify({
+              purchased_date: purchasedDate,
+              sub_type: subType,
+            }),
+          );
         }
       } catch (error) {
         console.log(error);
@@ -221,7 +228,7 @@ const PackageDetail = ({route}) => {
               'To access your subscription benefits, please create or log in to your account',
             screen: 'Login',
           });
-          trackPurchaseEvent(data)
+          trackPurchaseEvent(data);
         } else {
           if (context.token) {
             setLoading(false);
@@ -239,6 +246,13 @@ const PackageDetail = ({route}) => {
             sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
           },
         });
+           await AsyncStorage.setItem(
+            'subscribed_details',
+            JSON.stringify({
+              purchased_date: purchaseMade?.transaction?.purchaseDate,
+              sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
+            }),
+          );
       } catch (error) {
         console.log('Error:', error?.response?.data || error?.message);
 
@@ -355,6 +369,7 @@ const PackageDetail = ({route}) => {
       .request(config)
       .then(async response => {
         const updatedExpiry = response?.data?.user?.expired_at;
+        console.log('response ===>',response?.data)
         if (updatedExpiry) {
           if (context?.token) {
             await AsyncStorage.setItem('token', context?.token);
@@ -363,7 +378,6 @@ const PackageDetail = ({route}) => {
               'user',
               JSON.stringify(response?.data?.user),
             );
-
             setContext({
               ...context,
               token: context?.token,
@@ -372,7 +386,7 @@ const PackageDetail = ({route}) => {
             });
             setLoading(false);
             navigation.navigate('Home');
-            trackPurchaseEvent(data)
+            trackPurchaseEvent(data);
           } else {
             setLoading(false);
           }
@@ -390,7 +404,7 @@ const PackageDetail = ({route}) => {
     //   duration: 1000,
     //   useNativeDriver: true,
     // }).start(() => {
-      nav();
+    nav();
     // });
   };
 

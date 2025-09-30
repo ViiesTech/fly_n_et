@@ -35,6 +35,8 @@ export const AppContext = ({ children }) => {
             const token = await AsyncStorage.getItem('token');
             const isVerified = await AsyncStorage.getItem('isVerified');
             const user = await AsyncStorage.getItem('user');
+               const subscribed_details = await AsyncStorage.getItem('subscribed_details');
+            //    console.log('subscribed_details ===>',subscribed_details)
 
             if (token && isVerified && user) {
                 setContext({
@@ -42,6 +44,7 @@ export const AppContext = ({ children }) => {
                     token,
                     isVerified,
                     user: JSON.parse(user),
+                    subscribed_details: subscribed_details ? JSON.parse(subscribed_details) : null,
                 });
             }
         }catch(err) {

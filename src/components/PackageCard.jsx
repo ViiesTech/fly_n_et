@@ -5,6 +5,7 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-nat
 import { ArrowRight2 } from 'iconsax-react-native';
 
 const PackageCard = ({ package_name, price, type, style, onPress, isActive, date }) => {
+  console.log('isActive ===>',isActive)
   return (
     <TouchableOpacity onPress={onPress} style={[styles.packageStyle, style]}>
       

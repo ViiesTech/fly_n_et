@@ -36,8 +36,11 @@ const Verify = ({ navigation }) => {
   // }, [IsFocused]);
 
   useEffect(() => {
+    // alert('hello')
     if (context?.token && context?.isVerified) {
+      // alert('user info does not exist')
       if (context?.user?.user_info) {
+        // alert('user info exist')
         nextScreen(() => navigation.replace('Home'));
       } else {
         nextScreen(() => navigation.replace('UserType'));

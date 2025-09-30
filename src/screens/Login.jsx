@@ -55,7 +55,7 @@ const Login = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [location, setLocation] = useState();
 
-  // console.log('user info ==>', context?.user?.user_info);
+  console.log('user info ==>', context?.user?.user_info);
 
   // useEffect(() => {
   //   const timeout = setTimeout(() => {
@@ -93,6 +93,12 @@ const Login = ({navigation}) => {
   }, []);
 
   const handlingNavigations = async () => {
+    const user = context?.user;
+
+if (!user || !user.user_info) {
+  console.log('Navigating to UserType because profile is missing');
+  nextScreen(() => navigation.navigate('UserType'));
+} else { 
     const updatedExpiry = await getSubscriptionInfo();
     const expiryDate = updatedExpiry
       ? new Date(updatedExpiry)
@@ -103,7 +109,7 @@ const Login = ({navigation}) => {
     const currentDate = new Date();
 
     const isPremium = await AsyncStorage.getItem('isPremium');
-    const isPremiumParsed = JSON.parse(isPremium);
+    // const isPremiumParsed = JSON.parse(isPremium);
 
     console.log('is premium', isPremium);
 
@@ -111,7 +117,7 @@ const Login = ({navigation}) => {
 
     console.log('isExpired', isExpired);
 
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === 'ios' && isPremium) {
       if (isPremium) {
         try {
           const iosSubType = 'monthly';
@@ -145,64 +151,122 @@ const Login = ({navigation}) => {
             });
             navigation.replace('Home');
           }
-          setApiLoading(false);
+          // setApiLoading(false);
+          return;
         } catch (error) {
-          console.log(error);
+          console.log('Error updating free trial to subscription:', error);
+        } finally {
           setApiLoading(false);
         }
-        return;
       }
     }
+  
 
-    if (isExpired) {
-      console.log('check the expiry');
-      nextScreen(() => navigation.navigate('Packages'));
-    } else if (context?.user?.user_info) {
-      nextScreen(() => navigation.navigate('Home'));
-    } else {
-      nextScreen(() => navigation.replace('UserType'));
-    }
+
+if (isExpired) {
+  console.log('check the expiry');
+  nextScreen(() => navigation.navigate('Packages'));
+} else {
+  nextScreen(() => navigation.replace('Home'));
+}
 
     setContext(prev => ({
       ...prev,
       skipNavigationCheck: false,
     }));
   };
+}
+
+  // const getSubscriptionInfo = async () => {
+  //   console.log('subscriptiom',context?.subscribed_details)
+  //   if (!context?.subscribed_details) return null;
+    
+  //   try {
+  //     const obj = {
+  //       sub_type: context.subscribed_details.sub_type,
+  //       purchase_date: context.subscribed_details.purchased_date,
+  //     };
+  //     // alert('from ios and android')
+  //     const response = await api.post('user/subscribe', obj, {
+  //       headers: {
+  //         Authorization: `Bearer ${context?.token}`,
+  //       },
+  //     });
+
+  //     if (
+  //       response?.data?.status === 'success' &&
+  //       response?.data?.user?.expired_at
+  //     ) {
+  //       const updatedExpiry = response.data.user.expired_at;
+  //       setContext(prev => ({
+  //         ...prev,
+  //         subscribed_details: null,
+  //         user: {...prev.user, expired_at: updatedExpiry},
+  //       }));
+
+  //       return updatedExpiry;
+  //     }
+  //   } catch (err) {
+  //     console.error('Error fetching subscription info:', err);
+  //   }
+
+  //   return null;
+  // };
 
   const getSubscriptionInfo = async () => {
-    if (!context?.subscribed_details) return null;
-
-    try {
-      const obj = {
-        sub_type: context.subscribed_details.sub_type,
-        purchase_date: context.subscribed_details.purchased_date,
-      };
-
-      const response = await api.post('user/subscribe', obj, {
-        headers: {
-          Authorization: `Bearer ${context?.token}`,
-        },
-      });
-
-      if (
-        response?.data?.status === 'success' &&
-        response?.data?.user?.expired_at
-      ) {
-        const updatedExpiry = response.data.user.expired_at;
-        setContext(prev => ({
-          ...prev,
-          subscribed_details: null,
-          user: {...prev.user, expired_at: updatedExpiry},
-        }));
-
-        return updatedExpiry;
-      }
-    } catch (err) {
-      console.error('Error fetching subscription info:', err);
+  try {
+    // Step 1: Try to load from context, otherwise fallback to AsyncStorage
+    // let subDetails = context?.subscribed_details;
+    // if (!subDetails) {
+    let subDetails;
+      const stored = await AsyncStorage.getItem("subscribed_details");
+    if (!stored) {
+      console.log("⚠️ No subscription details found");
+      return null;
     }
 
-    return null;
-  };
+    subDetails = JSON.parse(stored)
+
+
+
+    // Step 3: Send to backend to validate
+    const obj = {
+      sub_type: subDetails.sub_type,
+      purchase_date: subDetails.purchased_date,
+    };
+
+    const response = await api.post("user/subscribe", obj, {
+      headers: {
+        Authorization: `Bearer ${context?.token}`,
+      },
+    });
+
+    if (response?.data?.status === "success" && response?.data?.user?.expired_at) {
+      const updatedExpiry = response.data.user.expired_at;
+
+      // Step 4: Save fresh expiry everywhere
+      await AsyncStorage.setItem(
+        "subscribed_details",
+        JSON.stringify({
+          ...subDetails,
+          expired_at: updatedExpiry,
+        })
+      );
+
+      setContext(prev => ({
+        ...prev,
+        subscribed_details: { ...subDetails, expired_at: updatedExpiry },
+        user: { ...prev.user, expired_at: updatedExpiry },
+      }));
+
+      return updatedExpiry;
+    }
+  } catch (err) {
+    console.error("Error fetching subscription info:", err);
+  }
+
+  return null;
+};
 
   async function requestLocationPermission() {
     try {

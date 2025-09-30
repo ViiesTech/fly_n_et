@@ -67,7 +67,7 @@ const PointToPoint = ({ navigation }) => {
     // console.log('user',context?.isPoint)
 
     useEffect(() => {
-      if(context?.token && context?.user.user_info.geometry_location) {  
+      if(context?.token && context?.user.location.geometry_location) {  
         getLocations()
         // requestLocationPermission();
         }
@@ -216,7 +216,7 @@ const PointToPoint = ({ navigation }) => {
     //     showLocationDialog: true,
     //   },
     // );
-    await AsyncStorage.setItem('p2p_locationDetails',JSON.stringify(context?.user.user_info.geometry_location))
+    await AsyncStorage.setItem('p2p_locationDetails',JSON.stringify(context?.user.location.geometry_location))
     }
     const TopBar = () => {
         return (
@@ -242,7 +242,7 @@ const PointToPoint = ({ navigation }) => {
                                         <Small heading font="medium">Home Airport</Small>
                                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>
                                             <Loc size={hp('2%')} color={Color('text')} />
-                                            <Small heading font="bold" numberOfLines={1}>{context?.user?.user_info?.address}</Small>
+                                            <Small heading font="bold" numberOfLines={1}>{context?.user?.location?.address}</Small>
                                         </View>
                                         </>
                                         }
@@ -305,7 +305,7 @@ const PointToPoint = ({ navigation }) => {
         try {
           const savedSelection = await AsyncStorage.getItem('typedLocation2');
 
-          const defaultAirport = context?.user?.user_info?.nearest_airport;
+          const defaultAirport = context?.user?.location?.nearest_airport;
 
           const valueToSet =
             savedSelection !== null ? savedSelection : defaultAirport;

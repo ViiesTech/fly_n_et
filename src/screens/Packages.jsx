@@ -110,8 +110,9 @@ const Packages = () => {
 
   useEffect(() => {
     if (context?.user?.expired_at) {
-      const isActive = moment().isBefore(moment(context.user.expired_at));
+      const isActive = moment().isBefore(moment(context.user.expired_at))
       if (isActive) {
+        // alert('active')
         setActiveSubscription(context.user.sub_type);
       } else {
         setActiveSubscription(null);
@@ -128,17 +129,17 @@ const Packages = () => {
           if (offerings.current) {
             setOfferings(offerings.current.availablePackages);
           }
-          if (context?.token) {
-            const customerInfo = await Purchases.getCustomerInfo();
+          // if (context?.token) {
+          //   const customerInfo = await Purchases.getCustomerInfo();
 
-            // Check if user has any active entitlement
-            if (customerInfo.entitlements.active) {
-              const activeEntitlement = Object.values(
-                customerInfo.entitlements.active,
-              )[0]; // first active entitlement
-              setActiveSubscription(activeEntitlement.productIdentifier);
-            }
-          }
+          //   // Check if user has any active entitlement
+          //   if (customerInfo.entitlements.active) {
+          //     const activeEntitlement = Object.values(
+          //       customerInfo.entitlements.active,
+          //     )[0]; // first active entitlement
+          //     setActiveSubscription(activeEntitlement.productIdentifier);
+          //   }
+          // }
         } catch (error) {
           console.log('Error setting up RevenueCat:', error);
         }
@@ -526,7 +527,7 @@ const Packages = () => {
             {subscription.length > 0 ? (
               <>
                 {subscription.map(item => {
-                  console.log('item', item.productId);
+                  console.log('item ====>', item.productId);
                   // console.log("item", item.subscriptionOfferDetails[0].pricingPhases.pricingPhaseList[0].formattedPrice)
                   const priceString =
                     item.subscriptionOfferDetails[0].pricingPhases

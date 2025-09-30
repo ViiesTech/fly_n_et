@@ -16,6 +16,9 @@ const AndroidPackageCard = ({
   onPress,
   isActive,
 }) => {
+
+  alert(isActive)
+
   return (
     <TouchableOpacity onPress={onPress} style={[styles.packageStyle, style]}>
       {/* Left Side */}
