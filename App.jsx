@@ -428,7 +428,7 @@ function MainApp() {
 
   useEffect(() => {
     settings.initializeSDK();
-    settings.setAppID(META_APP_ID);
+    // settings.setAppID(META_APP_ID);
     setTimeout(() => {
       AppEventsLogger.logEvent('fb_mobile_activate_app');
       // AppEventsLogger.logEvent('IOS')
@@ -594,11 +594,11 @@ function MainApp() {
           },
         );
         console.log(response?.data?.user);
-        const updatedUser = response?.data?.user;
-        if (updatedUser) {
-          await AsyncStorage.setItem('token', token);
-          await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-          await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+        const updatedExpiry = response?.data?.user?.expired_at;
+        if (updatedExpiry) {
+          // await AsyncStorage.setItem('token', token);
+          // await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+          // await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
 
 
         // if (purchasedDate) {
@@ -607,15 +607,23 @@ function MainApp() {
         //     sub_type: subType,
         //   }));
         // }
-          setContext({
-            ...context,
-            token: token,
-            isVerified: true,
-            user: updatedUser,
-              subscribed_details: purchasedDate
-            ? { purchased_date: purchasedDate, sub_type: subType }
-            : context.subscribed_details,
-          });
+          // setContext({
+          //   ...context,
+          //   token: token,
+          //   isVerified: true,
+          //   user: updatedUser,
+          //     subscribed_details: purchasedDate
+          //   ? { purchased_date: purchasedDate, sub_type: subType }
+          //   : context.subscribed_details,
+          // });
+             setContext(prev => ({
+              ...prev,
+              user: {
+                ...prev.user,
+                expired_at: updatedExpiry,
+                sub_type: response?.data?.user?.sub_type
+              },
+            }));
         }
         setLoading(false); // Stop loader after API + async calls
       }
@@ -638,7 +646,7 @@ function MainApp() {
         <View style={{flex: 1}}>
   
 
-      <LoaderOverlay visible={loading} />
+      {/* <LoaderOverlay visible={loading} /> */}
       <Stack.Navigator screenOptions={{headerShown: false}}>
         {/* <Stack.Screen name="Splash" component={Splash} />
       <Stack.Screen name="Logout" component={Logout} /> */}

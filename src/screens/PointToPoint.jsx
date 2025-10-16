@@ -242,7 +242,7 @@ const PointToPoint = ({ navigation }) => {
                                         <Small heading font="medium">Home Airport</Small>
                                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('.5%') }}>
                                             <Loc size={hp('2%')} color={Color('text')} />
-                                            <Small heading font="bold" numberOfLines={1}>{context?.user?.location?.address}</Small>
+                                            <Small heading font="bold" numberOfLines={1}>{context?.user?.location?.nearest_airport}</Small>
                                         </View>
                                         </>
                                         }

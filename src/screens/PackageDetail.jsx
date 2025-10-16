@@ -54,7 +54,7 @@ const PackageDetail = ({route}) => {
   const {context, setContext} = useContext(DataContext);
   const navigation = useNavigation();
 
-  console.log('context', context.token);
+  console.log('context', context.user?.sub_type);
   // const [offering, setOffering] = useState(null);
 
   const data = route?.params?.detail;
@@ -169,32 +169,38 @@ const PackageDetail = ({route}) => {
             trackPurchaseEvent(data);
           } else {
             if (context.token) {
-            console.log('going in navigatii func');
-            await handlingNavigations();
-            return;
-          }
+              console.log('going in navigatii func');
+              await handlingNavigations();
+              return;
+            }
           }
 
           const subType = data?.productId.includes('year')
             ? 'yearly'
             : 'monthly';
-          const purchasedDate = new Date(purchase.transactionDate);
+          // const purchasedDate = new Date(purchase.transactionDate);
 
-          setContext({
-            ...context,
-            subscribed_details: {
-              purchased_date: purchasedDate,
-              sub_type: subType,
-            },
+          setContext(prev => ({
+            ...prev,
+            sub_type: subType,
             skipNavigationCheck: false,
-          });
-          await AsyncStorage.setItem(
-            'subscribed_details',
-            JSON.stringify({
-              purchased_date: purchasedDate,
-              sub_type: subType,
-            }),
-          );
+          }));
+
+          // setContext({
+          //   ...context,
+          //   subscribed_details: {
+          //     purchased_date: purchasedDate,
+          //     sub_type: subType,
+          //   },
+          //   skipNavigationCheck: false,
+          // });
+          // await AsyncStorage.setItem(
+          //   'subscribed_details',
+          //   JSON.stringify({
+          //     purchased_date: purchasedDate,
+          //     sub_type: subType,
+          //   }),
+          // );
         }
       } catch (error) {
         console.log(error);
@@ -239,20 +245,26 @@ const PackageDetail = ({route}) => {
         }
 
         //  alert('lilill')
-        setContext({
-          ...context,
-          subscribed_details: purchaseMade?.transaction?.purchaseDate && {
-            purchased_date: purchaseMade?.transaction?.purchaseDate,
-            sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
-          },
-        });
-           await AsyncStorage.setItem(
-            'subscribed_details',
-            JSON.stringify({
-              purchased_date: purchaseMade?.transaction?.purchaseDate,
-              sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
-            }),
-          );
+
+        // setContext({
+        //   ...context,
+        //   subscribed_details: purchaseMade?.transaction?.purchaseDate && {
+        //     purchased_date: purchaseMade?.transaction?.purchaseDate,
+        //     sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
+        //   },
+        // });
+        setContext(prev => ({
+          ...prev,
+          // expired_at: updatedExpiry,
+          sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
+        }));
+        // await AsyncStorage.setItem(
+        //   'subscribed_details',
+        //   JSON.stringify({
+        //     purchased_date: purchaseMade?.transaction?.purchaseDate,
+        //     sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
+        //   }),
+        // );
       } catch (error) {
         console.log('Error:', error?.response?.data || error?.message);
 
@@ -369,21 +381,32 @@ const PackageDetail = ({route}) => {
       .request(config)
       .then(async response => {
         const updatedExpiry = response?.data?.user?.expired_at;
-        console.log('response ===>',response?.data)
+        console.log('response ===>', response?.data);
         if (updatedExpiry) {
           if (context?.token) {
-            await AsyncStorage.setItem('token', context?.token);
-            await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-            await AsyncStorage.setItem(
-              'user',
-              JSON.stringify(response?.data?.user),
-            );
-            setContext({
-              ...context,
-              token: context?.token,
-              isVerified: true,
-              user: response?.data?.user,
-            });
+            // await AsyncStorage.setItem('token', context?.token);
+            // await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+            // await AsyncStorage.setItem(
+            //   'user',
+            //   JSON.stringify(response?.data?.user),
+            // );
+            setContext(prev => ({
+              ...prev,
+              user: {
+                ...prev.user,
+                expired_at: updatedExpiry,
+                sub_type: response?.data?.user?.sub_type,
+              },
+            }));
+            // setContext({
+            //   ...context,
+            //   // token: context?.token,
+            //   isVerified: true,
+            //   user: {
+            //     ...context?.user,
+            //     expired_at: updatedExpiry
+            //   }
+            // });
             setLoading(false);
             navigation.navigate('Home');
             trackPurchaseEvent(data);

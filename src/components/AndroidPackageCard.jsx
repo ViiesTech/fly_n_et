@@ -17,7 +17,7 @@ const AndroidPackageCard = ({
   isActive,
 }) => {
 
-  alert(isActive)
+  // alert(isActive)
 
   return (
     <TouchableOpacity onPress={onPress} style={[styles.packageStyle, style]}>

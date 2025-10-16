@@ -5,7 +5,7 @@ import MapView, {Marker, Polyline} from 'react-native-maps';
 import {DataContext} from '../utils/Context';
 import Geolocation from '@react-native-community/geolocation';
 import MapViewDirections from 'react-native-maps-directions';
-import { API_KEY } from '../utils/api';
+import { API_KEY, storageUrl } from '../utils/api';
 import { Color } from '../utils/Colors';
 
 const Map2 = ({navigation, route}) => {
@@ -78,7 +78,7 @@ const Map2 = ({navigation, route}) => {
             }}>
             <Image
               source={{
-                uri: `https://praetorstestnet.com/flyneat/${context?.restuarent?.image.path}`,
+                uri: `${storageUrl}/${context?.restuarent?.image.path}`,
               }}
               style={{
                 height: 50,

@@ -9,7 +9,6 @@ import {
   Text,
   Alert,
   Platform,
-  
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -39,7 +38,8 @@ import axios from 'axios';
 import {DataContext} from '../utils/Context';
 import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import WebView from 'react-native-webview';
-import Modal from 'react-native-modal'
+import Modal from 'react-native-modal';
+import { storageUrl } from '../utils/api';
 // const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 
@@ -172,6 +172,13 @@ const Map = ({navigation, route}) => {
     return {newCircleCenter, newRadius};
   };
 
+  console.log('route', route?.params?.restaurants.length);
+  // console.log(
+  //   'filter length',
+  //   route?.params?.restaurants
+  //     ?.filter(val => val?.latitude && val?.longitude),
+  // );
+
   const userRadiusMeters = nauticalMilesToMeters(distance);
 
   // useEffect(() => {
@@ -267,7 +274,7 @@ const Map = ({navigation, route}) => {
   }
 
   return (
-    <View style={{flex:1, }}>
+    <View style={{flex: 1}}>
       <View style={{zIndex: 1}}>
         <BackBtn navigation={navigation} translucent />
       </View>
@@ -517,14 +524,15 @@ const Map = ({navigation, route}) => {
         {route?.params?.restaurants
           ?.filter(val => val?.latitude && val?.longitude)
           ?.map((val, index) => {
-            const Img = isIOS ? Image : WebView;
+            console.log('lat long ===>',val?.title)
+            // const Img = isIOS ? Image : WebView;
             return (
               <>
                 <Marker
                   onPress={() => {
-                    if(Platform.OS === 'android') {
-                      setModalVisible(true)
-                      setRestaurantDetail(val)
+                    if (Platform.OS === 'android') {
+                      setModalVisible(true);
+                      setRestaurantDetail(val);
                     }
                   }}
                   coordinate={{
@@ -534,19 +542,20 @@ const Map = ({navigation, route}) => {
                   // title={val?.title}
 
                   // description={val?.description}
-                  key={index}
+                  key={`${val.id}-${index}`}
                   // image={{uri: `https://praetorstestnet.com/flyneat/${val?.image_path}`}}
                   ref={ref => (markerRefs.current[index] = ref)}>
                   <TouchableOpacity
                     onPress={() => {
-                    if(Platform.OS === 'ios') {  
-                      setModalVisible(true);
-                      setRestaurantDetail(val);
-                    }}}
+                      if (Platform.OS === 'ios') {
+                        setModalVisible(true);
+                        setRestaurantDetail(val);
+                      }
+                    }}
                     style={{alignItems: 'center', justifyContent: 'center'}}>
                     <Image
                       source={{
-                        uri: `https://praetorstestnet.com/flyneat/${val?.image?.path}`,
+                        uri: `${storageUrl}${val?.image?.path}`,
                       }}
                       style={{
                         height: 50,
@@ -621,26 +630,33 @@ const Map = ({navigation, route}) => {
 
       <Modal
         isVisible={modalVisible}
-        style={{flex:1}}
-        onBackdropPress={()=> setModalVisible(false)}
+        style={{flex: 1}}
+        onBackdropPress={() => setModalVisible(false)}
         // transparent
         // animationType="fade"
-        animationIn={"fadeIn"}
-        animationOut={"fadeOut"}
-        >
-        <TouchableOpacity onPress={() => {
-           if (context?.token) {
-            navigation.navigate('RestuarantDetails', {id: restaurantDetail?.id});
-          } else {
-            navigation.navigate('Message', {
-              theme: 'light',
-              title: 'Login Required',
-              message: 'Please log in to continue',
-              screen: 'Login',
-            });
-          }
-          setModalVisible(false)
-        }} style={{ alignItems:'center', justifyContent:'center', backgroundColor:'transparent'}}>
+        animationIn={'fadeIn'}
+        animationOut={'fadeOut'}>
+        <TouchableOpacity
+          onPress={() => {
+            if (context?.token) {
+              navigation.navigate('RestuarantDetails', {
+                id: restaurantDetail?.id,
+              });
+            } else {
+              navigation.navigate('Message', {
+                theme: 'light',
+                title: 'Login Required',
+                message: 'Please log in to continue',
+                screen: 'Login',
+              });
+            }
+            setModalVisible(false);
+          }}
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'transparent',
+          }}>
           <View
             style={{
               width: 250,
@@ -685,10 +701,8 @@ const Map = ({navigation, route}) => {
               </Text>
             )}
           </View>
-          </TouchableOpacity>
-
+        </TouchableOpacity>
       </Modal>
-      
     </View>
   );
 };

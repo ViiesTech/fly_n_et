@@ -34,6 +34,7 @@ import {Dimensions} from 'react-native';
 import Orientation from 'react-native-orientation-locker';
 import {distance} from '@turf/turf';
 import LoaderOverlay from '../components/LoaderOverlay';
+import {useIsFocused} from '@react-navigation/native';
 
 // const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
@@ -46,7 +47,9 @@ const Home = ({navigation}) => {
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
   const [locationLoader, setLocationLoader] = useState(false);
 
-  console.log('context ===>', context?.user?.expired_at);
+  // console.log('sub type is still coming===>', context?.sub_type);
+
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -83,66 +86,128 @@ const Home = ({navigation}) => {
   const Latitude = context?.user?.latitude;
   const longitude = context?.user?.longitude;
 
-  console.log('helo3r', context?.user?.user_info);
+  // console.log('helo3r', context?.user?.user_info);
   // console.log('expiry ',context?.subscribed_details)
 
-useEffect(() => {
-  if (context?.token) {
-    if (!context?.user?.location?.address) {
-      requestLocationPermission();
+  useEffect(() => {
+    if (context?.token) {
+      checkSubscriptionAgain();
     }
+  }, [context?.token, isFocused]);
 
-    checkSubscriptionAgain();
-  }
-}, [context?.token]);
+  useEffect(() => {
+    if (context?.token) {
+      if (!context?.user?.location?.address) {
+        requestLocationPermission();
+      }
 
-const checkSubscriptionAgain = async () => {
-  try {
-    // Step 1: Always call backend to refresh subscription status
-   const subData = await AsyncStorage.getItem('subscribed_details')
-   const updatedData = JSON.parse(subData)
-  //  console.log()  
-    if (updatedData) {
-      const obj = {
-        sub_type: updatedData?.sub_type,
-        purchase_date: updatedData?.purchased_date,
-      };
+      // checkSubscriptionAgain();
+    }
+  }, [context?.token]);
 
-      const response = await api.post("user/subscribe", obj, {
-        headers: { Authorization: `Bearer ${context?.token}` },
+  const checkSubscriptionAgain = async () => {
+    try {
+      // Step 1: Always call backend to refresh subscription status
+      const response = await api.post('user/check-subscribe', '', {
+        headers: {Authorization: `Bearer ${context?.token}`},
       });
-
-      if (
-        response?.data?.status === "success" &&
-        response?.data?.user?.expired_at
-      ) {
-        const updatedExpiry = response.data.user.expired_at;
-        const subType = response.data.user.sub_type
+      console.log('api check ===>', response?.data);
+      if (response?.data?.status === 'success' && response?.data?.expiry_date) {
+        const updatedExpiry = response.data.expiry_date;
 
         // Step 2: Save latest subscription details locally
-        await AsyncStorage.setItem(
-          "subscribed_details",
-          JSON.stringify({
-            ...updatedData,
-            expired_at: updatedExpiry,
-          })
-        );
+        // await AsyncStorage.setItem(
+        //   "subscribed_details",
+        //   JSON.stringify({
+        //     ...updatedData,
+        //     expired_at: updatedExpiry,
+        //   })
+        // );
 
         // Step 3: Update context user with refreshed expiry
         setContext(prev => ({
           ...prev,
-          user: { ...prev.user, expired_at: updatedExpiry,sub_type: subType },
+          user: {...prev.user, expired_at: updatedExpiry},
         }));
 
-        console.log("✅ Subscription refreshed:", updatedExpiry);
+        // console.log("✅ Subscription refreshed:", updatedExpiry);
+      } else {
+        if (context?.sub_type) {
+        //  return alert('without login method')
+          const obj = {
+            sub_type: context?.sub_type,
+          };
+          const response = await api.post('user/subscribe', obj, {
+            headers: {Authorization: `Bearer ${context?.token}`},
+          });
+          console.log('api check ===>', response?.data);
+          if (response?.data?.user?.expired_at) {
+            setContext(prev => ({
+              ...prev,
+              sub_type: null,
+              user: {
+                ...prev.user,
+                expired_at: response?.data?.user?.expired_at,
+                sub_type: response?.data?.user?.sub_type || context?.sub_type
+              },
+            }));
+          }
+        } else {
+          console.log('please subscribe first to enjoy more features');
+        }
       }
-    } else {
-      console.log("⚠️ No subscribed_details found in storage");
+    } catch (error) {
+      console.log('❌ Error refreshing subscription:', error);
     }
-  } catch (error) {
-    console.log("❌ Error refreshing subscription:", error);
-  }
-};
+  };
+
+  // const checkSubscriptionAgain = async () => {
+  //   try {
+  //     // Step 1: Always call backend to refresh subscription status
+  //    const subData = await AsyncStorage.getItem('subscribed_details')
+  //    const updatedData = JSON.parse(subData)
+  //   //  console.log()
+  //     if (updatedData) {
+  //       const obj = {
+  //         sub_type: updatedData?.sub_type,
+  //         // purchase_date: updatedData?.purchased_date,
+  //       };
+
+  //       const response = await api.post("user/subscribe", obj, {
+  //         headers: { Authorization: `Bearer ${context?.token}` },
+  //       });
+
+  //       if (
+  //         response?.data?.status === "success" &&
+  //         response?.data?.user?.expired_at
+  //       ) {
+  //         const updatedExpiry = response.data.user.expired_at;
+  //         const subType = response.data.user.sub_type
+
+  //         // Step 2: Save latest subscription details locally
+  //         await AsyncStorage.setItem(
+  //           "subscribed_details",
+  //           JSON.stringify({
+  //             ...updatedData,
+  //             expired_at: updatedExpiry,
+  //           })
+  //         );
+
+  //         // Step 3: Update context user with refreshed expiry
+  //         setContext(prev => ({
+  //           ...prev,
+  //           user: { ...prev.user, expired_at: updatedExpiry,sub_type: subType },
+  //         }));
+
+  //         console.log("✅ Subscription refreshed:", updatedExpiry);
+  //       }
+  //     } else {
+  //       console.log("⚠️ No subscribed_details found in storage");
+  //     }
+  //   } catch (error) {
+  //     console.log("❌ Error refreshing subscription:", error);
+  //   }
+  // };
   const convertLatLngToAddr = async () => {
     const response = await axios.get(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${Latitude},${longitude}&key=${API_KEY}`,
@@ -167,6 +232,7 @@ const checkSubscriptionAgain = async () => {
   const getLocation = async place_id => {
     const BASE_URL = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${API_KEY}&fields=geometry`;
     const response = await axios.get(BASE_URL);
+    console.log('response', response?.data?.result?.geometry?.location);
     await AsyncStorage.setItem(
       'locationDetails',
       JSON.stringify(response.data?.result?.geometry?.location),
@@ -174,7 +240,11 @@ const checkSubscriptionAgain = async () => {
   };
 
   const onSelectLocation = async value => {
-    await AsyncStorage.setItem('typedLocation', value?.structured_formatting?.main_text);
+    // console.log('lat long ===>',value)
+    await AsyncStorage.setItem(
+      'typedLocation',
+      value?.structured_formatting?.main_text,
+    );
     await AsyncStorage.setItem('selectLocation', JSON.stringify(value));
     getLocation(value?.place_id);
   };
@@ -294,7 +364,7 @@ const checkSubscriptionAgain = async () => {
       },
       err => {
         console.log('Geolocation error: ', err);
-        alert('failed to fetch location')
+        alert('failed to fetch location');
         setLocationLoader(false);
       },
       {
@@ -352,7 +422,7 @@ const checkSubscriptionAgain = async () => {
         <View style={{width: width * 0.6, alignItems: 'center'}}>
           {context?.token &&
             !locationLoader &&
-            context?.user.location?.address && (
+            context?.user.location?.nearest_airport && (
               <>
                 <Small heading font="medium">
                   Home Airport
@@ -365,7 +435,7 @@ const checkSubscriptionAgain = async () => {
                   }}>
                   <Loc size={hp('2%')} color={Color('text')} />
                   <Small heading font="bold" numberOfLines={1}>
-                    {context?.user?.location?.address}
+                    {context?.user?.location?.nearest_airport}
                   </Small>
                 </View>
               </>
@@ -474,6 +544,7 @@ const checkSubscriptionAgain = async () => {
     };
 
     const onClick = val => {
+      console.log('onClick', val);
       onSelectLocation(val);
       setPredictions();
       setSelection(val?.structured_formatting?.main_text);
@@ -657,9 +728,7 @@ const checkSubscriptionAgain = async () => {
         </View>
       </Background>
       <Navigation navigation={navigation} />
-    {locationLoader &&  
-      <LoaderOverlay text={true} visible={locationLoader} />
-      }
+      {locationLoader && <LoaderOverlay text={true} visible={locationLoader} />}
     </>
   );
 };

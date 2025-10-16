@@ -459,7 +459,7 @@ const RestuarantDetails = ({navigation, route}) => {
                             }}>
                             <Image
                               source={{
-                                uri: `https://praetorstestnet.com/flyneat/${context?.restuarent?.image.path}`,
+                                uri: `${storageUrl}/${context?.restuarent?.image.path}`,
                               }}
                               style={{
                                 height: 50,

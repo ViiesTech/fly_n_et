@@ -75,7 +75,9 @@ const Packages = () => {
   const [activeSubscription, setActiveSubscription] = useState(null);
   // const [activeSubscription,setActiveSubscription] = useState(null)
 
-  console.log('active subds', context?.user?.sub_type);
+
+
+  console.log('active subds', context?.user?.expired_at);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -280,19 +282,27 @@ const Packages = () => {
         const updatedExpiry = response?.data?.user?.expired_at;
         if (updatedExpiry) {
           if (context?.token) {
-            await AsyncStorage.setItem('token', context?.token);
-            await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-            await AsyncStorage.setItem(
-              'user',
-              JSON.stringify(response?.data?.user),
-            );
+            // await AsyncStorage.setItem('token', context?.token);
+            // await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+            // await AsyncStorage.setItem(
+            //   'user',
+            //   JSON.stringify(response?.data?.user),
+            // );
             setCodeLoader(false);
-            setContext({
-              ...context,
-              token: context?.token,
-              isVerified: true,
-              user: response?.data?.user,
-            });
+               setContext(prev => ({
+              ...prev,
+              user: {
+                ...prev.user,
+                expired_at: updatedExpiry,
+                sub_type: response?.data?.user?.sub_type
+              },
+            }));
+            // setContext({
+            //   ...context,
+            //   token: context?.token,
+            //   isVerified: true,
+            //   user: response?.data?.user,
+            // });
             navigation.navigate('Home');
           } else {
             setCodeLoader(false);
@@ -411,19 +421,27 @@ const Packages = () => {
           const updatedExpiry = response?.data?.user?.expired_at;
           if (updatedExpiry) {
             if (context?.token) {
-              await AsyncStorage.setItem('token', context?.token);
-              await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-              await AsyncStorage.setItem(
-                'user',
-                JSON.stringify(response?.data?.user),
-              );
+              // await AsyncStorage.setItem('token', context?.token);
+              // await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+              // await AsyncStorage.setItem(
+              //   'user',
+              //   JSON.stringify(response?.data?.user),
+              // );
 
-              setContext({
-                ...context,
-                token: context?.token,
-                isVerified: true,
-                user: response?.data?.user,
-              });
+              // setContext({
+              //   ...context,
+              //   token: context?.token,
+              //   isVerified: true,
+              //   user: response?.data?.user,
+              // });
+                 setContext(prev => ({
+              ...prev,
+              user: {
+                ...prev.user,
+                expired_at: updatedExpiry,
+                sub_type: response?.data?.user?.sub_type
+              },
+            }));
               setLoading(false);
               navigation.navigate('Home');
             } else {

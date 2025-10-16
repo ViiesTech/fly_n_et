@@ -55,7 +55,7 @@ const Login = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [location, setLocation] = useState();
 
-  console.log('user info ==>', context?.user?.user_info);
+  console.log('user info ==>', context?.user?.sub_type);
 
   // useEffect(() => {
   //   const timeout = setTimeout(() => {
@@ -95,7 +95,7 @@ const Login = ({navigation}) => {
   const handlingNavigations = async () => {
     const user = context?.user;
 
-if (!user || !user.user_info) {
+if (!user?.user_info) {
   console.log('Navigating to UserType because profile is missing');
   nextScreen(() => navigation.navigate('UserType'));
 } else { 
@@ -138,17 +138,25 @@ if (!user || !user.user_info) {
           // console.log(response?.data?.user);
           const updatedUser = response?.data?.user;
           if (updatedUser) {
-            await AsyncStorage.setItem('token', context?.token);
-            await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-            await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+            // await AsyncStorage.setItem('token', context?.token);
+            // await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+            // await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
 
-            setContext({
-              ...context,
-              token: context?.token,
-              isVerified: true,
-              user: updatedUser,
-              skipNavigationCheck: false,
-            });
+            // setContext({
+            //   ...context,
+            //   token: context?.token,
+            //   isVerified: true,
+            //   user: updatedUser,
+            //   skipNavigationCheck: false,
+            // });
+               setContext(prev => ({
+          ...prev,
+          user: {
+            ...prev.user,
+            expired_at: response?.data?.user?.expired_at,
+            sub_type: response?.data?.user?.sub_type
+          },
+        }));
             navigation.replace('Home');
           }
           // setApiLoading(false);
@@ -218,21 +226,21 @@ if (isExpired) {
     // Step 1: Try to load from context, otherwise fallback to AsyncStorage
     // let subDetails = context?.subscribed_details;
     // if (!subDetails) {
-    let subDetails;
-      const stored = await AsyncStorage.getItem("subscribed_details");
-    if (!stored) {
-      console.log("⚠️ No subscription details found");
-      return null;
-    }
+    // let subDetails;
+    //   const stored = await AsyncStorage.getItem("subscribed_details");
+    // if (!stored) {
+    //   console.log("⚠️ No subscription details found");
+    //   return null;
+    // }
 
-    subDetails = JSON.parse(stored)
+    // subDetails = JSON.parse(stored)
 
 
 
     // Step 3: Send to backend to validate
     const obj = {
-      sub_type: subDetails.sub_type,
-      purchase_date: subDetails.purchased_date,
+      sub_type: context?.user?.sub_type,
+      // purchase_date: subDetails.purchased_date,
     };
 
     const response = await api.post("user/subscribe", obj, {
@@ -245,19 +253,27 @@ if (isExpired) {
       const updatedExpiry = response.data.user.expired_at;
 
       // Step 4: Save fresh expiry everywhere
-      await AsyncStorage.setItem(
-        "subscribed_details",
-        JSON.stringify({
-          ...subDetails,
-          expired_at: updatedExpiry,
-        })
-      );
+      // await AsyncStorage.setItem(
+      //   "subscribed_details",
+      //   JSON.stringify({
+      //     ...subDetails,
+      //     expired_at: updatedExpiry,
+      //   })
+      // );
 
-      setContext(prev => ({
-        ...prev,
-        subscribed_details: { ...subDetails, expired_at: updatedExpiry },
-        user: { ...prev.user, expired_at: updatedExpiry },
-      }));
+         setContext(prev => ({
+          ...prev,
+          user: {
+            ...prev.user,
+            expired_at: updatedExpiry,
+            sub_type: response?.data?.user?.sub_type
+          },
+        }));
+      // setContext(prev => ({
+      //   ...prev,
+      //   subscribed_details: { ...subDetails, expired_at: updatedExpiry },
+      //   user: { ...prev.user, expired_at: updatedExpiry },
+      // }));
 
       return updatedExpiry;
     }
@@ -509,7 +525,7 @@ if (isExpired) {
           {/* </Animated.View> */}
         </View>
       </Background>
-      <LoaderOverlay visible={api} />
+      {/* <LoaderOverlay visible={api} /> */}
     </>
   );
 };

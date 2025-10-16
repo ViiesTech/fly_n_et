@@ -7,7 +7,7 @@ export const baseUrl = 'https://fly-n-eat.com/admin/api';
 // export const storageUrl = 'https://praetorstestnet.com/flyneat/';
 export const storageUrl = 'https://fly-n-eat.com/admin/'
 export const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
-export const META_APP_ID = '1111969450559335'
+export const META_APP_ID = '1740089953363758'
 export const api = axios.create({
     baseURL: baseUrl,
 });
