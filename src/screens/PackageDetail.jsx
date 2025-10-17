@@ -216,7 +216,7 @@ const PackageDetail = ({route}) => {
       try {
         const purchaseMade = await Purchases.purchasePackage(data);
         // setLoading(true);
-        console.log('response ===>',purchaseMade.customerInfo)
+        // console.log('response ===>',purchaseMade)
 
         // const obj = {
         //   purchase_date: purchaseMade?.transaction?.purchaseDate,
@@ -405,6 +405,7 @@ const PackageDetail = ({route}) => {
             // );
             setContext(prev => ({
               ...prev,
+              transaction_id: transactionId,
               user: {
                 ...prev.user,
                 expired_at: updatedExpiry,
