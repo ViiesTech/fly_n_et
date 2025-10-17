@@ -566,8 +566,14 @@ q
         const customerInfo = await Purchases.restorePurchases();
         console.log(
           'restore',
-          customerInfo.entitlements.active.Premium.productIdentifier,
+          customerInfo,
         );
+         const activeProduct = customerInfo.activeSubscriptions[0];
+
+        const subscriptionData =
+          customerInfo.subscriptionsByProductIdentifier[activeProduct];
+
+        const transactionId = subscriptionData?.storeTransactionId;
         const subType =
           customerInfo.entitlements.active.Premium.productIdentifier ===
           'flyneat_year2'
@@ -596,6 +602,7 @@ q
           // return console.log('first',customerInfo)
           let datatoBeAppend = new FormData();
           datatoBeAppend.append('sub_type', subType);
+          datatoBeAppend.append('transaction_id',transactionId)
           let config = {
             method: 'post',
             maxBodyLength: Infinity,

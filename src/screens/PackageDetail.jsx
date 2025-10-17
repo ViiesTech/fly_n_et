@@ -365,6 +365,7 @@ const PackageDetail = ({route}) => {
   const handlingNavigations = async (transactionId) => {
     // console.log("first", data)
     // return
+    console.log('transaction',transactionId)
     const androidsubtype =
       Platform.OS === 'android' &&
       data?.subscriptionOfferDetails[0]?.basePlanId == 'year'

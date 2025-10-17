@@ -128,11 +128,28 @@ const Home = ({navigation}) => {
           console.log('transaction id does not exist ===>');
         }
       } else {
-        const purchases = await Purchases.getCustomerInfo();
-        console.log('ios customer info ===>',purchases)
-        // const entitlement = purchases.entitlements.active['Premium'];
-        // const transactionId =
-        //   entitlement?.latestPurchase?.transactionIdentifier;
+        const customerInfo = await Purchases.getCustomerInfo();
+        // console.log('ios customer info ===>', customerInfo);
+        const activeProduct = customerInfo.activeSubscriptions[0];
+
+        const subscriptionData =
+          customerInfo.subscriptionsByProductIdentifier[activeProduct];
+
+        const transactionId = subscriptionData?.storeTransactionId;
+         if (transactionId) {
+          let data = {
+            transaction_id: transactionId,
+          };
+          const response = await api.post('assign_id', data, {
+            headers: {Authorization: `Bearer ${context?.token}`},
+          });
+          console.log(
+            'response of assigning transaction id ===>',
+            response?.data,
+          );
+        } else {
+          console.log('transaction id does not exist ===>');
+        }
       }
     } catch (error) {
       console.log('error assignining the transaction id ===>', error);
