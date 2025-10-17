@@ -136,6 +136,8 @@ const Home = ({navigation}) => {
         //  return alert('without login method')
           const obj = {
             sub_type: context?.sub_type,
+            transaction_id: context?.transaction_id
+
           };
           const response = await api.post('user/subscribe', obj, {
             headers: {Authorization: `Bearer ${context?.token}`},
