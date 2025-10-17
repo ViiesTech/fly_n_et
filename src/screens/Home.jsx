@@ -47,7 +47,7 @@ const Home = ({navigation}) => {
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
   const [locationLoader, setLocationLoader] = useState(false);
 
-  // console.log('sub type is still coming===>', context?.sub_type);
+  console.log('sub type is still coming===>', context?.user?.sub_type);
 
   const isFocused = useIsFocused();
 

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Animated, Image, Keyboard, View } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { H5, Small } from '../utils/Text';
@@ -9,9 +9,11 @@ import Btn from '../utils/Btn';
 import Background from '../utils/Background';
 import { drawerInner, drawerStyle } from '../utils/global';
 import { useIsFocused } from '@react-navigation/native';
+import { DataContext } from '../utils/Context';
 
 const UserType = ({ navigation, route }) => {
     const IsFocused = useIsFocused();
+    const {context} = useContext(DataContext)
 
     // const [slideAnimation] = useState(new Animated.Value(hp('100%')));
 

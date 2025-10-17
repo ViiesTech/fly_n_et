@@ -51,7 +51,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoaderOverlay from './src/components/LoaderOverlay';
 import ContactUs from './src/screens/ContactUs';
 import {createStackNavigator} from '@react-navigation/stack';
-import {AppEventsLogger, Settings as settings} from 'react-native-fbsdk-next';
+// import {AppEventsLogger, Settings as settings} from 'react-native-fbsdk-next';
 import { View } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -426,15 +426,15 @@ function MainApp() {
     checkToken();
   }, [context?.token]);
 
-  useEffect(() => {
-    settings.initializeSDK();
-    // settings.setAppID(META_APP_ID);
-    setTimeout(() => {
-      AppEventsLogger.logEvent('fb_mobile_activate_app');
-      // AppEventsLogger.logEvent('IOS')
-      console.log('📡 AppLaunched event sent');
-    }, 2000);
-  }, []);
+  // useEffect(() => {
+  //   settings.initializeSDK();
+  //   // settings.setAppID(META_APP_ID);
+  //   setTimeout(() => {
+  //     AppEventsLogger.logEvent('fb_mobile_activate_app');
+  //     // AppEventsLogger.logEvent('IOS')
+  //     console.log('📡 AppLaunched event sent');
+  //   }, 2000);
+  // }, []);
 
 
   const checkToken = async () => {
@@ -542,7 +542,7 @@ function MainApp() {
           const purchasedDate = premium.latestPurchaseDate;
 
           const token = await AsyncStorage.getItem('token');
-          if (premium.isTrial === true || premium.willRenew === true) {
+          if (premium.isTrial === true) {
           await handlingNavigations(token, subType, purchasedDate);
           }  
         }

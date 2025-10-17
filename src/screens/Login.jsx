@@ -78,7 +78,7 @@ const Login = ({navigation}) => {
     ) {
       Toast.show('Login Successfully', Toast.SHORT);
       // console.log('atleast wrk',context?.user?.expired_at)
-      handlingNavigations();
+      // handlingNavigations();
     } else if (
       !context?.skipNavigationCheck &&
       context?.token &&
@@ -92,103 +92,102 @@ const Login = ({navigation}) => {
     requestLocationPermission();
   }, []);
 
-  const handlingNavigations = async () => {
-    const user = context?.user;
+  const handlingNavigations = async (sub_type, token,userData,transactionId) => {
+    const user = userData || context?.user;
 
-if (!user?.user_info) {
-  console.log('Navigating to UserType because profile is missing');
-  nextScreen(() => navigation.navigate('UserType'));
-} else { 
-    const updatedExpiry = await getSubscriptionInfo();
-    const expiryDate = updatedExpiry
-      ? new Date(updatedExpiry)
-      : context?.user?.expired_at
-      ? new Date(context.user.expired_at)
-      : null;
+    if (!user?.user_info) {
+      console.log('Navigating to UserType because profile is missing');
+      nextScreen(() => navigation.navigate('UserType'));
+    } else {
+      const updatedExpiry = await getSubscriptionInfo(sub_type, token,transactionId);
+      const expiryDate = updatedExpiry
+        ? new Date(updatedExpiry)
+        : context?.user?.expired_at
+        ? new Date(context.user.expired_at)
+        : null;
 
-    const currentDate = new Date();
+      const currentDate = new Date();
 
-    const isPremium = await AsyncStorage.getItem('isPremium');
-    // const isPremiumParsed = JSON.parse(isPremium);
+      const isPremium = await AsyncStorage.getItem('isPremium');
+      // const isPremiumParsed = JSON.parse(isPremium);
 
-    console.log('is premium', isPremium);
+      console.log('is premium', isPremium);
 
-    const isExpired = !expiryDate || currentDate > expiryDate;
+      const isExpired = !expiryDate || currentDate > expiryDate;
 
-    console.log('isExpired', isExpired);
+      console.log('isExpired', isExpired);
 
-    if (Platform.OS === 'ios' && isPremium) {
-      if (isPremium) {
-        try {
-          const iosSubType = 'monthly';
-          const formData = new FormData();
-          formData.append('sub_type', iosSubType);
-          setApiLoading(true);
-          await AsyncStorage.removeItem('isPremium');
-          const response = await axios.post(
-            `${baseUrl}/user/subscribe`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${context?.token}`,
-                'Content-Type': 'multipart/form-data',
+      if (Platform.OS === 'ios' && isPremium) {
+        // alert('premium true tou nhi hai')
+        if (isPremium) {
+          try {
+            const iosSubType = 'monthly';
+            const formData = new FormData();
+            formData.append('sub_type', iosSubType);
+            setApiLoading(true);
+            await AsyncStorage.removeItem('isPremium');
+            const response = await axios.post(
+              `${baseUrl}/user/subscribe`,
+              formData,
+              {
+                headers: {
+                  Authorization: `Bearer ${context?.token}`,
+                  'Content-Type': 'multipart/form-data',
+                },
               },
-            },
-          );
-          // console.log(response?.data?.user);
-          const updatedUser = response?.data?.user;
-          if (updatedUser) {
-            // await AsyncStorage.setItem('token', context?.token);
-            // await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-            // await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+            );
+            // console.log(response?.data?.user);
+            const updatedUser = response?.data?.user;
+            if (updatedUser) {
+              // await AsyncStorage.setItem('token', context?.token);
+              // await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+              // await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
 
-            // setContext({
-            //   ...context,
-            //   token: context?.token,
-            //   isVerified: true,
-            //   user: updatedUser,
-            //   skipNavigationCheck: false,
-            // });
-               setContext(prev => ({
-          ...prev,
-          user: {
-            ...prev.user,
-            expired_at: response?.data?.user?.expired_at,
-            sub_type: response?.data?.user?.sub_type
-          },
-        }));
-            navigation.replace('Home');
+              // setContext({
+              //   ...context,
+              //   token: context?.token,
+              //   isVerified: true,
+              //   user: updatedUser,
+              //   skipNavigationCheck: false,
+              // });
+              setContext(prev => ({
+                ...prev,
+                user: {
+                  ...prev.user,
+                  expired_at: response?.data?.user?.expired_at,
+                  sub_type: response?.data?.user?.sub_type,
+                },
+              }));
+              navigation.replace('Home');
+            }
+            // setApiLoading(false);
+            return;
+          } catch (error) {
+            console.log('Error updating free trial to subscription:', error);
+          } finally {
+            setApiLoading(false);
           }
-          // setApiLoading(false);
-          return;
-        } catch (error) {
-          console.log('Error updating free trial to subscription:', error);
-        } finally {
-          setApiLoading(false);
         }
       }
+
+      if (isExpired) {
+        console.log('check the expiry');
+        nextScreen(() => navigation.navigate('Packages'));
+      } else {
+        nextScreen(() => navigation.replace('Home'));
+      }
+
+      setContext(prev => ({
+        ...prev,
+        skipNavigationCheck: false,
+      }));
     }
-  
-
-
-if (isExpired) {
-  console.log('check the expiry');
-  nextScreen(() => navigation.navigate('Packages'));
-} else {
-  nextScreen(() => navigation.replace('Home'));
-}
-
-    setContext(prev => ({
-      ...prev,
-      skipNavigationCheck: false,
-    }));
   };
-}
 
   // const getSubscriptionInfo = async () => {
   //   console.log('subscriptiom',context?.subscribed_details)
   //   if (!context?.subscribed_details) return null;
-    
+
   //   try {
   //     const obj = {
   //       sub_type: context.subscribed_details.sub_type,
@@ -221,68 +220,70 @@ if (isExpired) {
   //   return null;
   // };
 
-  const getSubscriptionInfo = async () => {
-  try {
-    // Step 1: Try to load from context, otherwise fallback to AsyncStorage
-    // let subDetails = context?.subscribed_details;
-    // if (!subDetails) {
-    // let subDetails;
-    //   const stored = await AsyncStorage.getItem("subscribed_details");
-    // if (!stored) {
-    //   console.log("⚠️ No subscription details found");
-    //   return null;
-    // }
+  const getSubscriptionInfo = async (sub_type, token,transactionId) => {
+    try {
+      // Step 1: Try to load from context, otherwise fallback to AsyncStorage
+      // let subDetails = context?.subscribed_details;
+      // if (!subDetails) {
+      // let subDetails;
+      //   const stored = await AsyncStorage.getItem("subscribed_details");
+      // if (!stored) {
+      //   console.log("⚠️ No subscription details found");
+      //   return null;
+      // }
 
-    // subDetails = JSON.parse(stored)
+      // subDetails = JSON.parse(stored)
 
+      // Step 3: Send to backend to validate
+      const obj = {
+        sub_type: sub_type,
+        transaction_id: transactionId
+        // purchase_date: subDetails.purchased_date,
+      };
 
+      const response = await api.post('user/subscribe', obj, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    // Step 3: Send to backend to validate
-    const obj = {
-      sub_type: context?.user?.sub_type,
-      // purchase_date: subDetails.purchased_date,
-    };
+      if (
+        response?.data?.status === 'success' &&
+        response?.data?.user?.expired_at
+      ) {
+        const updatedExpiry = response.data.user.expired_at;
 
-    const response = await api.post("user/subscribe", obj, {
-      headers: {
-        Authorization: `Bearer ${context?.token}`,
-      },
-    });
+        // Step 4: Save fresh expiry everywhere
+        // await AsyncStorage.setItem(
+        //   "subscribed_details",
+        //   JSON.stringify({
+        //     ...subDetails,
+        //     expired_at: updatedExpiry,
+        //   })
+        // );
 
-    if (response?.data?.status === "success" && response?.data?.user?.expired_at) {
-      const updatedExpiry = response.data.user.expired_at;
+        // setContext(prev => ({
+        //   ...prev,
+        //   user: {
+        //     ...prev.user,
+        //     expired_at: updatedExpiry,
+        //     sub_type: response?.data?.user?.sub_type,
+        //   },
+        // }));
+        // // setContext(prev => ({
+        //   ...prev,
+        //   subscribed_details: { ...subDetails, expired_at: updatedExpiry },
+        //   user: { ...prev.user, expired_at: updatedExpiry },
+        // }));
 
-      // Step 4: Save fresh expiry everywhere
-      // await AsyncStorage.setItem(
-      //   "subscribed_details",
-      //   JSON.stringify({
-      //     ...subDetails,
-      //     expired_at: updatedExpiry,
-      //   })
-      // );
-
-         setContext(prev => ({
-          ...prev,
-          user: {
-            ...prev.user,
-            expired_at: updatedExpiry,
-            sub_type: response?.data?.user?.sub_type
-          },
-        }));
-      // setContext(prev => ({
-      //   ...prev,
-      //   subscribed_details: { ...subDetails, expired_at: updatedExpiry },
-      //   user: { ...prev.user, expired_at: updatedExpiry },
-      // }));
-
-      return updatedExpiry;
+        return updatedExpiry;
+      }
+    } catch (err) {
+      console.error('Error fetching subscription info:', err);
     }
-  } catch (err) {
-    console.error("Error fetching subscription info:", err);
-  }
 
-  return null;
-};
+    return null;
+  };
 
   async function requestLocationPermission() {
     try {
@@ -316,38 +317,40 @@ if (isExpired) {
     //   maximumAge: 10000,
     // });
     Geolocation.getCurrentPosition(
-  async (pos) => {
-    console.log("Position received: ", pos);
-    const crd = pos.coords;
-    
-    const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`);
-    const data = response?.data;
-    const locationName = data?.results[0]?.formatted_address;
-    
-    console.log("Location Name: ", locationName);
-    if (locationName) {
-      setLocation({
-        latitude: crd?.latitude,
-        longitude: crd?.longitude,
-        latitudeDelta: 0.0421,
-        longitudeDelta: 0.0421,
-        locationName,
-      });
-    } else {
-      console.log("Could not get address from lat/lng");
-    }
-  },
-  (err) => {
-    console.log('Geolocation error: ', err);
-  },
-  {
-    enableHighAccuracy: true,
-    timeout: 15000,
-    maximumAge: 10000,
-    forceRequestLocation: true,
-    showLocationDialog: true,
-  }
-);
+      async pos => {
+        console.log('Position received: ', pos);
+        const crd = pos.coords;
+
+        const response = await axios.get(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`,
+        );
+        const data = response?.data;
+        const locationName = data?.results[0]?.formatted_address;
+
+        console.log('Location Name: ', locationName);
+        if (locationName) {
+          setLocation({
+            latitude: crd?.latitude,
+            longitude: crd?.longitude,
+            latitudeDelta: 0.0421,
+            longitudeDelta: 0.0421,
+            locationName,
+          });
+        } else {
+          console.log('Could not get address from lat/lng');
+        }
+      },
+      err => {
+        console.log('Geolocation error: ', err);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        forceRequestLocation: true,
+        showLocationDialog: true,
+      },
+    );
     // Geolocation.getCurrentPosition(
     //   async pos => {
     //     const crd = pos.coords;
@@ -407,12 +410,28 @@ if (isExpired) {
         await AsyncStorage.setItem('user', JSON.stringify(res?.data?.user));
       }
 
-      setContext(prev => ({
-        ...prev,
-        token: res?.data?.token,
-        isVerified: res?.data?.verified ? true : false,
-        user: res?.data?.user,
-      }));
+      const localSubType = context?.sub_type;
+      const transactionId = context?.transaction_id
+      const apiSubType = res?.data?.user?.sub_type;
+      let finalSubType = apiSubType;
+      if (localSubType && apiSubType && apiSubType !== localSubType) {
+       const updatedExpiry = await getSubscriptionInfo(localSubType, res?.data?.token,transactionId);
+        setContext(prev => ({
+          ...prev,
+          token: res?.data?.token,
+          isVerified: res?.data?.verified ? true : false,
+          user: {...res?.data?.user, expired_at: updatedExpiry, sub_type: localSubType},
+        }));
+        finalSubType = localSubType;
+      } else {
+        setContext(prev => ({
+          ...prev,
+          token: res?.data?.token,
+          isVerified: res?.data?.verified ? true : false,
+          user: {...res?.data?.user, sub_type: finalSubType},
+        }));
+      }
+      handlingNavigations(finalSubType, res?.data?.token,res?.data?.user,transactionId);
     } catch (err) {
       await errHandler(err, null, navigation);
     } finally {
@@ -436,12 +455,11 @@ if (isExpired) {
       <Background noScroll={true} translucent={true}>
         <View style={{height: hp(100), justifyContent: 'space-between'}}>
           <View />
-            <KeyboardAvoidingView
-              behavior={'padding'}>
-          <View style={drawerStyle}>
-            {/* <Animated.View
+          <KeyboardAvoidingView behavior={'padding'}>
+            <View style={drawerStyle}>
+              {/* <Animated.View
             style={[{transform: [{translateY: slideAnimation}]}, drawerStyle]}> */}
-            {/* <KeyboardAvoidingView behavior='padding'>                */}
+              {/* <KeyboardAvoidingView behavior='padding'>                */}
               {/* Place the Background and ScrollView inside here */}
               <ScrollView
                 keyboardShouldPersistTaps={'handled'}
@@ -519,9 +537,9 @@ if (isExpired) {
                 </TouchableOpacity>
               </ScrollView>
 
-            {/* </KeyboardAvoidingView> */}
-          </View>
-            </KeyboardAvoidingView>
+              {/* </KeyboardAvoidingView> */}
+            </View>
+          </KeyboardAvoidingView>
           {/* </Animated.View> */}
         </View>
       </Background>

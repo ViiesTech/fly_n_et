@@ -29,6 +29,7 @@ import {
   flushFailedPurchasesCachedAsPendingAndroid,
   getSubscriptions,
   presentCodeRedemptionSheetIOS,
+  getAvailablePurchases,
 } from 'react-native-iap';
 import AndroidPackageCard from '../components/AndroidPackageCard';
 import {baseUrl, note} from '../utils/api';
@@ -38,6 +39,8 @@ import Orientation from 'react-native-orientation-locker';
 import {Dimensions} from 'react-native';
 import {trackOfferRedemption} from '../utils/global';
 import moment from 'moment';
+import Btn from '../utils/Btn';
+import LoaderOverlay from '../components/LoaderOverlay';
 
 // const packages = [
 //   {
@@ -60,6 +63,7 @@ const Packages = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const {context, setContext} = useContext(DataContext);
+  const [restoreLoader, setRestoreLoader] = useState(false);
 
   const isAndroid = Platform.OS === 'android'; // check platform is android or not
 
@@ -73,11 +77,11 @@ const Packages = () => {
   const [width, setScreenWidth] = useState(Dimensions.get('window').width);
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
   const [activeSubscription, setActiveSubscription] = useState(null);
+  const [currentPurchase, setCurrentPurchase] = useState(null);
   // const [activeSubscription,setActiveSubscription] = useState(null)
 
-
-
   console.log('active subds', context?.user?.expired_at);
+  // console.log('current purchase',currentPurchase)
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -111,8 +115,12 @@ const Packages = () => {
   const androidsubscriptionsId = ['flyneat_month', 'flyneat_year2'];
 
   useEffect(() => {
+    strictToPurchaseMonthlyYearlyExist();
+  }, []);
+
+  useEffect(() => {
     if (context?.user?.expired_at) {
-      const isActive = moment().isBefore(moment(context.user.expired_at))
+      const isActive = moment().isBefore(moment(context.user.expired_at));
       if (isActive) {
         // alert('active')
         setActiveSubscription(context.user.sub_type);
@@ -127,7 +135,7 @@ const Packages = () => {
       const setupRevenueCat = async () => {
         try {
           const offerings = await Purchases.getOfferings();
-          // console.log(offerings.current.availablePackages)
+          console.log(offerings.current.availablePackages);
           if (offerings.current) {
             setOfferings(offerings.current.availablePackages);
           }
@@ -194,6 +202,23 @@ const Packages = () => {
   //     }
   //   }
   // }, []);
+
+  const strictToPurchaseMonthlyYearlyExist = async () => {
+    if (Platform.OS === 'ios') {
+      const customerInfo = await Purchases.restorePurchases();
+      const subType =
+        customerInfo.entitlements.active.Premium.productIdentifier ===
+        'flyneat_year2'
+          ? 'yearly'
+          : 'monthly';
+      setCurrentPurchase(subType);
+    } else {
+      const purchases = await getAvailablePurchases();
+      const subType =
+        purchases[0].productId === 'flyneat_year2' ? 'yearly' : 'monthly';
+      setCurrentPurchase(subType);
+    }
+  };
 
   // To get Subscription information
   const getSubscriptionInfo = async () => {
@@ -289,12 +314,12 @@ const Packages = () => {
             //   JSON.stringify(response?.data?.user),
             // );
             setCodeLoader(false);
-               setContext(prev => ({
+            setContext(prev => ({
               ...prev,
               user: {
                 ...prev.user,
                 expired_at: updatedExpiry,
-                sub_type: response?.data?.user?.sub_type
+                sub_type: response?.data?.user?.sub_type,
               },
             }));
             // setContext({
@@ -339,16 +364,17 @@ const Packages = () => {
 
       const customerInfoListener = async customerInfo => {
         const newEntitlement = customerInfo.entitlements.active['Premium'];
-
+q 
         if (
           newEntitlement &&
           newEntitlement.productIdentifier !==
             prevEntitlement?.productIdentifier
         ) {
+          const subType = newEntitlement.productIdentifier === 'flyneat_year2' ? 'yearly' : 'monthly'
           console.log('Entitlement changed via offer code!');
           isHandled = true;
           Purchases.removeCustomerInfoUpdateListener(customerInfoListener);
-          await handlingNavigations();
+          await handlingNavigations(subType);
         }
       };
 
@@ -360,10 +386,12 @@ const Packages = () => {
           // setLoading(true)
           const latestInfo = await Purchases.getCustomerInfo();
           const latestEntitlement = latestInfo.entitlements.active['Premium'];
-          // console.log('latest info', latestEntitlement.periodType);
+          // console.log('latest info', latestEntitlement.);
+          const subType = latestEntitlement?.productIdentifier === 'flyneat_year2' ? 'yearly' : 'monthly'
+          // const transactionId = latestInfo.
           if (latestEntitlement?.periodType === 'TRIAL') {
             console.log('Entitlement changed after delay fallback');
-            await handlingNavigations();
+            await handlingNavigations(subType);
           } else {
             console.log(
               'No entitlement change — likely canceled or invalid code',
@@ -381,7 +409,7 @@ const Packages = () => {
     }
   };
 
-  const handlingNavigations = async () => {
+  const handlingNavigations = async (subType) => {
     // console.log("first", data)
     // return
     if (!context?.token) {
@@ -398,7 +426,7 @@ const Packages = () => {
     } else {
       setLoading(true);
       await AsyncStorage.removeItem('isPremium');
-      const iosSubType = 'monthly';
+      const iosSubType = subType;
       // return console.log('hello world',iosSubType)
       let datatoBeAppend = new FormData();
       datatoBeAppend.append('sub_type', iosSubType);
@@ -434,14 +462,14 @@ const Packages = () => {
               //   isVerified: true,
               //   user: response?.data?.user,
               // });
-                 setContext(prev => ({
-              ...prev,
-              user: {
-                ...prev.user,
-                expired_at: updatedExpiry,
-                sub_type: response?.data?.user?.sub_type
-              },
-            }));
+              setContext(prev => ({
+                ...prev,
+                user: {
+                  ...prev.user,
+                  expired_at: updatedExpiry,
+                  sub_type: response?.data?.user?.sub_type,
+                },
+              }));
               setLoading(false);
               navigation.navigate('Home');
             } else {
@@ -453,6 +481,170 @@ const Packages = () => {
           console.log(error);
           setLoading(false);
         });
+    }
+  };
+
+  const onRestorePurchase = async () => {
+    if (Platform.OS == 'android') {
+      setRestoreLoader(true);
+      try {
+        const purchases = await getAvailablePurchases();
+        console.log('purchases', purchases);
+        const subType =
+          purchases[0].productId === 'flyneat_year2' ? 'yearly' : 'monthly';
+        // console.log(subType)
+        // if (purchases.length > 0 && !context.token) {
+        //   navigation.navigate('Message', {
+        //     theme: 'light',
+        //     title: 'Login Required',
+        //     message:
+        //       'To access your subscription benefits, please create or log in to your account',
+        //     screen: 'Login',
+        //   });
+        //   setContext(prev => ({
+        //     ...prev,
+        //     sub_type: subType,
+        //   }));
+        // }
+        if (purchases.length > 0 && context?.token) {
+          let datatoBeAppend = new FormData();
+          datatoBeAppend.append('sub_type', subType);
+          let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${baseUrl}/user/subscribe`,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              Authorization: `Bearer ${context.token}`,
+              'Content-Type': 'multipart/form-data',
+            },
+            data: datatoBeAppend,
+          };
+
+          axios
+            .request(config)
+            .then(async response => {
+              const updatedExpiry = response?.data?.user?.expired_at;
+              // alert(response)
+              console.log('response ===>', response?.data);
+              if (updatedExpiry) {
+                setContext(prev => ({
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    expired_at: updatedExpiry,
+                    sub_type: response?.data?.user?.sub_type,
+                  },
+                }));
+                setRestoreLoader(false);
+                navigation.navigate('Home');
+                note(
+                  'Purchases Restored!',
+                  'Your subscription has been restored successfully',
+                );
+              }
+            })
+            .catch(error => {
+              console.log(error);
+              setRestoreLoader(false);
+            });
+        } else {
+          note(
+            'Please buy the subscription',
+            'You have to buy the subscription first to continue',
+          );
+        }
+      } catch (e) {
+        console.error('Failed to restore purchases:', e);
+      } finally {
+        setRestoreLoader(false);
+      }
+    } else {
+      setRestoreLoader(true);
+      try {
+        const customerInfo = await Purchases.restorePurchases();
+        console.log(
+          'restore',
+          customerInfo.entitlements.active.Premium.productIdentifier,
+        );
+        const subType =
+          customerInfo.entitlements.active.Premium.productIdentifier ===
+          'flyneat_year2'
+            ? 'yearly'
+            : 'monthly';
+        // if (
+        //   Object.keys(customerInfo.entitlements.active).length > 0 &&
+        //   !context?.token
+        // ) {
+        //   navigation.navigate('Message', {
+        //     theme: 'light',
+        //     title: 'Login Required',
+        //     message:
+        //       'To access your subscription benefits, please rcreate or log in to your account',
+        //     screen: 'Login',
+        //   });
+        //   setContext(prev => ({
+        //     ...prev,
+        //     sub_type: subType,
+        //   }));
+        // }
+        if (
+          Object.keys(customerInfo.entitlements.active).length > 0 &&
+          context?.token
+        ) {
+          // return console.log('first',customerInfo)
+          let datatoBeAppend = new FormData();
+          datatoBeAppend.append('sub_type', subType);
+          let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${baseUrl}/user/subscribe`,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              Authorization: `Bearer ${context.token}`,
+              'Content-Type': 'multipart/form-data',
+            },
+            data: datatoBeAppend,
+          };
+
+          axios
+            .request(config)
+            .then(async response => {
+              const updatedExpiry = response?.data?.user?.expired_at;
+              // alert(response)
+              console.log('response ===>', response?.data);
+              if (updatedExpiry) {
+                setContext(prev => ({
+                  ...prev,
+                  user: {
+                    ...prev.user,
+                    expired_at: updatedExpiry,
+                    sub_type: response?.data?.user?.sub_type,
+                  },
+                }));
+                setRestoreLoader(false);
+                navigation.navigate('Home');
+                note(
+                  'Purchases Restored!',
+                  'Your subscription has been restored successfully',
+                );
+              }
+            })
+            .catch(error => {
+              console.log(error);
+              setRestoreLoader(false);
+            });
+        } else {
+          note(
+            'Please buy the subscription',
+            'You have to buy the subscription first to continue',
+          );
+        }
+      } catch (e) {
+        console.error('Failed to restore purchases:', e);
+      } finally {
+        setRestoreLoader(false);
+      }
     }
   };
 
@@ -553,6 +745,7 @@ const Packages = () => {
                   return (
                     <AndroidPackageCard
                       // isActive={activeSubscription === item.productId}
+                      disabled={currentPurchase === 'yearly' && true}
                       isActive={
                         (activeSubscription === 'monthly' &&
                           item.productId === 'flyneat_month') ||
@@ -590,16 +783,31 @@ const Packages = () => {
                       date={moment(context?.user?.expired_at).format(
                         'DD-MM-YYYY',
                       )}
-                      onPress={() =>
-                        navigation.navigate('PackageDetail', {detail: item})
-                      }
+                      // disabled={currentPurchase === 'yearly' && true}
+                      onPress={() => {
+                        navigation.navigate('PackageDetail', {detail: item});
+                      }}
                       style={{marginBottom: hp(2)}}
-                      package_name={item.packageType === 'ANNUAL' ? 'Yearly' : 'Monthly'}
+                      package_name={
+                        item.packageType === 'ANNUAL' ? 'Yearly' : 'Monthly'
+                      }
                       price={item.product.priceString}
                     />
                   );
                 })}
               </>
+            )}
+            {context?.token && (
+              <Btn
+                label={'Restore Purchase'}
+                onPress={() => onRestorePurchase()}
+                btnStyle={{
+                  backgroundColor: Color('drawerBg'),
+                  width: '90%',
+                  alignSelf: 'center',
+                  marginTop: hp(1),
+                }}
+              />
             )}
           </View>
           {Platform.OS === 'ios' ? (
@@ -737,6 +945,7 @@ const Packages = () => {
           </View>
         )}
       </Background>
+      <LoaderOverlay visible={restoreLoader} />
     </SafeAreaView>
   );
 };

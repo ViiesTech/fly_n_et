@@ -166,7 +166,7 @@ const PackageDetail = ({route}) => {
                 'To access your subscription benefits, please create or log in to your account',
               screen: 'Login',
             });
-            trackPurchaseEvent(data);
+            // trackPurchaseEvent(data);
           } else {
             if (context.token) {
               console.log('going in navigatii func');
@@ -216,6 +216,7 @@ const PackageDetail = ({route}) => {
       try {
         const purchaseMade = await Purchases.purchasePackage(data);
         // setLoading(true);
+        console.log('response ===>',purchaseMade.customerInfo)
 
         // const obj = {
         //   purchase_date: purchaseMade?.transaction?.purchaseDate,
@@ -234,12 +235,12 @@ const PackageDetail = ({route}) => {
               'To access your subscription benefits, please create or log in to your account',
             screen: 'Login',
           });
-          trackPurchaseEvent(data);
+          // trackPurchaseEvent(data);
         } else {
           if (context.token) {
             setLoading(false);
             console.log('going in navigatii func');
-            await handlingNavigations();
+            await handlingNavigations(purchaseMade.transaction.transactionIdentifier);
             return;
           }
         }
@@ -257,6 +258,7 @@ const PackageDetail = ({route}) => {
           ...prev,
           // expired_at: updatedExpiry,
           sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
+          transaction_id: purchaseMade?.transaction.transactionIdentifier
         }));
         // await AsyncStorage.setItem(
         //   'subscribed_details',
@@ -279,74 +281,84 @@ const PackageDetail = ({route}) => {
     }
   };
 
-  const onRestorePurchase = async () => {
-    if (Platform.OS == 'android') {
-      setLoading(true);
-      try {
-        // const purchases = await RNIap.getAvailablePurchases();
-        const purchases = await getAvailablePurchases();
-        console.log('purchases', purchases); // get current available purchases
+  // const onRestorePurchase = async () => {
+  //   if (Platform.OS == 'android') {
+  //     setLoading(true);
+  //     try {
+  //       // const purchases = await RNIap.getAvailablePurchases();
+  //       const purchases = await getAvailablePurchases();
+  //       console.log('purchases', purchases); // get current available purchases
 
-        if (purchases.length > 0) {
-          navigation.navigate('Message', {
-            theme: 'light',
-            title: 'Login Required',
-            message:
-              'To access your subscription benefits, please create or log in to your account',
-            screen: 'Login',
-          });
-        } else {
-          note(
-            'Please buy the subscription',
-            'You have to buy the subscription first to continue',
-          );
-        }
-      } catch (e) {
-        console.error('Failed to restore purchases:', e);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      setLoading(true);
-      try {
-        const customerInfo = await Purchases.restorePurchases();
-        console.log('restore', customerInfo.entitlements.active);
-        if (
-          Object.keys(customerInfo.entitlements.active).length > 0 &&
-          !context?.token
-        ) {
-          // note('Purchases Restored!', 'Your subscription has been restored successfully');
-          navigation.navigate('Message', {
-            theme: 'light',
-            title: 'Login Required',
-            message:
-              'To access your subscription benefits, please create or log in to your account',
-            screen: 'Login',
-          });
-          // navigation.replace('Home');
-        } else if (
-          Object.keys(customerInfo.entitlements.active).length > 0 &&
-          context?.token
-        ) {
-          note(
-            'Purchases Restored!',
-            'Your subscription has been restored successfully',
-          );
-        } else {
-          note(
-            'Please buy the subscription',
-            'You have to buy the subscription first to continue',
-          );
-        }
-      } catch (e) {
-        console.error('Failed to restore purchases:', e);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
+  //       if (purchases.length > 0) {
+  //         navigation.navigate('Message', {
+  //           theme: 'light',
+  //           title: 'Login Required',
+  //           message:
+  //             'To access your subscription benefits, please create or log in to your account',
+  //           screen: 'Login',
+  //         });
+          
+  //       } else {
+  //         note(
+  //           'Please buy the subscription',
+  //           'You have to buy the subscription first to continue',
+  //         );
+  //       }
+  //     } catch (e) {
+  //       console.error('Failed to restore purchases:', e);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   } else {
+  //     setLoading(true);
+  //     try {
+  //       const customerInfo = await Purchases.restorePurchases();
+  //       console.log('restore', customerInfo.entitlements.active.Premium.productIdentifier);
+  //       if (
+  //         Object.keys(customerInfo.entitlements.active).length > 0 &&
+  //         !context?.token
+  //       ) {
+  //         const subType = customerInfo.entitlements.active.Premium.productIdentifier
+  //         return
+  //         // return console.log('first', customerInfo.entitlements.active.Premium.productIdentifier)
+  //         // note('Purchases Restored!', 'Your subscription has been restored successfully');
+  //         navigation.navigate('Message', {
+  //           theme: 'light',
+  //           title: 'Login Required',
+  //           message:
+  //             'To access your subscription benefits, please rcreate or log in to your account',
+  //           screen: 'Login',
+  //         });
+  //       //        setContext(prev => ({
+  //       //   ...prev,
+  //       //   // expired_at: updatedExpiry,
+  //       //   sub_type: 
+  //       // }));
+  //         // navigation.replace('Home');
+  //       } else if (
+  //         Object.keys(customerInfo.entitlements.active).length > 0 &&
+  //         context?.token
+  //       ) {
+  //         return console.log('first',customerInfo)
+  //         note(
+  //           'Purchases Restored!',
+  //           'Your subscription has been restored successfully',
+  //         );
+  //       } else {
+  //         note(
+  //           'Please buy the subscription',
+  //           'You have to buy the subscription first to continue',
+  //         );
+  //       }
+  //     } catch (e) {
+  //       console.error('Failed to restore purchases:', e);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  // };
 
-  const handlingNavigations = async () => {
+  const handlingNavigations = async (transactionId) => {
     // console.log("first", data)
     // return
     const androidsubtype =
@@ -364,6 +376,7 @@ const PackageDetail = ({route}) => {
       'sub_type',
       Platform.OS == 'android' ? androidsubtype : iosSubType,
     );
+    datatoBeAppend.append('transaction_id',Platform.OS === 'ios' && transactionId)
 
     let config = {
       method: 'post',
@@ -409,7 +422,7 @@ const PackageDetail = ({route}) => {
             // });
             setLoading(false);
             navigation.navigate('Home');
-            trackPurchaseEvent(data);
+            // trackPurchaseEvent(data);
           } else {
             setLoading(false);
           }
@@ -476,7 +489,7 @@ const PackageDetail = ({route}) => {
               onPress={() => onConfirmPurchase()}
               btnStyle={{backgroundColor: Color('drawerBg'), width: '90%'}}
             />
-            <Btn
+            {/* <Btn
               label={'Restore Purchase'}
               onPress={() => onRestorePurchase()}
               btnStyle={{
@@ -484,7 +497,7 @@ const PackageDetail = ({route}) => {
                 width: '90%',
                 marginTop: hp(1),
               }}
-            />
+            /> */}
           </View>
         </>
       ) : (
@@ -531,7 +544,7 @@ const PackageDetail = ({route}) => {
               onPress={() => onConfirmPurchase()}
               btnStyle={{backgroundColor: Color('drawerBg'), width: '90%'}}
             />
-            <Btn
+            {/* <Btn
               label={'Restore Purchase'}
               onPress={() => onRestorePurchase()}
               btnStyle={{
@@ -539,7 +552,7 @@ const PackageDetail = ({route}) => {
                 width: '90%',
                 marginTop: hp(1),
               }}
-            />
+            /> */}
             <LoaderOverlay visible={loading} />
           </View>
         </>

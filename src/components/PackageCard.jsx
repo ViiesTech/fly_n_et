@@ -4,10 +4,10 @@ import { Color } from '../utils/Colors'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import { ArrowRight2 } from 'iconsax-react-native';
 
-const PackageCard = ({ package_name, price, type, style, onPress, isActive, date }) => {
+const PackageCard = ({ package_name, price, type, style, onPress, isActive, date,disabled }) => {
   console.log('isActive ===>',isActive)
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.packageStyle, style]}>
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.packageStyle, style]}>
       
       <View style={styles.topRow}>
         <View style={styles.leftRow}>

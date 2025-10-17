@@ -74,7 +74,7 @@ const Verify = ({ navigation }) => {
         isVerified: res?.data?.verified ? true : false,
         user: res?.data?.user,
       });
-      trackCompleteRegisterationEvent()
+      // trackCompleteRegisterationEvent()
     } catch (err) {
       await errHandler(err, null, navigation);
     } finally {

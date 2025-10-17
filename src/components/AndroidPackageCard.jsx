@@ -15,12 +15,13 @@ const AndroidPackageCard = ({
   style,
   onPress,
   isActive,
+  disabled
 }) => {
 
   // alert(isActive)
 
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.packageStyle, style]}>
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.packageStyle, style]}>
       {/* Left Side */}
       <View style={styles.topRow}>
         <View style={styles.leftRow}>
