@@ -155,6 +155,9 @@ const PackageDetail = ({route}) => {
         });
         // setLoading(true)
         const purchase = purchaseData?.[0];
+        const parseOrder = JSON.parse(purchase.dataAndroid)
+        const orderId = parseOrder?.orderId
+        console.log('orderId ===>',orderId)
 
         if (purchase.transactionDate && !purchase?.isAcknowledgedAndroid) {
           // return alert('hello')
@@ -170,7 +173,7 @@ const PackageDetail = ({route}) => {
           } else {
             if (context.token) {
               console.log('going in navigatii func');
-              await handlingNavigations();
+              await handlingNavigations(orderId);
               return;
             }
           }
@@ -184,6 +187,7 @@ const PackageDetail = ({route}) => {
             ...prev,
             sub_type: subType,
             skipNavigationCheck: false,
+            transaction_id: orderId
           }));
 
           // setContext({
@@ -376,7 +380,7 @@ const PackageDetail = ({route}) => {
       'sub_type',
       Platform.OS == 'android' ? androidsubtype : iosSubType,
     );
-    datatoBeAppend.append('transaction_id',Platform.OS === 'ios' && transactionId)
+    datatoBeAppend.append('transaction_id',transactionId)
 
     let config = {
       method: 'post',
@@ -396,6 +400,7 @@ const PackageDetail = ({route}) => {
         const updatedExpiry = response?.data?.user?.expired_at;
         console.log('response ===>', response?.data);
         if (updatedExpiry) {
+          alert(response?.data?.message)
           if (context?.token) {
             // await AsyncStorage.setItem('token', context?.token);
             // await AsyncStorage.setItem('isVerified', JSON.stringify(true));

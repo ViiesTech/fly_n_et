@@ -509,6 +509,7 @@ q
         if (purchases.length > 0 && context?.token) {
           let datatoBeAppend = new FormData();
           datatoBeAppend.append('sub_type', subType);
+          datatoBeAppend.append('transaction_id',purchases[0].transactionId)
           let config = {
             method: 'post',
             maxBodyLength: Infinity,
@@ -745,7 +746,7 @@ q
                   return (
                     <AndroidPackageCard
                       // isActive={activeSubscription === item.productId}
-                      disabled={currentPurchase === 'yearly' && true}
+                      // disabled={currentPurchase === 'yearly' && true}
                       isActive={
                         (activeSubscription === 'monthly' &&
                           item.productId === 'flyneat_month') ||

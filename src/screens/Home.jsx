@@ -35,6 +35,8 @@ import Orientation from 'react-native-orientation-locker';
 import {distance} from '@turf/turf';
 import LoaderOverlay from '../components/LoaderOverlay';
 import {useIsFocused} from '@react-navigation/native';
+import {getAvailablePurchases} from 'react-native-iap';
+import Purchases from 'react-native-purchases';
 
 // const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
@@ -47,7 +49,7 @@ const Home = ({navigation}) => {
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
   const [locationLoader, setLocationLoader] = useState(false);
 
-  console.log('sub type is still coming===>', context?.user?.sub_type);
+  console.log('sub type from context.user===>', context?.user?.sub_type);
 
   const isFocused = useIsFocused();
 
@@ -92,6 +94,7 @@ const Home = ({navigation}) => {
   useEffect(() => {
     if (context?.token) {
       checkSubscriptionAgain();
+      assignTransactionId();
     }
   }, [context?.token, isFocused]);
 
@@ -104,6 +107,37 @@ const Home = ({navigation}) => {
       // checkSubscriptionAgain();
     }
   }, [context?.token]);
+
+  const assignTransactionId = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const purchases = await getAvailablePurchases();
+        // console.log('purchases from android ===>',purchases[0].transactionId)
+        if (purchases[0].transactionId) {
+          let data = {
+            transaction_id: purchases[0].transactionId,
+          };
+          const response = await api.post('assign_id', data, {
+            headers: {Authorization: `Bearer ${context?.token}`},
+          });
+          console.log(
+            'response of assigning transaction id ===>',
+            response?.data,
+          );
+        } else {
+          console.log('transaction id does not exist ===>');
+        }
+      } else {
+        const purchases = await Purchases.getCustomerInfo();
+        console.log('ios customer info ===>',purchases)
+        // const entitlement = purchases.entitlements.active['Premium'];
+        // const transactionId =
+        //   entitlement?.latestPurchase?.transactionIdentifier;
+      }
+    } catch (error) {
+      console.log('error assignining the transaction id ===>', error);
+    }
+  };
 
   const checkSubscriptionAgain = async () => {
     try {
@@ -133,11 +167,10 @@ const Home = ({navigation}) => {
         // console.log("✅ Subscription refreshed:", updatedExpiry);
       } else {
         if (context?.sub_type) {
-        //  return alert('without login method')
+          //  return alert('without login method')
           const obj = {
             sub_type: context?.sub_type,
-            transaction_id: context?.transaction_id
-
+            transaction_id: context?.transaction_id,
           };
           const response = await api.post('user/subscribe', obj, {
             headers: {Authorization: `Bearer ${context?.token}`},
@@ -150,7 +183,7 @@ const Home = ({navigation}) => {
               user: {
                 ...prev.user,
                 expired_at: response?.data?.user?.expired_at,
-                sub_type: response?.data?.user?.sub_type || context?.sub_type
+                sub_type: response?.data?.user?.sub_type || context?.sub_type,
               },
             }));
           }
