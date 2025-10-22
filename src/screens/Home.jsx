@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {
   PermissionsAndroid,
@@ -48,8 +49,9 @@ const Home = ({navigation}) => {
   const [width, setScreenWidth] = useState(Dimensions.get('window').width);
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
   const [locationLoader, setLocationLoader] = useState(false);
+  const hasFetchedLocation = useRef(false);
 
-  console.log('sub type from context.user===>', context?.user?.sub_type);
+  console.log('sub type from context.user===>', context?.user);
 
   const isFocused = useIsFocused();
 
@@ -92,21 +94,24 @@ const Home = ({navigation}) => {
   // console.log('expiry ',context?.subscribed_details)
 
   useEffect(() => {
-    if (context?.token) {
+    if (context?.token && isFocused) {
       checkSubscriptionAgain();
       assignTransactionId();
+       savedUserLocation()
     }
-  }, [context?.token, isFocused]);
+  }, [isFocused]);
 
   useEffect(() => {
-    if (context?.token) {
-      if (!context?.user?.location?.address) {
-        requestLocationPermission();
-      }
-
+    if (
+      context?.token &&
+      !context?.user?.location?.address &&
+      !hasFetchedLocation.current
+    ) {
+      hasFetchedLocation.current = true;
+      requestLocationPermission();
       // checkSubscriptionAgain();
     }
-  }, [context?.token]);
+  }, []);
 
   const assignTransactionId = async () => {
     try {
@@ -136,7 +141,7 @@ const Home = ({navigation}) => {
           customerInfo.subscriptionsByProductIdentifier[activeProduct];
 
         const transactionId = subscriptionData?.storeTransactionId;
-         if (transactionId) {
+        if (transactionId) {
           let data = {
             transaction_id: transactionId,
           };
@@ -164,6 +169,7 @@ const Home = ({navigation}) => {
       });
       console.log('api check ===>', response?.data);
       if (response?.data?.status === 'success' && response?.data?.expiry_date) {
+        // alert('checking')
         const updatedExpiry = response.data.expiry_date;
 
         // Step 2: Save latest subscription details locally
@@ -184,6 +190,7 @@ const Home = ({navigation}) => {
         // console.log("✅ Subscription refreshed:", updatedExpiry);
       } else {
         if (context?.sub_type) {
+          // alert('sub type exist already')
           //  return alert('without login method')
           const obj = {
             sub_type: context?.sub_type,
@@ -326,59 +333,68 @@ const Home = ({navigation}) => {
     }
   }
 
-  async function getNearestAirport(lat, lng, locationName) {
+  async function savedUserLocation(lat, lng, locationName) {
     // await AsyncStorage.removeItem('locationDetails')
     // await AsyncStorage.removeItem('selectLocation')
 
     try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json`,
-        {
-          params: {
-            location: `${lat},${lng}`,
-            radius: 50000,
-            type: 'airport',
-            key: API_KEY,
-          },
-        },
-      );
+      // const response = await axios.get(
+      //   `https://maps.googleapis.com/maps/api/place/nearbysearch/json`,
+      //   {
+      //     params: {
+      //       location: `${lat},${lng}`,
+      //       radius: 50000,
+      //       type: 'airport',
+      //       key: API_KEY,
+      //     },
+      //   },
+      // );
 
-      const nearest = response?.data?.results?.[0];
-      if (nearest) {
-        console.log('Nearest Airport:', nearest.name);
+      // const nearest = response?.data?.results?.[0];
+      // if (nearest) {
+      //   console.log('Nearest Airport:', nearest.name);
 
-        setContext(prev => {
-          const updatedUser = {
-            ...prev.user,
-            latitude: lat,
-            longitude: lng,
-            location: {
-              ...prev.user.location,
-              address: locationName,
-              nearest_airport: nearest.name,
-              geometry_location: nearest.geometry.location,
-            },
-          };
+      //   setContext(prev => {
+      //     const updatedUser = {
+      //       ...prev.user,
+      //       latitude: lat,
+      //       longitude: lng,
+      //       location: {
+      //         ...prev.user.location,
+      //         address: locationName,
+      //         nearest_airport: nearest.name,
+      //         geometry_location: nearest.geometry.location,
+      //       },
+      //     };
 
-          AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      //     AsyncStorage.setItem('user', JSON.stringify(updatedUser));
 
-          return {...prev, user: updatedUser};
-        });
+      //     return {...prev, user: updatedUser};
+      //   });
 
-        await AsyncStorage.setItem(
+        // await AsyncStorage.setItem(
+        //   'locationDetails',
+        //   JSON.stringify(nearest.geometry.location),
+        // ); 
+        const obj = {
+          lat: context?.user?.latitude,
+          lng: context.user?.longitude
+        }
+        // console.log('context latlng',context?.user?.user_info?.obj)
+           await AsyncStorage.setItem(
           'locationDetails',
-          JSON.stringify(nearest.geometry.location),
+          JSON.stringify(obj),
         );
 
         await AsyncStorage.setItem(
           'selectLocation',
           JSON.stringify({
-            description: nearest.name,
-            place_id: nearest.place_id,
-            structured_formatting: {main_text: nearest.name},
+            description: context?.user?.user_info?.address,
+            // place_id: nearest.place_id,
+            structured_formatting: {main_text: context?.user?.user_info?.address},
           }),
         );
-      }
+      // }
     } catch (err) {
       console.log('Error fetching nearest airport:', err);
     }
@@ -386,7 +402,7 @@ const Home = ({navigation}) => {
 
   async function getLocations() {
     // Geolocation.setRNConfiguration({ enableHighAccuracy: false, timeout: 20000, maximumAge: 10000 });
-    setLocationLoader(true);
+    // setLocationLoader(true);
     Geolocation.getCurrentPosition(
       async pos => {
         console.log('Position received: ', pos);
@@ -407,17 +423,18 @@ const Home = ({navigation}) => {
             longitudeDelta: 0.0421,
             locationName,
           });
-          await getNearestAirport(crd.latitude, crd.longitude, locationName);
+        //  await savedUserLocation()
+          // await getNearestAirport(crd.latitude, crd.longitude, locationName);
         } else {
           convertLatLngToAddr();
           //   console.log('Could not get address from lat/lng');
         }
-        setLocationLoader(false);
+        // setLocationLoader(false);
       },
       err => {
         console.log('Geolocation error: ', err);
         alert('failed to fetch location');
-        setLocationLoader(false);
+        // setLocationLoader(false);
       },
       {
         enableHighAccuracy: true,
@@ -473,25 +490,43 @@ const Home = ({navigation}) => {
         </View>
         <View style={{width: width * 0.6, alignItems: 'center'}}>
           {context?.token &&
-            !locationLoader &&
-            context?.user.location?.nearest_airport && (
-              <>
-                <Small heading font="medium">
-                  Home Airport
+          // !locationLoader &&
+          // context?.user.location?.nearest_airport && (
+          context?.user?.user_info?.address ? (
+            <>
+              <Small heading font="medium">
+                Home Airport
+              </Small>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: hp('.5%'),
+                }}>
+                <Loc size={hp('2%')} color={Color('text')} />
+                <Small heading font="bold" numberOfLines={1}>
+                  {/* {context?.user?.location?.nearest_airport} */}
+                  {context?.user?.user_info?.address}
                 </Small>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: hp('.5%'),
-                  }}>
-                  <Loc size={hp('2%')} color={Color('text')} />
-                  <Small heading font="bold" numberOfLines={1}>
-                    {context?.user?.location?.nearest_airport}
-                  </Small>
-                </View>
-              </>
-            )}
+              </View>
+            </>
+          ) : (
+            <TouchableOpacity
+              style={{alignItems: 'center'}}
+              onPress={() => navigation.navigate('AccountSettings')}>
+              <Small heading font="medium">
+                Add Your Home Airport
+              </Small>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: hp('.5%'),
+                }}>
+                <Loc size={hp('2%')} color={Color('text')} />
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
         <View style={{width: wp('20%'), alignItems: 'center'}}>
           <TouchableOpacity
@@ -554,28 +589,29 @@ const Home = ({navigation}) => {
         try {
           const savedSelection = await AsyncStorage.getItem('typedLocation');
 
-          const defaultAirport = context?.user?.location?.nearest_airport;
+          const defaultAirport = context?.user?.user_info?.address;
 
           const valueToSet =
             savedSelection !== null ? savedSelection : defaultAirport;
 
-          console.log(savedSelection);
+          console.log('saved selection',savedSelection);
 
           if (valueToSet && inputRef.current) {
             inputRef.current.setNativeProps({
               text: valueToSet.toUpperCase(),
             });
-            setSelection(valueToSet);
+            // setSelection(valueToSet);
           }
         } catch (err) {
           console.log('Error restoring location:', err);
         }
       };
 
-      if (context?.token && !locationLoader) {
+      //previously added false locationloader condition also add in the dependencies
+      if (context?.token) {
         restoreSelection();
       }
-    }, [context?.token, locationLoader]);
+    }, [context?.token]);
 
     const searchAirports = async searchKey => {
       // alert('hello')
@@ -702,7 +738,7 @@ const Home = ({navigation}) => {
           }
 
           const json = JSON.parse(locationDetails);
-          console.log('json..........', json);
+          // return console.log('json..........',json?.lat);
           const res = await api.post(
             '/restaurant/search',
             {
@@ -780,7 +816,7 @@ const Home = ({navigation}) => {
         </View>
       </Background>
       <Navigation navigation={navigation} />
-      {locationLoader && <LoaderOverlay text={true} visible={locationLoader} />}
+      {/* {locationLoader && <LoaderOverlay text={true} visible={locationLoader} />} */}
     </>
   );
 };

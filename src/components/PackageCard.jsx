@@ -36,7 +36,7 @@ export default PackageCard;
 const styles = StyleSheet.create({
   packageStyle: {
     backgroundColor: Color('drawerBg'),
-    paddingVertical: hp(2),
+    paddingVertical: hp(1.7),
     paddingHorizontal: wp(4),
     width: wp(85),
     borderRadius: 12,

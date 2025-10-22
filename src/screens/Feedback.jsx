@@ -69,6 +69,8 @@ const Feedback = ({navigation,route}) => {
 
   const starCount = images?.filter(img => img.id === '8ggStxqyboK5').length;
 
+  console.log('data ===>',data)
+
   useEffect(() => {
     if (data?.rating) {
       setStar(data.rating); 
@@ -224,7 +226,7 @@ const Feedback = ({navigation,route}) => {
           <Br space={5} />
           <Image
             source={{
-              uri: `${storageUrl}${context?.user?.user_info?.profile_image}`,
+              uri: `${storageUrl}${data?.user?.user_info?.profile_image}`,
             }}
             style={{
               width: hp('14%'),
@@ -239,7 +241,7 @@ const Feedback = ({navigation,route}) => {
             color={Color('homeBg')}
             heading
             font="bold">
-            {context?.user?.name}
+            {data?.user?.name}
           </Pera>
           <Small
             style={{textAlign: 'center'}}

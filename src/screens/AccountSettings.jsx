@@ -22,6 +22,7 @@ import {Edit2} from 'iconsax-react-native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import DOB from '../components/DOB';
 import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // const validationSchema = Yup.object().shape({
 //   name: Yup.string()
@@ -108,6 +109,7 @@ const AccountSettings = ({navigation}) => {
         ...context,
         user: user,
       });
+      await AsyncStorage.setItem('user',JSON.stringify(res.data.user))
       note('Changes Saved', res?.data?.message);
     } catch (err) {
       await errHandler(err, null, navigation);

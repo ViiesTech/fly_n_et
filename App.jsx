@@ -531,7 +531,7 @@ function MainApp() {
 
     const fetchAndSaveEntitlement = async customerInfo => {
       const premium = customerInfo.entitlements.active['Premium'];
-      console.log('Entitlement Premium:', premium.periodType);
+      // console.log('Entitlement Premium:', premium.periodType);
 
       if (premium) {
         const currentProductId = premium.productIdentifier;
@@ -567,6 +567,7 @@ function MainApp() {
 
     try {
       if (!token) {
+        // alert('app start with no token')
         // alert('no token');
         // console.log('hello token')
         setLoading(true);
@@ -579,6 +580,8 @@ function MainApp() {
       // }
         setLoading(false);
       } else {
+        // alert('app start with token')
+
         // alert('token');
         setLoading(true);
         await AsyncStorage.removeItem('isPremium');
@@ -596,9 +599,9 @@ function MainApp() {
         console.log(response?.data?.user);
         const updatedExpiry = response?.data?.user?.expired_at;
         if (updatedExpiry) {
-          // await AsyncStorage.setItem('token', token);
-          // await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-          // await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+          await AsyncStorage.setItem('token', token);
+          await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+          await AsyncStorage.setItem('user', JSON.stringify(response?.data?.user));
 
 
         // if (purchasedDate) {

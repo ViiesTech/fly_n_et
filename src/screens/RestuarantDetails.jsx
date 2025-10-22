@@ -664,7 +664,7 @@ const styles = StyleSheet.create({
   },
   backIconContainer: {
     position: 'absolute',
-    top: 10,
+    top: 50,
     left: 20,
     zIndex: 10,
     backgroundColor: Color('btnColor'),

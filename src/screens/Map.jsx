@@ -674,7 +674,7 @@ const Map = ({navigation, route}) => {
               resizeMode="cover"
               style={{height: 120, width: 220, borderRadius: 8}}
               source={{
-                uri: `https://praetorstestnet.com/flyneat/${restaurantDetail?.image?.path}`,
+                uri: `${storageUrl}${restaurantDetail?.image?.path}`,
               }}
             />
             <Text

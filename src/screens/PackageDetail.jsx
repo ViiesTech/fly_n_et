@@ -60,6 +60,7 @@ const PackageDetail = ({route}) => {
   const data = route?.params?.detail;
   // console.log('user expiry', context?.user?.expired_at);
   // console.log('context', context?.subscribed_details);
+  // console.log('gg',data.product.identifier)
 
   const isAndroid = Platform.OS === 'android';
 
@@ -155,9 +156,9 @@ const PackageDetail = ({route}) => {
         });
         // setLoading(true)
         const purchase = purchaseData?.[0];
-        const parseOrder = JSON.parse(purchase.dataAndroid)
-        const orderId = parseOrder?.orderId
-        console.log('orderId ===>',orderId)
+        const parseOrder = JSON.parse(purchase.dataAndroid);
+        const orderId = parseOrder?.orderId;
+        console.log('orderId ===>', orderId);
 
         if (purchase.transactionDate && !purchase?.isAcknowledgedAndroid) {
           // return alert('hello')
@@ -187,7 +188,7 @@ const PackageDetail = ({route}) => {
             ...prev,
             sub_type: subType,
             skipNavigationCheck: false,
-            transaction_id: orderId
+            transaction_id: orderId,
           }));
 
           // setContext({
@@ -218,9 +219,24 @@ const PackageDetail = ({route}) => {
     } else {
       setLoading(true);
       try {
+        // const customerInfo = await Purchases.getCustomerInfo();
+        // const activeEntitlement = customerInfo?.entitlements?.active?.Premium;
+
+        // if (activeEntitlement) {
+        //   Alert.alert(
+        //     'Active Subscription Detected',
+        //     'You already have an active subscription. Please restore your purchase instead.',
+        //   );
+        //   setLoading(false);
+        //   return;
+        // }
         const purchaseMade = await Purchases.purchasePackage(data);
         // setLoading(true);
-        // console.log('response ===>',purchaseMade)
+        console.log('response ===>', purchaseMade);
+        //       const originalTransactionId =
+        // purchaseMade.customerInfo.subscriptionsByProductIdentifier[data?.product.identifier].storeTransactionId;
+
+        // console.log('original transaction id ===>',originalTransactionId);
 
         // const obj = {
         //   purchase_date: purchaseMade?.transaction?.purchaseDate,
@@ -230,8 +246,21 @@ const PackageDetail = ({route}) => {
         // console.log('Purchase data:', obj);
 
         // return console.log('hello world',purchaseMade)
+        // alert(new Date(purchaseMade?.transaction?.purchaseDate) <= new Date())
+        const purchaseDate = new Date(purchaseMade?.transaction?.purchaseDate);
+        const currentDate = new Date();
+        // console.log('tranaction purchase date ===>',purchaseDate)
+        if (
+          !purchaseMade?.transaction?.purchaseDate ||
+          purchaseDate < currentDate.setMinutes(currentDate.getMinutes() - 1)
+        ) {
+          alert(
+            'You already have an active subscription. Please restore your purchase instead.',
+          );
+          return;
+        }
 
-        if (purchaseMade?.transaction?.purchaseDate && !context?.token) {
+        if (!context?.token) {
           navigation.navigate('Message', {
             theme: 'light',
             title: 'Login Required',
@@ -241,12 +270,14 @@ const PackageDetail = ({route}) => {
           });
           // trackPurchaseEvent(data);
         } else {
-          if (context.token) {
-            setLoading(false);
-            console.log('going in navigatii func');
-            await handlingNavigations(purchaseMade.transaction.transactionIdentifier);
-            return;
-          }
+          // if (context.token) {
+          setLoading(false);
+          console.log('going in navigatii func');
+          await handlingNavigations(
+            purchaseMade?.transaction.transactionIdentifier,
+          );
+          return;
+          // }
         }
 
         //  alert('lilill')
@@ -262,7 +293,7 @@ const PackageDetail = ({route}) => {
           ...prev,
           // expired_at: updatedExpiry,
           sub_type: data?.packageType === 'ANNUAL' ? 'yearly' : 'monthly',
-          transaction_id: purchaseMade?.transaction.transactionIdentifier
+          transaction_id: purchaseMade?.transaction.transactionIdentifier,
         }));
         // await AsyncStorage.setItem(
         //   'subscribed_details',
@@ -301,7 +332,7 @@ const PackageDetail = ({route}) => {
   //             'To access your subscription benefits, please create or log in to your account',
   //           screen: 'Login',
   //         });
-          
+
   //       } else {
   //         note(
   //           'Please buy the subscription',
@@ -336,7 +367,7 @@ const PackageDetail = ({route}) => {
   //       //        setContext(prev => ({
   //       //   ...prev,
   //       //   // expired_at: updatedExpiry,
-  //       //   sub_type: 
+  //       //   sub_type:
   //       // }));
   //         // navigation.replace('Home');
   //       } else if (
@@ -362,10 +393,10 @@ const PackageDetail = ({route}) => {
   //   }
   // };
 
-  const handlingNavigations = async (transactionId) => {
+  const handlingNavigations = async transactionId => {
     // console.log("first", data)
     // return
-    console.log('transaction',transactionId)
+    console.log('transaction', transactionId);
     const androidsubtype =
       Platform.OS === 'android' &&
       data?.subscriptionOfferDetails[0]?.basePlanId == 'year'
@@ -381,7 +412,7 @@ const PackageDetail = ({route}) => {
       'sub_type',
       Platform.OS == 'android' ? androidsubtype : iosSubType,
     );
-    datatoBeAppend.append('transaction_id',transactionId)
+    datatoBeAppend.append('transaction_id', transactionId);
 
     let config = {
       method: 'post',
@@ -401,14 +432,14 @@ const PackageDetail = ({route}) => {
         const updatedExpiry = response?.data?.user?.expired_at;
         console.log('response ===>', response?.data);
         if (updatedExpiry) {
-          alert(response?.data?.message)
+          alert(response?.data?.message);
           if (context?.token) {
-            // await AsyncStorage.setItem('token', context?.token);
-            // await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-            // await AsyncStorage.setItem(
-            //   'user',
-            //   JSON.stringify(response?.data?.user),
-            // );
+            await AsyncStorage.setItem('token', context?.token);
+            await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+            await AsyncStorage.setItem(
+              'user',
+              JSON.stringify(response?.data?.user),
+            );
             setContext(prev => ({
               ...prev,
               transaction_id: transactionId,

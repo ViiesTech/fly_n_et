@@ -139,9 +139,9 @@ const Login = ({navigation}) => {
             // console.log(response?.data?.user);
             const updatedUser = response?.data?.user;
             if (updatedUser) {
-              // await AsyncStorage.setItem('token', context?.token);
-              // await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-              // await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+              await AsyncStorage.setItem('token', context?.token);
+              await AsyncStorage.setItem('isVerified', JSON.stringify(true));
+              await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
 
               // setContext({
               //   ...context,
