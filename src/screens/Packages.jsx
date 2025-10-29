@@ -82,7 +82,7 @@ const Packages = () => {
   const [packageLoading, setPackageLoading] = useState(false);
   // const [activeSubscription,setActiveSubscription] = useState(null)
 
-  // console.log('active sub type', context?.user?.sub_type);
+  console.log('active sub type', activeSubscription);
   // console.log('current purchase',currentPurchase)
 
   useEffect(() => {
@@ -558,7 +558,7 @@ const Packages = () => {
         if (purchases.length > 0 && context?.token) {
           let datatoBeAppend = new FormData();
           datatoBeAppend.append('sub_type', subType);
-          datatoBeAppend.append('transaction_id', purchases[0].transactionId);
+          datatoBeAppend.append('transaction_id', purchases[0].purchaseToken);
           let config = {
             method: 'post',
             maxBodyLength: Infinity,
@@ -846,9 +846,9 @@ const Packages = () => {
                   return (
                     <AndroidPackageCard
                       // isActive={activeSubscription === item.productId}
-                      disabled={
-                        activeSubscription?.sub_type === 'yearly' && true
-                      }
+                      // disabled={
+                      //   activeSubscription?.sub_type === 'yearly' && true
+                      // }
                       // isActive={
                       //   (activeSubscription === 'monthly' &&
                       //     item.productId === 'flyneat_month') ||

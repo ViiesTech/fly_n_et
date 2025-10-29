@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "665992536026",
+    "project_id": "flyneat-51801",
+    "storage_bucket": "flyneat-51801.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665992536026:android:6ffebe57d156847ff86ae3",
+        "android_client_info": {
+          "package_name": "com.fly_n_eat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBe-mZ_HmEmh73J5WZjPARA39-RokL0rIU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

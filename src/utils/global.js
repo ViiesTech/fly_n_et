@@ -10,6 +10,12 @@ import {
 } from '@react-navigation/native';
 import Purchases from 'react-native-purchases';
 import {AppEventsLogger} from 'react-native-fbsdk-next';
+import { PERMISSIONS, request } from 'react-native-permissions';
+import messaging from "@react-native-firebase/messaging";
+import notifee, {
+  AndroidBadgeIconType,
+  AndroidImportance,
+} from '@notifee/react-native';
 
 export const drawerStyle = {
   backgroundColor: Color('drawerBg'),
@@ -200,6 +206,113 @@ export function replace(name, params) {
     navigationRef.dispatch(StackActions.replace(name, params));
   }
 }
+
+export const requestPermission = async permissionType => {
+  let permissionSet;
+  const apiLevel = Platform.constants.Release;
+  console.log('hello world', apiLevel);
+  if (Platform.OS === 'ios') {
+    switch (permissionType) {
+
+      case 'notifications':
+        try {
+          await messaging().registerDeviceForRemoteMessages();
+          permissionSet = await messaging().requestPermission();
+          const enabled =
+            permissionSet === messaging.AuthorizationStatus.AUTHORIZED ||
+            permissionSet === messaging.AuthorizationStatus.PROVISIONAL;
+          return enabled ? 'granted' : 'denied';
+        } catch (error) {
+          console.log(
+            'failed to register device for remote messages on ios =>',
+          );
+        }
+        break;
+
+
+      default:
+        console.log('unknown permission type');
+    }
+  } else if (Platform.OS === 'android') {
+    switch (permissionType) {
+     
+
+      case 'notifications':
+        if (apiLevel > 13) {
+          permissionSet = Platform.select({
+            android: PERMISSIONS.ANDROID.POST_NOTIFICATIONS,
+          });
+        } else {
+          return 'granted';
+        }
+        break;
+
+      default:
+        console.log('unknown permission type');
+    }
+  }
+  if (permissionSet) {
+    const status = await request(permissionSet);
+    return status;
+  }
+};
+
+const NOTIFICATION_CHANNEL_ID = 'FLYNEAT1234567';
+class Notifications {
+  constructor() {
+    this.createNotificationChannel();
+    this.configureFCM();
+  }
+
+  async createNotificationChannel() {
+    await notifee.createChannel({
+      id: NOTIFICATION_CHANNEL_ID,
+      name: 'FLYNEATChannel',
+      sound: 'default',
+      badge: true,
+      badgeIconType: AndroidBadgeIconType.SMALL,
+      importance: AndroidImportance.HIGH,
+    });
+  }
+
+  async displayNotification(data) {
+    await notifee.displayNotification({
+      title: data?.notification?.title,
+      body: data?.notification?.body,
+      android: {
+        channelId: NOTIFICATION_CHANNEL_ID,
+        showTimestamp: true,
+        smallIcon: 'ic_launcher_round',
+        pressAction: {
+          id: 'default',
+        },
+      },
+      ios: {
+        sound: 'default',
+        badgeCount: 1,
+      },
+    });
+  }
+
+  configureFCM() {
+    if (!this.messageListener) {
+      this.messageListener = messaging().onMessage(async remoteMessage => {
+        console.log('notification from backend ====>', remoteMessage);
+        await this.displayNotification(remoteMessage);
+      });
+    }
+  }
+
+  unsubscribeFCM() {
+    if (this.messageListener) {
+      this.messageListener();
+      this.messageListener = null;
+    }
+  }
+}
+
+export default new Notifications();
+
 
 // export const trackCompleteRegisterationEvent = () => {
 //   AppEventsLogger.logEvent('CompleteRegistration', {

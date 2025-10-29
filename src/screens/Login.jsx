@@ -21,7 +21,7 @@ import {H5, Small} from '../utils/Text';
 import Br from '../components/Br';
 import Btn from '../utils/Btn';
 import Background from '../utils/Background';
-import {drawerInner, drawerStyle} from '../utils/global';
+import {drawerInner, drawerStyle, requestPermission} from '../utils/global';
 import Input from '../components/Input';
 import RadioBtn from '../components/RadioBtn';
 import {useIsFocused} from '@react-navigation/native';
@@ -32,8 +32,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-simple-toast';
 import Geolocation from 'react-native-geolocation-service';
 import axios from 'axios';
-import Purchases from 'react-native-purchases';
-import LoaderOverlay from '../components/LoaderOverlay';
+// import Purchases from 'react-native-purchases';
+// import LoaderOverlay from '../components/LoaderOverlay';
+import messaging from "@react-native-firebase/messaging";
 
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 const validationSchema = Yup.object().shape({
@@ -90,7 +91,24 @@ const Login = ({navigation}) => {
 
   useEffect(() => {
     requestLocationPermission();
+    askNotificationPermission();
   }, []);
+
+   const askNotificationPermission = async () => {
+    const status = await requestPermission('notifications');
+    console.log('permission status of android =====>', status);
+    if (
+      status === 'granted' ||
+      status === messaging.AuthorizationStatus.AUTHORIZED
+    ) {
+      // await messaging().registerDeviceForRemoteMessages()
+      const token = await messaging().getToken();
+      console.log('tokenn', token);
+      // setDeviceToken(token);
+    } else {
+      return alert('Permission denied');
+    }
+  };
 
   const handlingNavigations = async (sub_type, token,userData,transactionId) => {
     const user = userData || context?.user;

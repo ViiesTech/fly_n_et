@@ -51,7 +51,7 @@ const Home = ({navigation}) => {
   const [locationLoader, setLocationLoader] = useState(false);
   const hasFetchedLocation = useRef(false);
 
-  console.log('sub type from context.user===>', context?.user);
+  // console.log('sub type from context.user===>', context?.user);
 
   const isFocused = useIsFocused();
 
@@ -117,10 +117,10 @@ const Home = ({navigation}) => {
     try {
       if (Platform.OS === 'android') {
         const purchases = await getAvailablePurchases();
-        // console.log('purchases from android ===>',purchases[0].transactionId)
-        if (purchases[0].transactionId) {
+        console.log('purchases from android ===>',purchases[0].purchaseToken)
+        if (purchases[0].purchaseToken) {
           let data = {
-            transaction_id: purchases[0].transactionId,
+            transaction_id: purchases[0].purchaseToken,
           };
           const response = await api.post('assign_id', data, {
             headers: {Authorization: `Bearer ${context?.token}`},
@@ -594,7 +594,7 @@ const Home = ({navigation}) => {
           const valueToSet =
             savedSelection !== null ? savedSelection : defaultAirport;
 
-          console.log('saved selection',savedSelection);
+          // console.log('saved selection',savedSelection);
 
           if (valueToSet && inputRef.current) {
             inputRef.current.setNativeProps({

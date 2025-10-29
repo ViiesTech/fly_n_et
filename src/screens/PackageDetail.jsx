@@ -7,7 +7,7 @@ import {
   View,
   Animated,
 } from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Color} from '../utils/Colors';
 import {
   heightPercentageToDP as hp,
@@ -20,7 +20,14 @@ import {api, baseUrl, note} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import {useNavigation} from '@react-navigation/native';
 import {ArrowLeft} from 'iconsax-react-native';
-import {getAvailablePurchases, requestSubscription} from 'react-native-iap';
+import {
+  acknowledgePurchaseAndroid,
+  finishTransaction,
+  getAvailablePurchases,
+  purchaseErrorListener,
+  purchaseUpdatedListener,
+  requestSubscription,
+} from 'react-native-iap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import LoaderOverlay from '../components/LoaderOverlay';
@@ -157,10 +164,10 @@ const PackageDetail = ({route}) => {
         // setLoading(true)
         const purchase = purchaseData?.[0];
         const parseOrder = JSON.parse(purchase.dataAndroid);
-        const orderId = parseOrder?.orderId;
-        console.log('orderId ===>', orderId);
+        const purchaseToken = parseOrder?.purchaseToken;
+      //  return console.log('purchase Token ===>', purchaseToken);
 
-        if (purchase.transactionDate && !purchase?.isAcknowledgedAndroid) {
+        if (purchase.transactionDate) {
           // return alert('hello')
           if (!context?.token) {
             navigation.navigate('Message', {
@@ -174,7 +181,7 @@ const PackageDetail = ({route}) => {
           } else {
             if (context.token) {
               console.log('going in navigatii func');
-              await handlingNavigations(orderId);
+              await handlingNavigations(purchaseToken);
               return;
             }
           }
@@ -188,7 +195,7 @@ const PackageDetail = ({route}) => {
             ...prev,
             sub_type: subType,
             skipNavigationCheck: false,
-            transaction_id: orderId,
+            transaction_id: purchaseToken,
           }));
 
           // setContext({
@@ -315,6 +322,39 @@ const PackageDetail = ({route}) => {
       }
     }
   };
+
+  useEffect(() => {
+    const purchaseUpdateSubscription = purchaseUpdatedListener(
+      async purchase => {
+        const receipt = purchase.transactionReceipt;
+
+        if (receipt) {
+          try {
+            if (Platform.OS === 'android') {
+              if (!purchase.isAcknowledgedAndroid) {
+                await acknowledgePurchaseAndroid({
+                  token: purchase.purchaseToken,
+                });
+                await finishTransaction({purchase, isConsumable: false});
+              }
+            }
+            console.log('Purchase finished/acknowledged ✅');
+          } catch (err) {
+            console.warn('finishTransaction error', err);
+          }
+        }
+      },
+    );
+
+    const purchaseErrorSubscription = purchaseErrorListener(error => {
+      console.warn('purchaseErrorListener', error);
+    });
+
+    return () => {
+      purchaseUpdateSubscription.remove();
+      purchaseErrorSubscription.remove();
+    };
+  }, []);
 
   // const onRestorePurchase = async () => {
   //   if (Platform.OS == 'android') {
