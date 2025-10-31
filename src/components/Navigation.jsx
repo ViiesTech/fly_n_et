@@ -17,10 +17,31 @@ import Br from './Br';
 import {DataContext} from '../utils/Context';
 import Orientation from 'react-native-orientation-locker';
 
+const tabItems = [
+  {
+    id: 1,
+    label: 'Fly-Eat-Back',
+    icon: require('../assets/images/1.png'),
+    navTo: 'Home',
+  },
+  {
+    id: 2,
+    label: 'Point-To-Point',
+    icon: require('../assets/images/2.png'),
+    navTo: 'PointToPoint',
+  },
+  {
+    id: 3,
+    label: 'CFI/CFII',
+    icon: require('../assets/images/3.png'),
+  },
+];
+
 const Navigation = ({label, navigation, ...props}) => {
   const {context, setContext} = useContext(DataContext);
   const [width, setScreenWidth] = useState(Dimensions.get('window').width);
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
+  const [selectedItem, setSelectedItem] = useState(0);
   // const [premium, setPremium] = useState(null);
   useEffect(() => {
     const updateDimensions = () => {
@@ -59,23 +80,67 @@ const Navigation = ({label, navigation, ...props}) => {
   return (
     <>
       <View style={[styles.navigation, {width: width}]}>
-        <TouchableOpacity
-          style={{alignItems: 'center'}}
-          onPress={() => navigation.navigate('Home')}>
-          <Image
-            resizeMode="contain"
-            source={require('../assets/images/1.png')}
-            style={{
-              width: hp('3.5%'),
-              height: hp('3.5%'),
-            }}
-          />
-          <Br space={0.5} />
-          <Small size={hp(1.8)} font="Bold">
-            Fly-Eat-Back
-          </Small>
-        </TouchableOpacity>
-        <TouchableOpacity
+        {tabItems.map((item, index) => {
+          return (
+            <TouchableOpacity
+              style={{alignItems: 'center'}}
+              onPress={() => {
+                setSelectedItem(index);
+                setTimeout(() => {
+                  if (index == 2 && !item.navTo) {
+                    if (context?.token) {
+                      const expiryDate = context?.user?.expired_at
+                        ? new Date(context.user.expired_at)
+                        : null;
+                      const currentDate = new Date();
+                      const isExpired =
+                        !expiryDate || (expiryDate && currentDate > expiryDate);
+
+                      if (isExpired) {
+                        navigation.navigate('Packages');
+                      } else {
+                        navigation.navigate('CFISearch');
+                      }
+                    } else {
+                      navigation.navigate('Message', {
+                        theme: 'light',
+                        title: 'Login Required',
+                        message:
+                          'To access your subscription benefits, please create or log in to your account',
+                        screen: 'Login',
+                      });
+                    }
+                  } else {
+                    navigation.navigate(item.navTo);
+                  }
+                }, 500);
+              }}>
+              <Image
+                resizeMode="contain"
+                source={item.icon}
+                style={{
+                  width: hp('3.5%'),
+                  height: hp('3.5%'),
+                  tintColor:
+                    selectedItem === index
+                      ? Color('text')
+                      : Color('borderColor'),
+                }}
+              />
+              <Br space={0.5} />
+              <Small
+                color={
+                  selectedItem === index ? Color('text') : Color('borderColor')
+                }
+                size={hp(1.8)}
+                font="Bold">
+                {item.label}
+              </Small>
+            </TouchableOpacity>
+          );
+        })}
+
+        {/* <TouchableOpacity
           style={{alignItems: 'center'}}
           onPress={() => navigation.navigate('PointToPoint')}>
           <Image
@@ -129,7 +194,7 @@ const Navigation = ({label, navigation, ...props}) => {
           <Small size={hp(1.8)} font="Bold">
             CFI/CFII
           </Small>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         {/* <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Settings')}>
                     <Image
                         resizeMode="contain"

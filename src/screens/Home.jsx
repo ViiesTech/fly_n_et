@@ -801,7 +801,7 @@ const Home = ({navigation}) => {
             justifyContent: 'center',
           }}>
           <Pera size={hp(2.2)} color={Color('homeBg')} heading font="bold">
-            Starting From
+            Starting Airport
           </Pera>
           <Br space={2} />
           <HomeInput1 placeholder="Type Here" />

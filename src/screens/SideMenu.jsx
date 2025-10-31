@@ -113,7 +113,7 @@ const SideMenu = ({navigation}) => {
             }}>
             <Heart size={hp('3%')} color={Color('drawerBg')} />
             <Small color={Color('drawerBg')} heading font="bold">
-              Favourites
+              Favorites
             </Small>
           </View>
           <ArrowRight size={hp('3%')} color={Color('lightText')} />

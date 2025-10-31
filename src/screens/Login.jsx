@@ -55,6 +55,7 @@ const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [location, setLocation] = useState();
+  const [token,setToken] = useState(null)
 
   console.log('user info ==>', context?.user?.sub_type);
 
@@ -103,6 +104,7 @@ const Login = ({navigation}) => {
     ) {
       // await messaging().registerDeviceForRemoteMessages()
       const token = await messaging().getToken();
+      setToken(token)
       console.log('tokenn', token);
       // setDeviceToken(token);
     } else {
@@ -411,6 +413,7 @@ const Login = ({navigation}) => {
         // latitude: 0,
         // longitude: 0,
         ...location,
+        ...(token && {device_token: token})
       };
 
       await validationSchema.validate(obj, {abortEarly: false});

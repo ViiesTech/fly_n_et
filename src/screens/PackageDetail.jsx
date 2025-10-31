@@ -36,23 +36,23 @@ import {trackPurchaseEvent} from '../utils/global';
 const packageDetails = [
   {
     id: 1,
-    text: 'Your choice of trip planning options: fly-eat-back to home base for short hops, or point-to-point when traveling   longer distances or even cross country.',
+    text: 'Flexible Trip Planning — Choose how you fly and dine: make quick fly-eat-return hops from your home base or enjoy point-to-point routes for longer cross-country adventures.',
   },
   {
     id: 2,
-    text: 'Airport locations (city/state/region) and call letters.',
+    text: 'Airport Directory — Find airport locations with city, state, and regional details, plus call letters for easy flight planning.',
   },
   {
     id: 3,
-    text: 'Restaurant names, addresses, phone numbers.',
+    text: 'Restaurant Listings — Access top restaurant names, full addresses, and direct phone numbers at your destination.',
   },
   {
     id: 4,
-    text: 'Hours of operation and descriptions of décor, ambience, and other amenities.',
+    text: 'Business Details — View hours of operation, atmosphere descriptions, décor notes, and amenities to plan the perfect dining stop.',
   },
   {
     id: 5,
-    text: 'Links to restaurant websites and menus.',
+    text: 'Menu Access — Instantly connect to restaurant websites and view menus before you go.',
   },
 ];
 
@@ -537,7 +537,7 @@ const PackageDetail = ({route}) => {
               <View
                 style={{
                   flexDirection: 'column',
-                  gap: hp(2),
+                  gap: hp(1),
                   paddingTop: hp(3),
                 }}>
                 {packageDetails.map(item => (
@@ -591,7 +591,7 @@ const PackageDetail = ({route}) => {
               <View
                 style={{
                   flexDirection: 'column',
-                  gap: hp(2),
+                  gap: hp(1),
                   paddingTop: hp(3),
                 }}>
                 {packageDetails.map(item => (

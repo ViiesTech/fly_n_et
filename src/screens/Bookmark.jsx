@@ -38,7 +38,7 @@ const Bookmark = ({ navigation }) => {
             <Background barStyle={'dark-content'} translucent={false} noBackground>
                 <Br space={8} />
                 <Wrapper>
-                    <Pera color={Color('homeBg')} heading font="bold">Favourites</Pera>
+                    <Pera color={Color('homeBg')} heading font="bold">Favorites</Pera>
                     <Br space={2} />
                     {
                         !context?.savedRestuarents
@@ -48,7 +48,7 @@ const Bookmark = ({ navigation }) => {
                         context?.savedRestuarents?.length === 0
                         ?
                         <Small style={{textAlign: 'center'}} color={Color('homeBg')}>
-                            No Favourites Found
+                            No Favorites Found
                         </Small>
                         :
                         <View style={{flexDirection: 'row', flexWrap: 'wrap', columnGap: wp('5%'), rowGap: hp('2%')}}>

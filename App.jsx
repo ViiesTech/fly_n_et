@@ -54,6 +54,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 // import {AppEventsLogger, Settings as settings} from 'react-native-fbsdk-next';
 import { View } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
+import Notification from '../fly_n_et/src/utils/global'
 
 const Stack = createStackNavigator();
 
@@ -497,6 +498,7 @@ function MainApp() {
     };
   }, []);
 
+
   // useEffect(() => {
   //   if (Platform.OS === 'ios') {
   //     if (isFocused) {
@@ -642,7 +644,16 @@ function MainApp() {
     });
     return () => unsubscribe();
   }, []);
-  
+
+ useEffect(() => {
+    Notification.configureFCM();
+    return () => {
+      Notification.unsubscribeFCM();
+    };
+  }, []);
+
+     
+
 
   return (
     <>

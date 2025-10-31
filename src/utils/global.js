@@ -258,7 +258,7 @@ export const requestPermission = async permissionType => {
 };
 
 const NOTIFICATION_CHANNEL_ID = 'FLYNEAT1234567';
-class Notifications {
+class Notification {
   constructor() {
     this.createNotificationChannel();
     this.configureFCM();
@@ -311,7 +311,7 @@ class Notifications {
   }
 }
 
-export default new Notifications();
+export default new Notification();
 
 
 // export const trackCompleteRegisterationEvent = () => {
