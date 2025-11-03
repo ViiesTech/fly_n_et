@@ -23,33 +23,35 @@ const Notifications = ({ navigation }) => {
     }, []);
 
     const Notification = ({ data }) => {
+        console.log('data ===>',data?.data?.data?.restaurant?.title)
         return (
             <View style={styles.notification}>
-                <Image
+                {/* <Image
                     source={{ uri: `${storageUrl}${data?.data?.sender?.profile_image}` }}
                     style={{ borderWidth: 1, borderColor: Color('lightText'), width: hp('6%'), height: hp('6%'), borderRadius: hp('50%'), alignSelf: 'center' }}
-                />
-                <View style={{ width: wp('52%') }}>
-                    <Small color={Color('homeBg')} heading font="bold">{data?.data?.sender?.name}</Small>
-                    <Small color={Color('lightText')} heading font="regular">{data?.data?.data?.message}</Small>
+                /> */}
+                <View style={{ width: wp('82%') }}>
+                    <Small color={Color('homeBg')} heading font="bold">{data?.data?.data?.restaurant?.title || 'No Title'}</Small>
+                    <Small color={Color('lightText')} heading font="regular"> {data?.data?.data?.message || 'No message'}</Small>
                 </View>
-                <View style={{ alignItems: 'flex-end' }}>
+                {/* <View style={{ alignItems: 'flex-end' }}>
                     {!data?.read_at && (
                         <View style={{borderRadius: hp('50%'), overflow: 'hidden'}}>
                             <Small style={{ fontSize: hp('1.1%'), backgroundColor: Color('homeBg'), paddingVertical: hp('0.6%'), paddingHorizontal: hp('1%') }}>1</Small>
                         </View>
                     )}
                     <Small color={Color('lightText')} heading font="regular">{moment(data?.created_at).format('hh:mm A')}</Small>
-                </View>
+                </View> */}
             </View>
         );
     };
 
     const getNotifications = async () => {
-        try {
+        try {``
             const res = await api.get('/user/list-notify', {
                 headers: {Authorization: `Bearer ${context?.token}`},
             });
+            console.log('notifications response ===>',res.data?.notifications)
             setContext({
                 ...context,
                 notifications: res.data?.notifications,

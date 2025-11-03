@@ -77,6 +77,8 @@ const Map = ({navigation, route}) => {
     longitude: parseFloat(route?.params?.airport?.lng),
   };
 
+  // console.log('map params ===>',route?.params)
+
   // const latitudeMid = (route?.params?.airport?.lat + route?.params?.airport2?.lat) / 2;
   // const longitudeMid = (route?.params?.airport?.lng +  route?.params?.airport2?.lng) / 2;
 

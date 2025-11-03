@@ -45,7 +45,7 @@ const GetStarted = ({navigation}) => {
   }, []);
 
   const onGetStartedPress = async () => {
-    navigation.navigate('Home')
+    navigation.navigate('BottomStack')
     // try {
     //   const customerInfo = await Purchases.getCustomerInfo();
     //   console.log(customerInfo.entitlements.active);

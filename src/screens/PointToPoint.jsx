@@ -34,7 +34,11 @@ import {DataContext} from '../utils/Context';
 import {api, errHandler, note} from '../utils/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {calculateDistance, nauticalMilesToMeters} from '../utils/global';
+import {
+  calculateDistance,
+  nauticalMilesToMeters,
+  responsiveHeight,
+} from '../utils/global';
 import Orientation from 'react-native-orientation-locker';
 import LoaderOverlay from '../components/LoaderOverlay';
 import Geolocation from 'react-native-geolocation-service';
@@ -52,7 +56,11 @@ const PointToPoint = ({navigation}) => {
 
   const isFocused = useIsFocused();
 
-  console.log('context data ===>',context?.user?.latitude,context?.user?.longitude)
+  console.log(
+    'context data ===>',
+    context?.user?.latitude,
+    context?.user?.longitude,
+  );
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -121,7 +129,7 @@ const PointToPoint = ({navigation}) => {
       'typedLocation2',
       value?.structured_formatting?.main_text,
     );
-    console.log(value)
+    console.log(value);
     await AsyncStorage.setItem('p2p_selectLocation', JSON.stringify(value));
     getLocation(value?.place_id);
   };
@@ -258,11 +266,13 @@ const PointToPoint = ({navigation}) => {
       lng: parseFloat(context?.user?.longitude),
     };
     await AsyncStorage.setItem('p2p_locationDetails', JSON.stringify(obj));
-    await AsyncStorage.setItem('p2p_selectLocation', JSON.stringify({
+    await AsyncStorage.setItem(
+      'p2p_selectLocation',
+      JSON.stringify({
         description: context?.user?.user_info?.address,
-        structured_formatting: {main_text: context?.user?.user_info?.address}
-    }));
-
+        structured_formatting: {main_text: context?.user?.user_info?.address},
+      }),
+    );
   }
   const TopBar = () => {
     return (
@@ -277,7 +287,9 @@ const PointToPoint = ({navigation}) => {
               justifyContent: 'center',
               borderRadius: hp('50%'),
             }}
-            onPress={() => navigation.navigate('SideMenu')}>
+            onPress={() =>
+              navigation.navigate('SecondaryStack', {screen: 'SideMenu'})
+            }>
             <TextalignLeft size={hp('2.5%')} color={Color('text')} />
           </TouchableOpacity>
         </View>
@@ -321,7 +333,9 @@ const PointToPoint = ({navigation}) => {
                   screen: 'Login',
                 });
               } else {
-                navigation.navigate('Notifications');
+                navigation.navigate('SecondaryStack', {
+                  screen: 'Notifications',
+                });
               }
             }}>
             <Notification size={hp('2.5%')} color={Color('text')} />
@@ -361,12 +375,12 @@ const PointToPoint = ({navigation}) => {
     useEffect(() => {
       const restoreSelection = async () => {
         try {
-            const savedSelection = await AsyncStorage.getItem('typedLocation2');
+          const savedSelection = await AsyncStorage.getItem('typedLocation2');
 
           const defaultAirport = context?.user?.user_info?.address;
 
-            const valueToSet =
-              savedSelection !== null ? savedSelection : defaultAirport;
+          const valueToSet =
+            savedSelection !== null ? savedSelection : defaultAirport;
 
           //   console.log(savedSelection);
 
@@ -414,7 +428,7 @@ const PointToPoint = ({navigation}) => {
 
     return (
       <>
-        <View style={{position: 'relative', overflow: 'visible', zIndex: 1}}>
+        <View style={{position: 'relative', overflow: 'visible', zIndex: 5}}>
           <View style={styles.input}>
             <TextInput
               autoCapitalize="characters"
@@ -442,8 +456,8 @@ const PointToPoint = ({navigation}) => {
                 shadowRadius: 3.84,
                 borderRadius: hp('0.5%'),
                 elevation: 5,
-                zIndex: 3,
-                height: hp('10%'),
+                zIndex: 2,
+                height: hp('27%'),
               }}>
               <ScrollView>
                 {predictions?.map((val, index) => {
@@ -497,7 +511,7 @@ const PointToPoint = ({navigation}) => {
 
     return (
       <>
-        <View style={{position: 'relative', overflow: 'visible', zIndex: 1}}>
+        <View style={{position: 'relative', overflow: 'visible', zIndex: 3}}>
           <View style={styles.input}>
             <TextInput
               autoCapitalize="characters"
@@ -527,7 +541,7 @@ const PointToPoint = ({navigation}) => {
                 borderRadius: hp('0.5%'),
                 elevation: 5,
                 zIndex: 3,
-                height: hp('10%'),
+                height: hp('27%'),
               }}>
               <ScrollView>
                 {predictions?.map((val, index) => {
@@ -662,8 +676,8 @@ const PointToPoint = ({navigation}) => {
 
           const json = JSON.parse(locationDetails);
           const json2 = JSON.parse(locationDetails2);
-           console.log(`${json?.lat},${json?.lng}`)
-        //   return console.log(`${json2?.lat},${json2.lng}`)
+          console.log(`${json?.lat},${json?.lng}`);
+          //   return console.log(`${json2?.lat},${json2.lng}`)
           const res = await api.post(
             '/restaurant/pintopin',
             {
@@ -686,15 +700,18 @@ const PointToPoint = ({navigation}) => {
             //     ...context,
             //     isPoint: true
             // })
-            navigation.navigate('Map', {
-              distance: distance,
-              restaurants: res.data?.restaurant,
-              location: location,
-              airport: JSON.parse(locationDetails),
-              airportDetails: JSON.parse(selectLocation),
-              airport2: JSON.parse(locationDetails2),
-              airportDetails2: JSON.parse(selectLocation2),
-              p2p: true,
+            navigation.navigate('SecondaryStack', {
+              screen: 'Map',
+              params: {
+                distance: distance,
+                restaurants: res.data?.restaurant,
+                location: location,
+                airport: JSON.parse(locationDetails),
+                airportDetails: JSON.parse(selectLocation),
+                airport2: JSON.parse(locationDetails2),
+                airportDetails2: JSON.parse(selectLocation2),
+                p2p: true,
+              },
             });
           } else {
             note(
@@ -709,7 +726,7 @@ const PointToPoint = ({navigation}) => {
           setLoading(false);
         }
       } else {
-        navigation.navigate('Packages');
+        navigation.navigate('SecondaryStack', {screen: 'Packages'});
       }
     };
     return (
@@ -755,7 +772,7 @@ const PointToPoint = ({navigation}) => {
           <Button />
         </View>
       </Background>
-      <Navigation navigation={navigation} />
+      {/* <Navigation navigation={navigation} /> */}
       {/* <LoaderOverlay text={true} visible={locationLoader} /> */}
     </>
   );
@@ -784,6 +801,7 @@ const styles = StyleSheet.create({
   inputField: {
     borderRadius: hp('50%'),
     width: '100%',
+    height: responsiveHeight(5),
     paddingHorizontal: wp('5%'),
     color: Color('homeBg'),
     paddingVertical: Platform.OS === 'android' && 0,

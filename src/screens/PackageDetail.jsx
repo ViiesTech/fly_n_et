@@ -499,7 +499,7 @@ const PackageDetail = ({route}) => {
             //   }
             // });
             setLoading(false);
-            navigation.navigate('Home');
+            navigation.navigate('Navigation');
             // trackPurchaseEvent(data);
           } else {
             setLoading(false);

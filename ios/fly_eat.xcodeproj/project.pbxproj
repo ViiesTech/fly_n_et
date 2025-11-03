@@ -41,6 +41,7 @@
 		F195F9950DA6E3834EDEC9DC /* Pods_fly_eat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9541BB8DC9618C698A98624 /* Pods_fly_eat.framework */; };
 		F282ADA06685479CB809B128 /* Montserrat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4EE7EB2F03D54A6E91F0FD82 /* Montserrat-Regular.ttf */; };
 		FA1EB1EE2D72258F00BE2A56 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA1EB1ED2D72258F00BE2A56 /* StoreKit.framework */; };
+		FA3382502EB9571100E591B0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FA33824F2EB9571100E591B0 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,7 +99,7 @@
 		E1FE016C4D3E4946ACD83BF0 /* Manrope-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Manrope-Regular.ttf"; path = "../src/assets/fonts/Manrope-Regular.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FA1EB1ED2D72258F00BE2A56 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		FAF6861A2EB2A9C6004E76FB /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		FA33824F2EB9571100E591B0 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		FAF6861B2EB2B89E004E76FB /* fly_eat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = fly_eat.entitlements; path = fly_eat/fly_eat.entitlements; sourceTree = "<group>"; };
 		FEF2B1C5E88641508364A861 /* Montserrat-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Thin.ttf"; path = "../src/assets/fonts/Montserrat-Thin.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -210,6 +211,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				FA33824F2EB9571100E591B0 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* fly_eat */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* fly_eatTests */,
@@ -217,7 +219,6 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
 				35E1D976B00A4BACBC2FAF99 /* Resources */,
-				FAF6861A2EB2A9C6004E76FB /* GoogleService-Info.plist */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -345,6 +346,7 @@
 				5A604F7860064367A29EFD2A /* Manrope-ExtraBold.ttf in Resources */,
 				1500446208D6473A84129466 /* Manrope-ExtraLight.ttf in Resources */,
 				7A02FC886C8943008D00CDA6 /* Manrope-Light.ttf in Resources */,
+				FA3382502EB9571100E591B0 /* GoogleService-Info.plist in Resources */,
 				791D76019A8E48A2865999E3 /* Manrope-Medium.ttf in Resources */,
 				ED16C37FB15C4B779B654F90 /* Manrope-Regular.ttf in Resources */,
 				B62A41E09D9D42338B4AFA3C /* Manrope-SemiBold.ttf in Resources */,
@@ -615,7 +617,7 @@
 					"@executable_path/Frameworks",
 					"\"${PODS_CONFIGURATION_BUILD_DIR}/DoubleConversion\"",
 				);
-				MARKETING_VERSION = 5;
+				MARKETING_VERSION = 6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -650,7 +652,7 @@
 					"@executable_path/Frameworks",
 					"\"${PODS_CONFIGURATION_BUILD_DIR}/DoubleConversion\"",
 				);
-				MARKETING_VERSION = 5;
+				MARKETING_VERSION = 6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -750,7 +752,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -835,7 +840,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

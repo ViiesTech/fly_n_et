@@ -57,7 +57,7 @@ import LoaderOverlay from '../components/LoaderOverlay';
 //   }
 // ]
 
-const Packages = () => {
+const Packages = ({route}) => {
   const [offerings, setOfferings] = useState(null);
   const navigation = useNavigation();
   const [products, setProducts] = useState([]);
@@ -82,7 +82,7 @@ const Packages = () => {
   const [packageLoading, setPackageLoading] = useState(false);
   // const [activeSubscription,setActiveSubscription] = useState(null)
 
-  console.log('active sub type', activeSubscription);
+  console.log('previous screen', route?.params?.from);
   // console.log('current purchase',currentPurchase)
 
   useEffect(() => {
@@ -371,7 +371,7 @@ const Packages = () => {
             //   isVerified: true,
             //   user: response?.data?.user,
             // });
-            navigation.navigate('Home');
+            navigation.navigate('Navigation');
           } else {
             setCodeLoader(false);
           }
@@ -520,7 +520,7 @@ const Packages = () => {
                 },
               }));
               setLoading(false);
-              navigation.navigate('Home');
+              navigation.navigate('Navigation');
             } else {
               setLoading(false);
             }
@@ -540,7 +540,7 @@ const Packages = () => {
         const purchases = await getAvailablePurchases();
         console.log('purchases', purchases);
         const subType =
-          purchases[0].productId === 'flyneat_year2' ? 'yearly' : 'monthly';
+          purchases[0]?.productId === 'flyneat_year2' ? 'yearly' : 'monthly';
         // console.log(subType)
         // if (purchases.length > 0 && !context.token) {
         //   navigation.navigate('Message', {
@@ -587,7 +587,7 @@ const Packages = () => {
                   },
                 }));
                 setRestoreLoader(false);
-                navigation.navigate('Home');
+                navigation.navigate('Navigation');
                 note(
                   'Purchases Restored!',
                   'Your subscription has been restored successfully',
@@ -677,7 +677,7 @@ const Packages = () => {
                   },
                 }));
                 setRestoreLoader(false);
-                navigation.navigate('Home');
+                navigation.navigate('Navigation');
                 note(
                   'Purchases Restored!',
                   'Your subscription has been restored successfully',
@@ -727,7 +727,12 @@ const Packages = () => {
                   borderRadius: hp('50%'),
                 }}
                 onPress={() => {
-                  navigation.goBack();
+                  if(route?.params?.from === 'SideMenu') {
+                  navigation.navigate('Navigation')
+                  } else {
+                  navigation.navigate('BottomStack')
+
+                  }
                   // if (!context?.user?.user_info && context?.token) {
                   //   navigation.navigate('UserType');
                   // } else {

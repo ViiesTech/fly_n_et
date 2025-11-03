@@ -38,7 +38,7 @@ import Btn from '../utils/Btn';
 import {api, errHandler, storageUrl} from '../utils/api';
 import {DataContext} from '../utils/Context';
 import {calcCrow, capitalize} from '../utils/global';
-import { Dimensions } from 'react-native';
+import {Dimensions} from 'react-native';
 import Orientation from 'react-native-orientation-locker';
 
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
@@ -47,7 +47,7 @@ const CFISearch = ({navigation}) => {
   const {context, setContext} = useContext(DataContext);
   const [location, setLocation] = useState();
   const [filter, setFilter] = useState('');
-  const [nauticalLocation,setNauticalLocation] = useState({})
+  const [nauticalLocation, setNauticalLocation] = useState({});
   const [distance, setDistance] = useState('');
   const [mode, setMode] = useState('cfi');
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,10 +61,9 @@ const CFISearch = ({navigation}) => {
   const [width, setScreenWidth] = useState(Dimensions.get('window').width);
   const [height, setScreenHeight] = useState(Dimensions.get('window').height);
 
-
   useEffect(() => {
     const updateDimensions = () => {
-      const { width, height } = Dimensions.get('window');
+      const {width, height} = Dimensions.get('window');
       setScreenWidth(width);
       setScreenHeight(height);
     };
@@ -73,7 +72,10 @@ const CFISearch = ({navigation}) => {
     Orientation.addOrientationListener(updateDimensions);
 
     // Listen for dimension changes (e.g. on rotation)
-    const dimensionSubscription = Dimensions.addEventListener('change', updateDimensions);
+    const dimensionSubscription = Dimensions.addEventListener(
+      'change',
+      updateDimensions,
+    );
 
     // Cleanup both listeners
     return () => {
@@ -82,14 +84,13 @@ const CFISearch = ({navigation}) => {
     };
   }, []);
 
-
-  useEffect(() => { 
+  useEffect(() => {
     getLocation();
   }, []);
 
   useEffect(() => {
     // if (location) {
-      getCFI();
+    getCFI();
     // }
   }, []);
 
@@ -100,7 +101,7 @@ const CFISearch = ({navigation}) => {
   // }, [filter, nauticalLocation, distance]);
 
   const getCFI = async (page = 1) => {
-    console.log('loadingn value',isLoading);
+    console.log('loadingn value', isLoading);
     if (isLoading) {
       // alert('kia horha hai')
       return;
@@ -111,10 +112,10 @@ const CFISearch = ({navigation}) => {
         headers: {Authorization: `Bearer ${context?.token}`},
       });
 
-      console.log('is this even working ?',res.data)
+      console.log('is this even working ?', res.data);
 
       const newUsers = res?.data?.users?.data || [];
-      
+
       setContext(prevContext => ({
         ...prevContext,
         pro_users:
@@ -123,7 +124,7 @@ const CFISearch = ({navigation}) => {
       setCurrentPage(page);
       setHasMore(page < res?.data?.users?.last_page);
     } catch (err) {
-      console.log('error',err)
+      console.log('error', err);
       await errHandler(err, null, navigation);
     } finally {
       setIsLoading(false);
@@ -138,7 +139,6 @@ const CFISearch = ({navigation}) => {
     Geolocation.getCurrentPosition(
       async pos => {
         const crd = pos.coords;
-        
 
         const response = await axios.get(
           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${crd.latitude},${crd.longitude}&key=${API_KEY}`,
@@ -163,9 +163,9 @@ const CFISearch = ({navigation}) => {
     setFilter(searchKey);
     if (searchKey.trim().length === 0) {
       getCFI(1); // Reset to default list when input is cleared
-      setPredictions([])
+      setPredictions([]);
       return;
-  }
+    }
     const response = await axios.get(
       `https://maps.googleapis.com/maps/api/place/autocomplete/json`,
       {
@@ -178,75 +178,84 @@ const CFISearch = ({navigation}) => {
     );
     // console.log('hh',response?.data)
     setPredictions(response?.data?.predictions);
-   
   };
 
-  const getPlaceLocation = async (place_id) => {
+  const getPlaceLocation = async place_id => {
     const BASE_URL = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${API_KEY}&fields=geometry`;
-        const response = await axios.get(BASE_URL);
-        // console.log('hhhhh ====>',response.data?.result?.geometry?.location)
-        setNauticalLocation(response?.data?.result?.geometry?.location)
-  }
+    const response = await axios.get(BASE_URL);
+    // console.log('hhhhh ====>',response.data?.result?.geometry?.location)
+    setNauticalLocation(response?.data?.result?.geometry?.location);
+  };
 
   const onSearchCFI = async (page = 1) => {
-  
-    if(!distance || !nauticalLocation) {
+    if (!distance || !nauticalLocation) {
       return;
     }
     if (isLoading || !hasMore) {
-        return;
-      }
-      setIsLoading(true);
-      try {
-        const data = new FormData()
-        data.append('starting_from',`${nauticalLocation?.lat},${nauticalLocation?.lng}`)
-        data.append('max_distance',distance)
-        data.append('page',page)
-        data.append('per_page',10)
-        // const obj = {
-        //         starting_from: `${nauticalLocation?.lat},${nauticalLocation?.lng}`,
-        //         max_distance: distance,
-        //         page: page,
-        //         per_page: 4,
-        // }
-        const res = await api.post('/user/search-cfii', data, {
-          headers: {Authorization: `Bearer ${context?.token}`},
-        });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const data = new FormData();
+      data.append(
+        'starting_from',
+        `${nauticalLocation?.lat},${nauticalLocation?.lng}`,
+      );
+      data.append('max_distance', distance);
+      data.append('page', page);
+      data.append('per_page', 10);
+      // const obj = {
+      //         starting_from: `${nauticalLocation?.lat},${nauticalLocation?.lng}`,
+      //         max_distance: distance,
+      //         page: page,
+      //         per_page: 4,
+      // }
+      const res = await api.post('/user/search-cfii', data, {
+        headers: {Authorization: `Bearer ${context?.token}`},
+      });
 
-        console.log('responnse of cfgii',res.data?.users?.last_page);
-  
-        const newUsers = res?.data?.users?.data || [];
-        setContext(prevContext => ({
-          ...prevContext,
-          pro_users:
-            page === 1 ? newUsers : [...prevContext.pro_users, ...newUsers],
-        }));
-        setCurrentPage(page);
-        setHasMore(page < res?.data?.users?.last_page || false);
-      } catch (err) {
-        await errHandler(err, null, navigation);
-      } finally {
-        // alert('loader false')
-        setIsLoading(false);
-      }
+      console.log('responnse of cfgii', res.data?.users?.last_page);
+
+      const newUsers = res?.data?.users?.data || [];
+      setContext(prevContext => ({
+        ...prevContext,
+        pro_users:
+          page === 1 ? newUsers : [...prevContext.pro_users, ...newUsers],
+      }));
+      setCurrentPage(page);
+      setHasMore(page < res?.data?.users?.last_page || false);
+    } catch (err) {
+      await errHandler(err, null, navigation);
+    } finally {
+      // alert('loader false')
+      setIsLoading(false);
+    }
   };
 
   const TopBar = () => {
     return (
-      <View style={[styles.topbar,{width: width , justifyContent: 'space-between',paddingHorizontal: 50}]}>
+      <View
+        style={[
+          styles.topbar,
+          {
+            width: width,
+            justifyContent: 'space-between',
+            paddingHorizontal: 50,
+          },
+        ]}>
         {/* <View style={{width: width * 0.2, alignItems: 'center'}}> */}
-          <TouchableOpacity
-            style={{
-              backgroundColor: Color('btnColor'),
-              width: hp('5%'),
-              height: hp('5%'),
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: hp('50%'),
-            }}
-            onPress={() => navigation.goBack()}>
-            <ArrowLeft size={hp('2.5%')} color={Color('text')} />
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: Color('btnColor'),
+            width: hp('5%'),
+            height: hp('5%'),
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: hp('50%'),
+          }}
+          onPress={() => navigation.goBack()}>
+          <ArrowLeft size={hp('2.5%')} color={Color('text')} />
+        </TouchableOpacity>
         {/* </View> */}
         {/* <View style={{ width: wp('60%'), alignItems: 'center' }}>
                         <Small heading font="medium">Current Location</Small>
@@ -256,19 +265,21 @@ const CFISearch = ({navigation}) => {
                         </View>
                     </View> */}
         {/* <View style={{width: width * 0.6,alignItems: 'center'}}> */}
-          <TouchableOpacity
-            style={{
-              backgroundColor: Color('btnColor'),
-              width: hp('5%'),
-              height: hp('5%'),
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: hp('50%'),
-            }}
-            onPress={() => navigation.navigate('Notifications')}>
-            <Notification size={hp('2.5%')} color={Color('text')} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={{
+            backgroundColor: Color('btnColor'),
+            width: hp('5%'),
+            height: hp('5%'),
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: hp('50%'),
+          }}
+          onPress={() =>
+            navigation.navigate('SecondaryStack', {screen: 'Notifications'})
+          }>
+          <Notification size={hp('2.5%')} color={Color('text')} />
+        </TouchableOpacity>
+      </View>
       //  </View>
     );
   };
@@ -305,127 +316,127 @@ const CFISearch = ({navigation}) => {
                         </TouchableOpacity> */}
           {/* </View> */}
           {/* <Br space={1.5} /> */}
-          <View style={{position: 'relative',overflow: 'visible',zIndex: 1}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              borderRadius: hp('1%'),
-              alignItems: 'center',
-              gap: hp('1%'),
-              padding: hp('1%'),
-              backgroundColor: Color('inputSearch'),
-              marginTop: hp(6),
-            }}>
-            <SearchNormal size={hp('3%')} color={Color('modelDark')} />
-            <TextInput
-            //   value={filter?.toUpperCase()}
-              ref={inputRef}
-              value={filter}
-              onChangeText={searchPlaces}
-              placeholder="Enter address or city name"
-              placeholderTextColor={Color('modelDark')}
+          <View style={{position: 'relative', overflow: 'visible', zIndex: 1}}>
+            <View
               style={{
-                padding: 0,
-                height: hp('3%'),
-                width: width * 0.75,
-                color: Color('shadow'),
-              }}
-            />
-            {predictions && predictions?.length > 0 && (
-              <View
+                flexDirection: 'row',
+                borderRadius: hp('1%'),
+                alignItems: 'center',
+                gap: hp('1%'),
+                padding: hp('1%'),
+                backgroundColor: Color('inputSearch'),
+                marginTop: hp(6),
+              }}>
+              <SearchNormal size={hp('3%')} color={Color('modelDark')} />
+              <TextInput
+                //   value={filter?.toUpperCase()}
+                ref={inputRef}
+                value={filter}
+                onChangeText={searchPlaces}
+                placeholder="Enter address or city name"
+                placeholderTextColor={Color('modelDark')}
                 style={{
-                  position: 'absolute',
-                  top: hp(5),
+                  padding: 0,
+                  height: hp('3%'),
                   width: width * 0.75,
-                  backgroundColor: Color('inputSearch'),
-                  shadowColor: Color('shadow'),
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 3.84,
-                  borderRadius: hp('1%'),
-                  elevation: 5,
-                  zIndex: 3,
-                //   maxHeight: hp('30%'),
-                  height: hp('10%'),
-                }}>
-                <ScrollView>
-                  {predictions?.map((val, index) => {
-                    return (
-                      <Pressable
-                        onPress={() => {
+                  color: Color('shadow'),
+                }}
+              />
+              {predictions && predictions?.length > 0 && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: hp(5),
+                    width: width * 0.75,
+                    backgroundColor: Color('inputSearch'),
+                    shadowColor: Color('shadow'),
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    borderRadius: hp('1%'),
+                    elevation: 5,
+                    zIndex: 3,
+                    //   maxHeight: hp('30%'),
+                    height: hp('10%'),
+                  }}>
+                  <ScrollView>
+                    {predictions?.map((val, index) => {
+                      return (
+                        <Pressable
+                          onPress={() => {
                             // if (inputRef.current) {
                             //     inputRef.current.setNativeProps({ text: val?.structured_formatting?.main_text?.toUpperCase() });
                             // }
-                          setFilter(val?.structured_formatting?.main_text);
-                          getPlaceLocation(val?.place_id);
-                          setPredictions([]);
-                        }}>
-                        <Small
-                          numberOfLines={1}
-                          key={index}
-                          color={Color('homeBg')}
-                          size={hp(2.6)}
-                          style={{padding: hp('0.5%')}}>
-                          {val?.structured_formatting?.main_text?.toUpperCase()}
-                        </Small>
-                      </Pressable>
-                    );
-                  })}
-                </ScrollView>
+                            setFilter(val?.structured_formatting?.main_text);
+                            getPlaceLocation(val?.place_id);
+                            setPredictions([]);
+                          }}>
+                          <Small
+                            numberOfLines={1}
+                            key={index}
+                            color={Color('homeBg')}
+                            size={hp(2.6)}
+                            style={{padding: hp('0.5%')}}>
+                            {val?.structured_formatting?.main_text?.toUpperCase()}
+                          </Small>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          </View>
+          <View>
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+              <View
+                style={{
+                  //   flexDirection: 'row',
+                  borderRadius: hp('1%'),
+                  alignItems: 'center',
+                  //   gap: hp('1%'),s
+                  padding: hp('1%'),
+                  // width: width * 0.68,
+                  backgroundColor: Color('inputSearch'),
+                  marginTop: predictions?.length < 1 ? hp(2) : hp(12),
+                }}>
+                {/* <SearchNormal size={hp('3%')} color={Color('modelDark')} /> */}
+                <TextInput
+                  keyboardType="numeric"
+                  onChangeText={text => {
+                    setDistance(text);
+                    if (text.trim().length === 0) {
+                      // alert('why')
+                      getCFI(1);
+                    }
+                  }}
+                  value={distance}
+                  placeholder="Distance (NM)"
+                  placeholderTextColor={Color('modelDark')}
+                  style={{
+                    padding: 0,
+                    height: hp('3%'),
+                    width: width * 0.7,
+                    color: Color('shadow'),
+                  }}
+                />
               </View>
-            )}
-          </View>
-          </View>
-         <View> 
-         <View style={{flexDirection: 'row',alignItems: 'center',gap: 10}}> 
-          <View
-            style={{
-            //   flexDirection: 'row',
-              borderRadius: hp('1%'),
-              alignItems: 'center',
-            //   gap: hp('1%'),s
-              padding: hp('1%'),
-              // width: width * 0.68,
-              backgroundColor: Color('inputSearch'),
-              marginTop: predictions?.length < 1 ? hp(2) : hp(12),
-            }}>
-            {/* <SearchNormal size={hp('3%')} color={Color('modelDark')} /> */}
-            <TextInput
-              keyboardType="numeric"
-              onChangeText={text => {
-               setDistance(text)
-               if (text.trim().length === 0) {
-                // alert('why')
-                getCFI(1);
-              }
-            }}
-              value={distance}
-              placeholder="Distance (NM)"
-              placeholderTextColor={Color('modelDark')}
-              style={{
-                padding: 0,
-                height: hp('3%'),
-                width: width * 0.7,
-                color: Color('shadow')
-              }}
-            />
-          </View>
-          <Btn
-              onPress={() => onSearchCFI()}
-              loading={false}
-              label="Search"
-              textStyle={{fontSize: hp('1.5%')}}
-              btnStyle={{
-                backgroundColor: Color('homeBg'),
-                marginTop: predictions?.length < 1 ? hp(2) : hp(12),
-                width: width * 0.16
-              }}
-            />
+              <Btn
+                onPress={() => onSearchCFI()}
+                loading={false}
+                label="Search"
+                textStyle={{fontSize: hp('1.5%')}}
+                btnStyle={{
+                  backgroundColor: Color('homeBg'),
+                  marginTop: predictions?.length < 1 ? hp(2) : hp(12),
+                  width: width * 0.16,
+                }}
+              />
             </View>
-            </View>
+          </View>
           <Br space={3} />
           <View
             style={{
@@ -475,52 +486,101 @@ const CFISearch = ({navigation}) => {
               <ActivityIndicator size={hp('5%')} color={Color('shadow')} />
             </View>
           )}
-          {
-                        context?.pro_users
-                        ?.filter((val) => val?.user_type?.toLowerCase() === mode?.toLowerCase())
-                        ?.map((val, index) => {                
-                          // console.log('i am just checking is that true or not',context?.pro_users)
-                            // const distance = calcCrow(parseFloat(context?.user?.latitude), parseFloat(context?.user?.longitude), parseFloat(val?.latitude), parseFloat(val?.longitude));
-                            return (
-                                <View key={index}>
-                                    <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: hp('1%'), shadowColor: Color('lightGray'), marginBottom: hp('2%') }} onPress={() => navigation.navigate('CFIDetail', { id: val?.id })}>
-                                        <Image
-                                            source={{ uri: `${storageUrl}${val?.user_info?.profile_image}` }}
-                                            style={{ width: wp('25%'), height: wp('25%'), borderRadius: hp('2%') }}
-                                        />
-                                        <View style={{ width: wp('50%') }}>
-                                            <Pera color={Color('shadow')}>
-                                                {capitalize(val?.name)}
-                                            </Pera>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('0.5%') }}>
-                                                <Location size={hp('2%')} color={Color('modelDark')} />
-                                                <Small color={Color('modelDark')} numberOfLines={1}>
-                                                    {val?.user_info?.city && val?.user_info?.state ? val?.user_info?.city + ',' + val?.user_info?.state : 'No Location Found'}
-                                                </Small>
-                                            </View>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('0.5%') }}>
-                                                <Star1
-                                                    size={hp('2.5%')}
-                                                    color={'#FFC000'}
-                                                    variant="Bold"
-                                                />
-                                                <Small color={Color('shadow')}>{!val?.avg_rating ? 0 : parseFloat(val?.avg_rating).toFixed(1)}</Small>
-                                                <Small color={Color('modelDark')}>({val?.rating_count || 0})</Small>
-                                            </View>
-                                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: hp('0.5%') }}>
-                                              <Calendar size={hp('2.5%')} color={Color('modelDark')} />
-                                                <Small color={Color('modelDark')}>{val?.user_info?.licence_expiry ? val?.user_info?.licence_expiry : 'No Date Found'}</Small>
-                                                </View>
-                                        </View>
-                                        <Small color={Color('modelDark')}>
-                                            {isNaN(distance) ? 0 : Math.round(distance)} km
-                                        </Small>
-                                    </Pressable>
-                                </View>
-                            );
-                        })
-                    }
-                    {/* {
+          {context?.pro_users
+            ?.filter(
+              val => val?.user_type?.toLowerCase() === mode?.toLowerCase(),
+            )
+            ?.map((val, index) => {
+              // console.log('i am just checking is that true or not',context?.pro_users)
+              // const distance = calcCrow(parseFloat(context?.user?.latitude), parseFloat(context?.user?.longitude), parseFloat(val?.latitude), parseFloat(val?.longitude));
+              return (
+                <View key={index}>
+                  <Pressable
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: hp('1%'),
+                      shadowColor: Color('lightGray'),
+                      marginBottom: hp('2%'),
+                    }}
+                    onPress={() =>
+                      navigation.navigate('SecondaryStack', {
+                        screen: 'CFIDetail',
+                        params: {id: val?.id},
+                      })
+                    }>
+                    <Image
+                      source={{
+                        uri: `${storageUrl}${val?.user_info?.profile_image}`,
+                      }}
+                      style={{
+                        width: wp('25%'),
+                        height: wp('25%'),
+                        borderRadius: hp('2%'),
+                      }}
+                    />
+                    <View style={{width: wp('50%')}}>
+                      <Pera color={Color('shadow')}>
+                        {capitalize(val?.name)}
+                      </Pera>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: hp('0.5%'),
+                        }}>
+                        <Location size={hp('2%')} color={Color('modelDark')} />
+                        <Small color={Color('modelDark')} numberOfLines={1}>
+                          {val?.user_info?.city && val?.user_info?.state
+                            ? val?.user_info?.city + ',' + val?.user_info?.state
+                            : 'No Location Found'}
+                        </Small>
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: hp('0.5%'),
+                        }}>
+                        <Star1
+                          size={hp('2.5%')}
+                          color={'#FFC000'}
+                          variant="Bold"
+                        />
+                        <Small color={Color('shadow')}>
+                          {!val?.avg_rating
+                            ? 0
+                            : parseFloat(val?.avg_rating).toFixed(1)}
+                        </Small>
+                        <Small color={Color('modelDark')}>
+                          ({val?.rating_count || 0})
+                        </Small>
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: hp('0.5%'),
+                        }}>
+                        <Calendar
+                          size={hp('2.5%')}
+                          color={Color('modelDark')}
+                        />
+                        <Small color={Color('modelDark')}>
+                          {val?.user_info?.licence_expiry
+                            ? val?.user_info?.licence_expiry
+                            : 'No Date Found'}
+                        </Small>
+                      </View>
+                    </View>
+                    <Small color={Color('modelDark')}>
+                      {isNaN(distance) ? 0 : Math.round(distance)} km
+                    </Small>
+                  </Pressable>
+                </View>
+              );
+            })}
+          {/* {
   context?.pro_users?.map((val, index) => (
     <View key={index}>
       <Pressable
@@ -584,7 +644,7 @@ const CFISearch = ({navigation}) => {
           <Br space={10} />
         </Wrapper>
       </Background>
-      <Navigation navigation={navigation} />
+      {/* <Navigation navigation={navigation} /> */}
     </>
   );
 };
@@ -604,4 +664,3 @@ const styles = StyleSheet.create({
 
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-

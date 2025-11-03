@@ -55,6 +55,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import { View } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import Notification from '../fly_n_et/src/utils/global'
+import Navigation from './src/components/Navigation';
+import BottomStack from './src/components/Navigation';
 
 const Stack = createStackNavigator();
 
@@ -666,12 +668,12 @@ function MainApp() {
       <Stack.Screen name="Logout" component={Logout} /> */}
         <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="Logout" component={Logout} />
-        <Stack.Screen name="PointToPoint">
+        {/* <Stack.Screen name="PointToPoint">
           {props => <Sus component={<PointToPoint {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="SelectLocation">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="SelectLocation">
           {props => <Sus component={<SelectLocation {...props} />} />}
-        </Stack.Screen>
+        </Stack.Screen> */}
         <Stack.Screen name="GetStarted">
           {props => <Sus component={<GetStarted {...props} />} />}
         </Stack.Screen>
@@ -699,81 +701,82 @@ function MainApp() {
         <Stack.Screen name="Message">
           {props => <Sus component={<Message {...props} />} />}
         </Stack.Screen>
-        <Stack.Screen name="Home">
+        {/* <Stack.Screen name="Home">
           {props => <Sus component={<Home {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="SideMenu">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="SideMenu">
           {props => <Sus component={<SideMenu {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Map">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="Map">
           {props => <Sus component={<Map {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Map2">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="Map2">
           {props => <Sus component={<Map2 {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="RestuarantDetails">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="RestuarantDetails">
           {props => <Sus component={<RestuarantDetails {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Feedback">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="Feedback">
           {props => <Sus component={<Feedback {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Bookmark">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="Bookmark">
           {props => <Sus component={<Bookmark {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Notifications">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="Notifications">
           {props => <Sus component={<Notifications {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Profile">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="Profile">
           {props => <Sus component={<Profile {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="AccountSettings">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="AccountSettings">
           {props => <Sus component={<AccountSettings {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="ChangePassword">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="ChangePassword">
           {props => <Sus component={<ChangePassword {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Settings">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="Settings">
           {props => <Sus component={<Settings {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="About">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="About">
           {props => <Sus component={<About {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Terms">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="Terms">
           {props => <Sus component={<Terms {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Privacy">
+        </Stack.Screen> */}
+        {/* <Stack.Screen name="Privacy">
           {props => <Sus component={<Privacy {...props} />} />}
-        </Stack.Screen>
+        </Stack.Screen> */}
         <Stack.Screen name="Verify">
           {props => <Sus component={<Verify {...props} />} />}
         </Stack.Screen>
         <Stack.Screen name="CFISelection">
           {props => <Sus component={<CFISelection {...props} />} />}
-        </Stack.Screen>
+        </Stack.Screen> 
         <Stack.Screen name="CFIScreen">
           {props => <Sus component={<CFIScreen {...props} />} />}
         </Stack.Screen>
-        <Stack.Screen name="CFiIScreen">
+         <Stack.Screen name="CFiIScreen">
           {props => <Sus component={<CFiIScreen {...props} />} />}
         </Stack.Screen>
-        <Stack.Screen name="CFISearch">
+        {/* <Stack.Screen name="CFISearch">
           {props => <Sus component={<CFISearch {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="CFIDetail">
+        </Stack.Screen> 
+        {/* <Stack.Screen name="CFIDetail">
           {props => <Sus component={<CFIDetail {...props} />} />}
-        </Stack.Screen>
+        </Stack.Screen> */}
         <Stack.Screen name="UserType">
           {props => <Sus component={<UserType {...props} />} />}
         </Stack.Screen>
-        <Stack.Screen name="Packages">
-          {props => <Sus component={<Packages {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="PackageDetail">
-          {props => <Sus component={<PackageDetail {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="ContactUs">
+        {/* <Stack.Screen name="ContactUs">
           {props => <Sus component={<ContactUs {...props} />} />}
-        </Stack.Screen>
+          </Stack.Screen> */}
+        <Stack.Screen name='BottomStack' component={BottomStack} />
+          <Stack.Screen name="Packages">
+            {props => <Sus component={<Packages {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="PackageDetail">
+            {props => <Sus component={<PackageDetail {...props} />} />}
+          </Stack.Screen>
         {/* Add the rest of your screens similarly using <Sus component={<Component />} /> */}
       </Stack.Navigator>
         {!isConnected && (

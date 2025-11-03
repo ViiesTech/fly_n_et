@@ -248,7 +248,7 @@ const CFIDetail = ({navigation, route}) => {
           </>
         )}
       </Background>
-      <Navigation navigation={navigation} />
+      {/* <Navigation navigation={navigation} /> */}
       {show && (
         <Model style={{padding: 0}} show={show}>
           <TouchableOpacity

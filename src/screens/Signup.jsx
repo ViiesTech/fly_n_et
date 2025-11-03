@@ -17,7 +17,7 @@ import {H5, Small} from '../utils/Text';
 import Br from '../components/Br';
 import Btn from '../utils/Btn';
 import Background from '../utils/Background';
-import {drawerInner, drawerStyle} from '../utils/global';
+import {drawerInner, drawerStyle, requestPermission} from '../utils/global';
 import Input from '../components/Input';
 import * as Yup from 'yup';
 import {useIsFocused} from '@react-navigation/native';
@@ -27,6 +27,7 @@ import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import {Color} from '../utils/Colors';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import messaging from "@react-native-firebase/messaging";
 
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 const validationSchema = Yup.object().shape({
@@ -71,6 +72,7 @@ const Signup = ({navigation}) => {
     data: {},
   });
   const [selectedSources, setSelectedSources] = useState([]);
+  const [token,setToken] = useState(null) 
 
   console.log('h', selectedSources);
 
@@ -124,6 +126,23 @@ const Signup = ({navigation}) => {
       console.warn(err);
     }
   }
+
+    const askNotificationPermission = async () => {
+      const status = await requestPermission('notifications');
+      console.log('permission status of android =====>', status);
+      if (
+        status === 'granted' ||
+        status === messaging.AuthorizationStatus.AUTHORIZED
+      ) {
+        // await messaging().registerDeviceForRemoteMessages()
+        const token = await messaging().getToken();
+        setToken(token)
+        // console.log('tokenn', token);
+        // setDeviceToken(token);
+      } else {
+        return alert('Permission denied');
+      }
+    };
 
   async function getLocation() {
     Geolocation.setRNConfiguration({
@@ -187,6 +206,7 @@ const Signup = ({navigation}) => {
         email,
         password,
         confirmPassword,
+        ...(token && {device_token: token}),
         ...location,
       };
       await validationSchema.validate(obj, {abortEarly: false});

@@ -41,7 +41,7 @@ const Verify = ({ navigation }) => {
       // alert('user info does not exist')
       if (context?.user?.user_info) {
         // alert('user info exist')
-        nextScreen(() => navigation.replace('Home'));
+        nextScreen(() => navigation.replace('BottomStack'));
       } else {
         nextScreen(() => navigation.replace('UserType'));
       }

@@ -186,7 +186,7 @@ const CreateProProfile = ({navigation}) => {
         navigation.replace('Message', {
           title: 'All Done',
           message: 'Your profile has been created successfully.',
-          screen: 'Home',
+          screen: 'BottomStack',
         }),
       );
     }

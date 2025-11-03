@@ -227,7 +227,7 @@ const Profile = ({navigation}) => {
                     justifyContent: 'center',
                     borderRadius: hp('50%'),
                   }}
-                  onPress={() => navigation.navigate('AccountSettings')}>
+                  onPress={() => navigation.navigate('SecondaryStack',{screen:'AccountSettings'})}>
                   <Edit2 size={hp('2.5%')} color={Color('text')} />
                 </TouchableOpacity>
               </View>
@@ -710,7 +710,7 @@ const Profile = ({navigation}) => {
           </Wrapper>
         </View>
       </Background>
-      <Navigation navigation={navigation} />
+      {/* <Navigation navigation={navigation} /> */}
     </>
   );
 };

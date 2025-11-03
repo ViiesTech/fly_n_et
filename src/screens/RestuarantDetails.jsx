@@ -52,7 +52,7 @@ const RestuarantDetails = ({navigation, route}) => {
   // console.log('restaurat detail ===>', navigation.getState());
   const routes = navigation.getState()?.routes;
   const previousScreen = routes[routes.length - 2]?.name;
-  // console.log('Navigated from:', context?.restuarent);
+  console.log('Navigated from:', previousScreen);
 
   const getRestuarentDetails = async () => {
     try {

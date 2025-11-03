@@ -34,7 +34,6 @@ import {storageUrl} from '../utils/api';
 const SideMenu = ({navigation}) => {
   const {context} = useContext(DataContext);
 
-
   const onDeleteAccount = async () => {
     navigation.navigate('Message', {
       theme: 'light',
@@ -46,16 +45,51 @@ const SideMenu = ({navigation}) => {
     });
   };
 
+  // const onNavigateScreen = screenName => {
+  //   if (context?.token) {
+  //     if (screenName === 'Profile' || screenName === 'Bookmark') {
+  //       navigation.navigate('Navigation', {
+  //         screen: 'HomeStack',
+  //         params: {screen: 'Profile'},
+  //       });
+  //     } else {
+  //       navigation.navigate(screenName);
+  //     }
+  //   } else {
+  //     if (
+  //       screenName === 'Home' ||
+  //       screenName === 'Settings' ||
+  //       screenName === 'Packages'
+  //     ) {
+  //       navigation.navigate(screenName);
+  //     } else {
+  //       navigation.navigate('Message', {
+  //         theme: 'light',
+  //         title: 'Login Required',
+  //         message: 'Please log in to continue',
+  //         screen: 'Login',
+  //       });
+  //     }
+  //   }
+  // };
+
   const onNavigateScreen = screenName => {
-    if (context?.token) {
-      navigation.navigate(screenName);
+    const isLoggedIn = !!context?.token;
+
+    const publicScreens = ['Navigation', 'Settings', 'Packages'];
+
+    if (isLoggedIn) {
+      if (screenName === 'Profile' || screenName === 'Bookmark') {
+        navigation.navigate('Navigation', {
+          screen: 'HomeStack',
+          params: {screen: screenName},
+        });
+      } else {
+        navigation.navigate(screenName,{from: 'SideMenu'});
+      }
     } else {
-      if (
-        screenName === 'Home' ||
-        screenName === 'Settings' ||
-        screenName === 'Packages'
-      ) {
-        navigation.navigate(screenName);
+      if (publicScreens.includes(screenName)) {
+        navigation.navigate(screenName,{from: 'SideMenu'});
       } else {
         navigation.navigate('Message', {
           theme: 'light',
@@ -72,7 +106,7 @@ const SideMenu = ({navigation}) => {
       <>
         <TouchableOpacity
           style={styles.option}
-          onPress={() => onNavigateScreen('Home')}>
+          onPress={() => onNavigateScreen('Navigation')}>
           <View
             style={{
               flexDirection: 'row',
@@ -166,7 +200,7 @@ const SideMenu = ({navigation}) => {
           </View>
           <ArrowRight size={hp('3%')} color={Color('lightText')} />
         </TouchableOpacity>
-           <TouchableOpacity
+        <TouchableOpacity
           style={styles.option}
           onPress={() => navigation.navigate('ContactUs')}>
           <View
@@ -257,16 +291,20 @@ const SideMenu = ({navigation}) => {
             <>
               <Br space={5} />
               <Image
-                source={context?.user?.user_info?.profile_image ? {
-                  uri: `${storageUrl}${context?.user?.user_info?.profile_image}`,
-                } : require('../assets/images/userProfile.jpeg')}
+                source={
+                  context?.user?.user_info?.profile_image
+                    ? {
+                        uri: `${storageUrl}${context?.user?.user_info?.profile_image}`,
+                      }
+                    : require('../assets/images/userProfile.jpeg')
+                }
                 style={{
                   width: hp('14%'),
                   height: hp('14%'),
                   borderRadius: hp('50%'),
                   alignSelf: 'center',
                 }}
-                resizeMode='cover'
+                resizeMode="cover"
               />
               <Br space={1} />
               <Pera

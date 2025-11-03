@@ -19,6 +19,7 @@ export const AppContext = ({children}) => {
     returnFromDetail: false,
     subscribed_details: null,
     skipNavigationCheck: false,
+    // activeScreen: 'Home'
     // isHome: false,
     // isPoint: false,
   });

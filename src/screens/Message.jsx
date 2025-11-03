@@ -25,6 +25,8 @@ const Message = ({ navigation, route }) => {
     const {context,setContext} = useContext(DataContext)
     const [loading,setLoading] = useState(false)
 
+    console.log('screen',screen)
+
     // useEffect(() => {
     //     Animated.timing(popUpAnimation, {
     //         toValue: 1,
@@ -87,7 +89,7 @@ const Message = ({ navigation, route }) => {
             await AsyncStorage.clear()
             navigation.navigate(screen);
         } else {
-            navigation.navigate(screen || 'Home');
+            navigation.navigate(screen || 'BottomStack');
         }
         // });
     };

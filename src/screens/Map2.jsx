@@ -3,41 +3,64 @@ import React, {useContext, useEffect, useState} from 'react';
 import BackBtn from '../components/BackBtn';
 import MapView, {Marker, Polyline} from 'react-native-maps';
 import {DataContext} from '../utils/Context';
-import Geolocation from '@react-native-community/geolocation';
+// import Geolocation from '@react-native-community/geolocation';
 import MapViewDirections from 'react-native-maps-directions';
 import { API_KEY, storageUrl } from '../utils/api';
 import { Color } from '../utils/Colors';
+import Geolocation from 'react-native-geolocation-service';
 
 const Map2 = ({navigation, route}) => {
   const {context} = useContext(DataContext);
   const [currentLocation, setCurrentLocation] = useState(null);
 
-  console.log('restaurat latitude', context?.restuarent.latitude);
+  console.log('restaurat latitude',context?.restuarent.latitude);
   console.log('restaurant longitude', context?.restuarent.longitude);
   console.log('current location', currentLocation);
   console.log('restaurant data',context?.restuarent)
 
   const restaurantLocation = {
-    latitude: context?.restuarent?.latitude || 42.222222,
-    longitude: context?.restuarent?.longitude || -120.870053,
+    latitude: parseFloat(context?.restuarent?.latitude) || 42.222222,
+    longitude: parseFloat(context?.restuarent?.longitude) || -120.870053,
   };
+
+  // console.log('restaurantLocation ===>',restaurantLocation)
 
   useEffect(() => {
     const startWatchingLocation = () => {
-      Geolocation.watchPosition(
-        position => {
-          const {latitude, longitude} = position.coords;
-          setCurrentLocation({latitude, longitude});
-        },
-        error => {
-          console.log('Error watching position:', error);
-        },
-        {
-          enableHighAccuracy: true,
-          distanceFilter: 10,
-          interval: 5000,
-        },
-      );
+      // Geolocation.watchPosition(
+      //   position => {
+      //     const {latitude, longitude} = position.coords;
+      //     setCurrentLocation({latitude, longitude});
+      //   },
+      //   error => {
+      //     console.log('Error watching position:', error);
+      //   },
+      //   {
+      //     enableHighAccuracy: true,
+      //     distanceFilter: 10,
+      //     interval: 5000,
+      //   },
+      // );
+       Geolocation.getCurrentPosition(
+      async pos => {
+        console.log('Position received: ', pos);
+        const {latitude,longitude} = pos.coords;
+              setCurrentLocation({latitude,longitude})
+        // setLocationLoader(false);
+      },
+      err => {
+        console.log('Geolocation error: ', err);
+        alert('failed to fetch location');
+        // setLocationLoader(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        forceRequestLocation: true,
+        showLocationDialog: true,
+      },
+    );
     };
 
     startWatchingLocation();
@@ -78,7 +101,7 @@ const Map2 = ({navigation, route}) => {
             }}>
             <Image
               source={{
-                uri: `${storageUrl}/${context?.restuarent?.image.path}`,
+                uri: `${storageUrl}${context?.restuarent?.image.path}`,
               }}
               style={{
                 height: 50,
@@ -95,6 +118,7 @@ const Map2 = ({navigation, route}) => {
             description="This is your current location"
           />
         )}
+      </MapView>
         {/* {currentLocation && (
           <MapViewDirections
             origin={currentLocation}
@@ -118,7 +142,6 @@ const Map2 = ({navigation, route}) => {
             strokeWidth={4}
           />
         )} */}
-      </MapView>
     </>
   );
 };

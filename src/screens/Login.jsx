@@ -178,7 +178,7 @@ const Login = ({navigation}) => {
                   sub_type: response?.data?.user?.sub_type,
                 },
               }));
-              navigation.replace('Home');
+              navigation.replace('BottomStack');
             }
             // setApiLoading(false);
             return;
@@ -192,9 +192,9 @@ const Login = ({navigation}) => {
 
       if (isExpired) {
         console.log('check the expiry');
-        nextScreen(() => navigation.navigate('Packages'));
+        nextScreen(() => navigation.navigate('Packages',{from: 'Login'}));
       } else {
-        nextScreen(() => navigation.replace('Home'));
+        nextScreen(() => navigation.replace('BottomStack'));
       }
 
       setContext(prev => ({

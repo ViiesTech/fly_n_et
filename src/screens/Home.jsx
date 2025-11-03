@@ -38,6 +38,7 @@ import LoaderOverlay from '../components/LoaderOverlay';
 import {useIsFocused} from '@react-navigation/native';
 import {getAvailablePurchases} from 'react-native-iap';
 import Purchases from 'react-native-purchases';
+import {responsiveHeight} from '../utils/global';
 
 // const API_KEY = 'AIzaSyD0w7OQfYjg6mc7LVGwqPkvNDQ6Ao7GTwk';
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
@@ -97,7 +98,7 @@ const Home = ({navigation}) => {
     if (context?.token && isFocused) {
       checkSubscriptionAgain();
       assignTransactionId();
-       savedUserLocation()
+      savedUserLocation();
     }
   }, [isFocused]);
 
@@ -117,7 +118,7 @@ const Home = ({navigation}) => {
     try {
       if (Platform.OS === 'android') {
         const purchases = await getAvailablePurchases();
-        console.log('purchases from android ===>',purchases[0].purchaseToken)
+        console.log('purchases from android ===>', purchases[0].purchaseToken);
         if (purchases[0].purchaseToken) {
           let data = {
             transaction_id: purchases[0].purchaseToken,
@@ -372,28 +373,25 @@ const Home = ({navigation}) => {
       //     return {...prev, user: updatedUser};
       //   });
 
-        // await AsyncStorage.setItem(
-        //   'locationDetails',
-        //   JSON.stringify(nearest.geometry.location),
-        // ); 
-        const obj = {
-          lat: context?.user?.latitude,
-          lng: context.user?.longitude
-        }
-        // console.log('context latlng',context?.user?.user_info?.obj)
-           await AsyncStorage.setItem(
-          'locationDetails',
-          JSON.stringify(obj),
-        );
+      // await AsyncStorage.setItem(
+      //   'locationDetails',
+      //   JSON.stringify(nearest.geometry.location),
+      // );
+      const obj = {
+        lat: context?.user?.latitude,
+        lng: context.user?.longitude,
+      };
+      // console.log('context latlng',context?.user?.user_info?.obj)
+      await AsyncStorage.setItem('locationDetails', JSON.stringify(obj));
 
-        await AsyncStorage.setItem(
-          'selectLocation',
-          JSON.stringify({
-            description: context?.user?.user_info?.address,
-            // place_id: nearest.place_id,
-            structured_formatting: {main_text: context?.user?.user_info?.address},
-          }),
-        );
+      await AsyncStorage.setItem(
+        'selectLocation',
+        JSON.stringify({
+          description: context?.user?.user_info?.address,
+          // place_id: nearest.place_id,
+          structured_formatting: {main_text: context?.user?.user_info?.address},
+        }),
+      );
       // }
     } catch (err) {
       console.log('Error fetching nearest airport:', err);
@@ -423,7 +421,7 @@ const Home = ({navigation}) => {
             longitudeDelta: 0.0421,
             locationName,
           });
-        //  await savedUserLocation()
+          //  await savedUserLocation()
           // await getNearestAirport(crd.latitude, crd.longitude, locationName);
         } else {
           convertLatLngToAddr();
@@ -484,7 +482,9 @@ const Home = ({navigation}) => {
               justifyContent: 'center',
               borderRadius: hp('50%'),
             }}
-            onPress={() => navigation.navigate('SideMenu')}>
+            onPress={() =>
+              navigation.navigate('SecondaryStack', {screen: 'SideMenu'})
+            }>
             <TextalignLeft size={hp('2.5%')} color={Color('text')} />
           </TouchableOpacity>
         </View>
@@ -513,7 +513,7 @@ const Home = ({navigation}) => {
           ) : (
             <TouchableOpacity
               style={{alignItems: 'center'}}
-              onPress={() => navigation.navigate('AccountSettings')}>
+              onPress={() => navigation.navigate('SecondaryStack',{screen:'SelectLocation'})}>
               <Small heading font="medium">
                 Add Your Home Airport
               </Small>
@@ -547,7 +547,9 @@ const Home = ({navigation}) => {
                   screen: 'Login',
                 });
               } else {
-                navigation.navigate('Notifications');
+                navigation.navigate('SecondaryStack', {
+                  screen: 'Notifications',
+                });
               }
             }}>
             <Notification size={hp('2.5%')} color={Color('text')} />
@@ -674,7 +676,7 @@ const Home = ({navigation}) => {
                 borderRadius: hp('0.5%'),
                 elevation: 5,
                 zIndex: 3,
-                height: hp('10%'),
+                height: hp('27%'),
               }}>
               <ScrollView>
                 {predictions?.map((val, index) => {
@@ -756,12 +758,15 @@ const Home = ({navigation}) => {
             //     ...context,
             //     isHome: true
             // })
-            navigation.navigate('Map', {
+            navigation.navigate('SecondaryStack', {
+              screen: 'Map',
+            params: {  
               distance: distance,
               restaurants: res.data?.restaurant,
               location: location,
               airport: JSON.parse(locationDetails),
               airportDetails: JSON.parse(selectLocation),
+              }
             });
           } else {
             note(
@@ -815,7 +820,7 @@ const Home = ({navigation}) => {
           <Button />
         </View>
       </Background>
-      <Navigation navigation={navigation} />
+      {/* <Navigation navigation={navigation} /> */}
       {/* {locationLoader && <LoaderOverlay text={true} visible={locationLoader} />} */}
     </>
   );
@@ -844,6 +849,7 @@ const styles = StyleSheet.create({
   inputField: {
     borderRadius: hp('50%'),
     width: '100%',
+    height: responsiveHeight(5),
     paddingHorizontal: wp('5%'),
     paddingVertical: Platform.OS === 'android' && 0,
     color: Color('homeBg'),
