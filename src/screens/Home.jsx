@@ -654,6 +654,7 @@ const Home = ({navigation}) => {
               ref={inputRef}
               onChangeText={searchAirports}
               style={styles.inputField}
+              numberOfLines={1}
               placeholderTextColor={Color('lightText')}
               placeholder={placeholder}
               autoCorrect={false}

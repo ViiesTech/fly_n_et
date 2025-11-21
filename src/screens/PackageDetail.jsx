@@ -177,7 +177,7 @@ const PackageDetail = ({route}) => {
                 'To access your subscription benefits, please create or log in to your account',
               screen: 'Login',
             });
-            // trackPurchaseEvent(data);
+            trackPurchaseEvent(data);
           } else {
             if (context.token) {
               console.log('going in navigatii func');
@@ -275,7 +275,7 @@ const PackageDetail = ({route}) => {
               'To access your subscription benefits, please create or log in to your account',
             screen: 'Login',
           });
-          // trackPurchaseEvent(data);
+          trackPurchaseEvent(data);
         } else {
           // if (context.token) {
           setLoading(false);
@@ -500,7 +500,7 @@ const PackageDetail = ({route}) => {
             // });
             setLoading(false);
             navigation.navigate('Navigation');
-            // trackPurchaseEvent(data);
+            trackPurchaseEvent(data);
           } else {
             setLoading(false);
           }

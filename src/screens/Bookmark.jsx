@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -22,6 +22,7 @@ import {DataContext} from '../utils/Context';
 
 const Bookmark = ({navigation}) => {
   const {context, setContext} = useContext(DataContext);
+  const [loader,setLoader] = useState(false)
 
   useEffect(() => {
     getSavedRestuarents();
@@ -29,6 +30,7 @@ const Bookmark = ({navigation}) => {
 
   const getSavedRestuarents = async () => {
     try {
+      setLoader(true)
       const res = await api.get('/bookmark/list', {
         headers: {Authorization: `Bearer ${context?.token}`},
       });
@@ -38,6 +40,8 @@ const Bookmark = ({navigation}) => {
       });
     } catch (err) {
       await errHandler(err, null, navigation);
+    } finally {
+      setLoader(false)
     }
   };
 
@@ -51,7 +55,7 @@ const Bookmark = ({navigation}) => {
             Favorites
           </Pera>
           <Br space={2} />
-          {!context?.savedRestuarents ? (
+          {loader ? (
             <ActivityIndicator size={'large'} color={Color('drawerBg')} />
           ) : context?.savedRestuarents?.length === 0 ? (
             <Small style={{textAlign: 'center'}} color={Color('homeBg')}>

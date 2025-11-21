@@ -55,7 +55,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 import { View } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import Notification from '../fly_n_et/src/utils/global'
-import Navigation from './src/components/Navigation';
 import BottomStack from './src/components/Navigation';
 
 const Stack = createStackNavigator();

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import Background from '../utils/Background';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
@@ -17,6 +17,7 @@ import moment from 'moment';
 
 const Notifications = ({ navigation }) => {
     const {context, setContext} = useContext(DataContext);
+    const [loader,setLoader] = useState(false)
 
     useEffect(() => {
         getNotifications();
@@ -47,7 +48,8 @@ const Notifications = ({ navigation }) => {
     };
 
     const getNotifications = async () => {
-        try {``
+        try {
+            setLoader(true)
             const res = await api.get('/user/list-notify', {
                 headers: {Authorization: `Bearer ${context?.token}`},
             });
@@ -58,6 +60,8 @@ const Notifications = ({ navigation }) => {
             });
         } catch (err) {
             await errHandler(err, null, navigation);
+        } finally {
+            setLoader(false)
         }
     };
 
@@ -71,7 +75,7 @@ const Notifications = ({ navigation }) => {
                     <Br space={3.5} />
                     <Wrapper>
                         {
-                            !context?.notifications
+                            loader
                             ?
                             <View style={{alignItems: 'center'}}>
                                 <ActivityIndicator size={hp('5%')} color={Color('shadow')} />
