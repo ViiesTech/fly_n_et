@@ -31,7 +31,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import LoaderOverlay from '../components/LoaderOverlay';
-import {trackPurchaseEvent} from '../utils/global';
+import { trackPurchaseEvent } from '../utils/global';
+// import {trackPurchaseEvent} from '../utils/global';
 
 const packageDetails = [
   {

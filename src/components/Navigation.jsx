@@ -207,7 +207,8 @@ const Navigation = ({label, navigation, ...props}) => {
               if (isExpired) {
                 navigation.navigate('Packages');
               } else {
-                navigation.navigate('CFISearch');
+              //  return console.log('navigation ===>',navigation.getState().routeNames)
+                navigation.navigate('CFI/CFII');
               }
             } else {
               navigation.navigate('Message', {

@@ -314,10 +314,10 @@ const Home = ({navigation}) => {
       if (Platform.OS === 'android') {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: 'Fly n Eat',
-            message: 'Fly n Eat App access to your location',
-          },
+          // {
+          //   title: 'Fly n Eat',
+          //   message: 'Fly n Eat App access to your location',
+          // },
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           getLocations();
@@ -845,7 +845,7 @@ const styles = StyleSheet.create({
     width: wp('70%'),
     alignItems: 'center',
     justifyContent: 'center',
-    height: hp('5%'),
+    // height: hp('5%'),
   },
   inputField: {
     borderRadius: hp('50%'),

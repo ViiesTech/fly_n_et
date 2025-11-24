@@ -51,7 +51,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoaderOverlay from './src/components/LoaderOverlay';
 import ContactUs from './src/screens/ContactUs';
 import {createStackNavigator} from '@react-navigation/stack';
-// import {AppEventsLogger, Settings as settings} from 'react-native-fbsdk-next';
+import {AppEventsLogger, Settings as settings} from 'react-native-fbsdk-next';
 import { View } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import Notification from '../fly_n_et/src/utils/global'
@@ -404,13 +404,13 @@ const Sus = ({component}) => {
 
 function MainApp() {
   const {context, setContext} = useContext(DataContext);
-  const [isConnected,setIsConnected] = useState(false)
+  const [isConnected,setIsConnected] = useState(true)
   // const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(false);
   // const [appState, setAppState] = useState(AppState.currentState);
   const isFocused = useIsFocused();
 
-  console.log(context?.token);
+  // console.log(context?.token);
 
   let APIKEY =
     Platform.OS === 'android'
@@ -428,15 +428,15 @@ function MainApp() {
     checkToken();
   }, [context?.token]);
 
-  // useEffect(() => {
-  //   settings.initializeSDK();
-  //   // settings.setAppID(META_APP_ID);
-  //   setTimeout(() => {
-  //     AppEventsLogger.logEvent('fb_mobile_activate_app');
-  //     // AppEventsLogger.logEvent('IOS')
-  //     console.log('📡 AppLaunched event sent');
-  //   }, 2000);
-  // }, []);
+  useEffect(() => {
+    settings.initializeSDK();
+    // settings.setAppID(META_APP_ID);
+    setTimeout(() => {
+      AppEventsLogger.logEvent('fb_mobile_activate_app');
+      // AppEventsLogger.logEvent('IOS')
+      console.log('📡 AppLaunched event sent');
+    }, 2000);
+  }, []);
 
 
   const checkToken = async () => {
@@ -773,6 +773,9 @@ function MainApp() {
           <Stack.Screen name="Packages">
             {props => <Sus component={<Packages {...props} />} />}
           </Stack.Screen>
+              {/* <Stack.Screen name="CFISearch">
+            {props => <Sus component={<CFISearch {...props} />} />}
+          </Stack.Screen> */}
           <Stack.Screen name="PackageDetail">
             {props => <Sus component={<PackageDetail {...props} />} />}
           </Stack.Screen>

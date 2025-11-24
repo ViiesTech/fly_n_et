@@ -314,36 +314,36 @@ class Notification {
 export default new Notification();
 
 
-// export const trackCompleteRegisterationEvent = () => {
-//   AppEventsLogger.logEvent('CompleteRegistration', {
-//     registration_method: 'email',
-//   });
-// };
+export const trackCompleteRegisterationEvent = () => {
+  AppEventsLogger.logEvent('CompleteRegistration', {
+    registration_method: 'email',
+  });
+};
 
-// export const trackPurchaseEvent = data => {
-//   if (data && Object.keys(data).length > 0) {
-//     let amount = 0;
+export const trackPurchaseEvent = data => {
+  if (data && Object.keys(data).length > 0) {
+    let amount = 0;
 
-//     if (Platform.OS === 'android') {
-//       const priceString =
-//         data?.subscriptionOfferDetails?.[0]?.pricingPhases
-//           ?.pricingPhaseList?.[0]?.formattedPrice || '0';
+    if (Platform.OS === 'android') {
+      const priceString =
+        data?.subscriptionOfferDetails?.[0]?.pricingPhases
+          ?.pricingPhaseList?.[0]?.formattedPrice || '0';
 
-//       amount = parseFloat(priceString.replace(/[^0-9.]/g, '')) || 0;
-//     } else {
-//       const priceString = data?.product?.priceString || '0';
-//       amount = parseFloat(priceString.replace(/[^0-9.]/g, '')) || 0;
-//     }
+      amount = parseFloat(priceString.replace(/[^0-9.]/g, '')) || 0;
+    } else {
+      const priceString = data?.product?.priceString || '0';
+      amount = parseFloat(priceString.replace(/[^0-9.]/g, '')) || 0;
+    }
 
-//     const productId =
-//       Platform.OS === 'android' ? data?.productId : data?.product?.identifier;
+    const productId =
+      Platform.OS === 'android' ? data?.productId : data?.product?.identifier;
 
-//     const productName =
-//       Platform.OS === 'android' ? data?.name : data?.product?.title;
+    const productName =
+      Platform.OS === 'android' ? data?.name : data?.product?.title;
 
-//     AppEventsLogger.logPurchase(amount, 'USD', {
-//       item_id: productId,
-//       item_name: productName,
-//     });
-//   }
-// };
+    AppEventsLogger.logPurchase(amount, 'USD', {
+      item_id: productId,
+      item_name: productName,
+    });
+  }
+};
