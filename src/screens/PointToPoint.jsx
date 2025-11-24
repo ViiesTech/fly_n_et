@@ -587,7 +587,7 @@ const PointToPoint = ({navigation}) => {
   const Button = () => {
     const [loading, setLoading] = useState(false);
     const onSearch = async () => {
-      await AsyncStorage.removeItem('search');
+      // await AsyncStorage.removeItem('search');
       const firstSearch = await AsyncStorage.getItem('search');
       if (
         (!context?.user?.expired_at && !firstSearch) ||
@@ -726,7 +726,8 @@ const PointToPoint = ({navigation}) => {
           setLoading(false);
         }
       } else {
-        navigation.navigate('SecondaryStack', {screen: 'Packages'});
+        // alert('why')
+        navigation.navigate('SecondaryStack', {screen: 'Packages',params: {from: 'PointToPoint'}});
       }
     };
     return (

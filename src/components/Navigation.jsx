@@ -209,6 +209,7 @@ const Navigation = ({label, navigation, ...props}) => {
               } else {
               //  return console.log('navigation ===>',navigation.getState().routeNames)
                 navigation.navigate('CFI/CFII');
+                ''
               }
             } else {
               navigation.navigate('Message', {

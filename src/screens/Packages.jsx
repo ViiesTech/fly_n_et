@@ -727,7 +727,8 @@ const Packages = ({route}) => {
                   borderRadius: hp('50%'),
                 }}
                 onPress={() => {
-                  if(route?.params?.from === 'SideMenu') {
+                  if(route?.params?.from === 'SideMenu' || route?.params?.from === 'Home' ||  route?.params?.from === 'PointToPoint') {
+                    // alert('hello')
                   navigation.navigate('Navigation')
                   } else {
                   navigation.navigate('BottomStack')

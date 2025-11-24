@@ -781,7 +781,7 @@ const Home = ({navigation}) => {
           setLoading(false);
         }
       } else {
-        navigation.navigate('Packages');
+        navigation.navigate('SecondaryStack',{screen:'Packages',params: {from: 'Home'}});
       }
     };
     return (
