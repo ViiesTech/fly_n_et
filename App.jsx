@@ -641,7 +641,7 @@ function MainApp() {
 
     useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
-      setIsConnected(state.isConnected && state.isInternetReachable);
+      setIsConnected(state.isConnected);
     });
     return () => unsubscribe();
   }, []);
