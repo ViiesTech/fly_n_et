@@ -57,59 +57,58 @@ const validationSchema = Yup.object().shape({
 });
 
 const CreateProfile = ({navigation}) => {
- const typeData = [
-  'None',
-  'Aero',
-  'American Champion',
-  'American Legend',
-  'Antonov',
-  'ATR',
-  'Aviat',
-  'Beechcraft (the one Rick has)',
-  'Bellanca',
-  'Boeing',
-  'Bristell',
-  'Cessna',
-  'Cirrus',
-  'Columbia',
-  'Commander',
-  'Cubcrafters',
-  'Czech Sport',
-  'Daher TBM',
-  'Dehavilland',
-  'Diamond',
-  'Dornier',
-  'Epic',
-  'Evektor',
-  'Fairchild',
-  'Flight Design',
-  'Game Composites',
-  'Gogetair',
-  'Grumman/American General',
-  'Helicopter',
-  'Icon',
-  'JMB',
-  'Light Sport Aircraft',
-  'Lockheed',
-  'Maule',
-  'Mitsubishi',
-  'Mooney',
-  'Piper',
-  'Pilatus',
-  'Piaggio',
-  'Pipestrel',
-  'Siai',
-  'Single Engine',
-  'Socata TBM',
-  'TBM',
-  'Tecnam',
-  'Tecnam',
-  'Tomark Aero',
-  'Turbo Prop Aircraft',
-  'Vashon',
-  'Waco',
-];
-
+  const typeData = [
+    'None',
+    'Aero',
+    'American Champion',
+    'American Legend',
+    'Antonov',
+    'ATR',
+    'Aviat',
+    'Beechcraft (the one Rick has)',
+    'Bellanca',
+    'Boeing',
+    'Bristell',
+    'Cessna',
+    'Cirrus',
+    'Columbia',
+    'Commander',
+    'Cubcrafters',
+    'Czech Sport',
+    'Daher TBM',
+    'Dehavilland',
+    'Diamond',
+    'Dornier',
+    'Epic',
+    'Evektor',
+    'Fairchild',
+    'Flight Design',
+    'Game Composites',
+    'Gogetair',
+    'Grumman/American General',
+    'Helicopter',
+    'Icon',
+    'JMB',
+    'Light Sport Aircraft',
+    'Lockheed',
+    'Maule',
+    'Mitsubishi',
+    'Mooney',
+    'Piper',
+    'Pilatus',
+    'Piaggio',
+    'Pipestrel',
+    'Siai',
+    'Single Engine',
+    'Socata TBM',
+    'TBM',
+    'Tecnam',
+    'Tecnam',
+    'Tomark Aero',
+    'Turbo Prop Aircraft',
+    'Vashon',
+    'Waco',
+  ];
 
   const {context, setContext} = useContext(DataContext);
   const IsFocused = useIsFocused();
@@ -124,7 +123,6 @@ const CreateProfile = ({navigation}) => {
   const [age, setAge] = useState(0);
 
   // console.log(context?.token)
-
 
   // useEffect(() => {
   //   Animated.timing(slideAnimation, {
@@ -164,7 +162,7 @@ const CreateProfile = ({navigation}) => {
     //   duration: 1000,
     //   useNativeDriver: true,
     // }).start(() => {
-      nav();
+    nav();
     // });
   };
   const uploadProfileImage = async () => {
@@ -223,11 +221,16 @@ const CreateProfile = ({navigation}) => {
       // formData.append('age', age);
       // formData.append('dob', date_of_birth);
       formData.append('aircraft_type', type);
-      formData.append('profile_image', {
-        uri: profile.uri,
-        type: profile.type,
-        name: profile.fileName,
-      });
+
+      // Only append profile image if it exists
+      if (profile) {
+        formData.append('profile_image', {
+          uri: profile.uri,
+          type: profile.type,
+          name: profile.fileName,
+        });
+      }
+
       // formData.append('banner_image', banner ? {
       //   uri: banner?.uri,
       //   type: banner?.type,
@@ -240,7 +243,7 @@ const CreateProfile = ({navigation}) => {
           'Content-Type': 'multipart/form-data',
         },
       });
-       console.log('first',res.data)
+      console.log('first', res.data);
       // const token = await AsyncStorage.getItem('token');
       const user = {
         ...context?.user,
@@ -248,7 +251,7 @@ const CreateProfile = ({navigation}) => {
       };
       // return console.log(user)
       // if (token) {
-        await AsyncStorage.setItem('user', JSON.stringify(user));
+      await AsyncStorage.setItem('user', JSON.stringify(user));
       // }
       //  console.log('token',context)
       setContext({
@@ -260,7 +263,6 @@ const CreateProfile = ({navigation}) => {
       //   user: user,
       //   token: prevContext.token
       // }));
-      
     } catch (err) {
       await errHandler(err, null, navigation);
     } finally {
@@ -273,7 +275,7 @@ const CreateProfile = ({navigation}) => {
         <View style={{height: hp('100%'), justifyContent: 'space-between'}}>
           <View />
           <View style={drawerStyle}>
-          {/* <Animated.View
+            {/* <Animated.View
             style={[
               {transform: [{translateY: slideAnimation}], zIndex: 100},
               drawerStyle,
@@ -355,17 +357,19 @@ const CreateProfile = ({navigation}) => {
                   Aircraft Type
                 </Pera>
                 <Br space={1} />
-            <TouchableOpacity
-                           style={{
-                             borderRadius: hp('1%'),
-                             padding: hp('2%'),
-                             borderWidth: 1,
-                             borderColor: Color('lightGray'),
-                           }}
-                           onPress={() => setShow(!show)}>
-                           <Text style={{color: Color('lightGray')}}>{type ? type : 'Select Type'}</Text>
-                           {/* <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly={false} /> */}
-                         </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    borderRadius: hp('1%'),
+                    padding: hp('2%'),
+                    borderWidth: 1,
+                    borderColor: Color('lightGray'),
+                  }}
+                  onPress={() => setShow(!show)}>
+                  <Text style={{color: Color('lightGray')}}>
+                    {type ? type : 'Select Type'}
+                  </Text>
+                  {/* <Input style={{borderRadius: hp('1%')}} label="Select Type" value={type} readOnly={false} /> */}
+                </TouchableOpacity>
                 <Br space={1} />
                 {/* <Pera heading font="bold">
                   Banner Image
@@ -427,7 +431,7 @@ const CreateProfile = ({navigation}) => {
                 />
               </ScrollView>
             </View>
-            </View>
+          </View>
           {/* </Animated.View> */}
         </View>
       </Background>

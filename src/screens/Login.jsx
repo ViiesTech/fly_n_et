@@ -34,7 +34,7 @@ import Geolocation from 'react-native-geolocation-service';
 import axios from 'axios';
 // import Purchases from 'react-native-purchases';
 // import LoaderOverlay from '../components/LoaderOverlay';
-import messaging from "@react-native-firebase/messaging";
+import messaging from '@react-native-firebase/messaging';
 
 const API_KEY = 'AIzaSyAtOEF2JBQyaPqt2JobxF1E5q6AX1VSWPk';
 const validationSchema = Yup.object().shape({
@@ -55,7 +55,7 @@ const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [location, setLocation] = useState();
-  const [token,setToken] = useState(null)
+  const [token, setToken] = useState(null);
 
   console.log('user info ==>', context?.user?.sub_type);
 
@@ -95,7 +95,7 @@ const Login = ({navigation}) => {
     askNotificationPermission();
   }, []);
 
-   const askNotificationPermission = async () => {
+  const askNotificationPermission = async () => {
     const status = await requestPermission('notifications');
     console.log('permission status of android =====>', status);
     if (
@@ -104,7 +104,7 @@ const Login = ({navigation}) => {
     ) {
       // await messaging().registerDeviceForRemoteMessages()
       const token = await messaging().getToken();
-      setToken(token)
+      setToken(token);
       console.log('tokenn', token);
       // setDeviceToken(token);
     } else {
@@ -112,14 +112,23 @@ const Login = ({navigation}) => {
     }
   };
 
-  const handlingNavigations = async (sub_type, token,userData,transactionId) => {
+  const handlingNavigations = async (
+    sub_type,
+    token,
+    userData,
+    transactionId,
+  ) => {
     const user = userData || context?.user;
 
     if (!user?.user_info) {
       console.log('Navigating to UserType because profile is missing');
       nextScreen(() => navigation.navigate('UserType'));
     } else {
-      const updatedExpiry = await getSubscriptionInfo(sub_type, token,transactionId);
+      const updatedExpiry = await getSubscriptionInfo(
+        sub_type,
+        token,
+        transactionId,
+      );
       const expiryDate = updatedExpiry
         ? new Date(updatedExpiry)
         : context?.user?.expired_at
@@ -192,7 +201,7 @@ const Login = ({navigation}) => {
 
       if (isExpired) {
         console.log('check the expiry');
-        nextScreen(() => navigation.navigate('Packages',{from: 'Login'}));
+        nextScreen(() => navigation.navigate('Packages', {from: 'Login'}));
       } else {
         nextScreen(() => navigation.replace('BottomStack'));
       }
@@ -240,7 +249,7 @@ const Login = ({navigation}) => {
   //   return null;
   // };
 
-  const getSubscriptionInfo = async (sub_type, token,transactionId) => {
+  const getSubscriptionInfo = async (sub_type, token, transactionId) => {
     try {
       // Step 1: Try to load from context, otherwise fallback to AsyncStorage
       // let subDetails = context?.subscribed_details;
@@ -257,7 +266,7 @@ const Login = ({navigation}) => {
       // Step 3: Send to backend to validate
       const obj = {
         sub_type: sub_type,
-        transaction_id: transactionId
+        transaction_id: transactionId,
         // purchase_date: subDetails.purchased_date,
       };
 
@@ -413,7 +422,7 @@ const Login = ({navigation}) => {
         // latitude: 0,
         // longitude: 0,
         ...location,
-        ...(token && {device_token: token})
+        ...(token && {device_token: token}),
       };
 
       await validationSchema.validate(obj, {abortEarly: false});
@@ -432,16 +441,24 @@ const Login = ({navigation}) => {
       }
 
       const localSubType = context?.sub_type;
-      const transactionId = context?.transaction_id
+      const transactionId = context?.transaction_id;
       const apiSubType = res?.data?.user?.sub_type;
       let finalSubType = apiSubType;
       if (localSubType && apiSubType && apiSubType !== localSubType) {
-       const updatedExpiry = await getSubscriptionInfo(localSubType, res?.data?.token,transactionId);
+        const updatedExpiry = await getSubscriptionInfo(
+          localSubType,
+          res?.data?.token,
+          transactionId,
+        );
         setContext(prev => ({
           ...prev,
           token: res?.data?.token,
           isVerified: res?.data?.verified ? true : false,
-          user: {...res?.data?.user, expired_at: updatedExpiry, sub_type: localSubType},
+          user: {
+            ...res?.data?.user,
+            expired_at: updatedExpiry,
+            sub_type: localSubType,
+          },
         }));
         finalSubType = localSubType;
       } else {
@@ -452,8 +469,14 @@ const Login = ({navigation}) => {
           user: {...res?.data?.user, sub_type: finalSubType},
         }));
       }
-      handlingNavigations(finalSubType, res?.data?.token,res?.data?.user,transactionId);
+      handlingNavigations(
+        finalSubType,
+        res?.data?.token,
+        res?.data?.user,
+        transactionId,
+      );
     } catch (err) {
+      console.log('error:-------', err);
       await errHandler(err, null, navigation);
     } finally {
       setLoading(false);

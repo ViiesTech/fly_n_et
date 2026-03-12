@@ -52,9 +52,9 @@ import LoaderOverlay from './src/components/LoaderOverlay';
 import ContactUs from './src/screens/ContactUs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {AppEventsLogger, Settings as settings} from 'react-native-fbsdk-next';
-import { View } from 'react-native';
+import {View} from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import Notification from '../fly_n_et/src/utils/global'
+import Notification from '../fly_n_et/src/utils/global';
 import BottomStack from './src/components/Navigation';
 
 const Stack = createStackNavigator();
@@ -404,7 +404,7 @@ const Sus = ({component}) => {
 
 function MainApp() {
   const {context, setContext} = useContext(DataContext);
-  const [isConnected,setIsConnected] = useState(true)
+  const [isConnected, setIsConnected] = useState(true);
   // const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(false);
   // const [appState, setAppState] = useState(AppState.currentState);
@@ -438,7 +438,6 @@ function MainApp() {
     }, 2000);
   }, []);
 
-
   const checkToken = async () => {
     try {
       const res = await api.get('/user/check-token', {
@@ -451,6 +450,9 @@ function MainApp() {
         res.data.error === 'Invalid token.' ||
         res.data.error === 'Token is expired'
       ) {
+        // Clear AsyncStorage
+        await AsyncStorage.multiRemove(['token', 'isVerified', 'user']);
+
         Alert.alert(
           'Session Expired',
           'Your account was accessed on another device. Please log in again to continue.',
@@ -458,9 +460,7 @@ function MainApp() {
             {
               text: 'Log In',
               onPress: () => {
-                replace('Login');
                 setContext({
-                  ...context,
                   token: false,
                   isVerified: false,
                   user: null,
@@ -473,6 +473,7 @@ function MainApp() {
                   serviceImages: null,
                   returnFromDetail: false,
                 });
+                replace('Login');
               },
             },
           ],
@@ -481,6 +482,25 @@ function MainApp() {
       }
     } catch (error) {
       console.log('Token check failed:', error);
+
+      // If we get a 401 error, clear the invalid token
+      if (error?.response?.status === 401) {
+        console.log('Clearing invalid token from storage');
+        await AsyncStorage.multiRemove(['token', 'isVerified', 'user']);
+        setContext({
+          token: false,
+          isVerified: false,
+          user: null,
+          notifications: null,
+          restuarents: null,
+          savedRestuarents: null,
+          restuarent: null,
+          about: null,
+          terms: null,
+          serviceImages: null,
+          returnFromDetail: false,
+        });
+      }
     }
   };
 
@@ -498,7 +518,6 @@ function MainApp() {
       }
     };
   }, []);
-
 
   // useEffect(() => {
   //   if (Platform.OS === 'ios') {
@@ -527,44 +546,45 @@ function MainApp() {
   //   }
   // }, [context.token, isFocused]);
 
-
   useEffect(() => {
-  if (Platform.OS === 'ios' && isFocused) {
-    const prevProductIdRef = { current: null };
+    if (Platform.OS === 'ios' && isFocused) {
+      const prevProductIdRef = {current: null};
 
-    const fetchAndSaveEntitlement = async customerInfo => {
-      const premium = customerInfo.entitlements.active['Premium'];
-      // console.log('Entitlement Premium:', premium.periodType);
+      const fetchAndSaveEntitlement = async customerInfo => {
+        const premium = customerInfo.entitlements.active['Premium'];
+        // console.log('Entitlement Premium:', premium.periodType);
 
-      if (premium) {
-        const currentProductId = premium.productIdentifier;
-        if (prevProductIdRef.current !== currentProductId) {
-          prevProductIdRef.current = currentProductId;
+        if (premium) {
+          const currentProductId = premium.productIdentifier;
+          if (prevProductIdRef.current !== currentProductId) {
+            prevProductIdRef.current = currentProductId;
 
-          const subType = currentProductId.includes('flyneat_month') ? 'monthly' : 'yearly';
-          const purchasedDate = premium.latestPurchaseDate;
+            const subType = currentProductId.includes('flyneat_month')
+              ? 'monthly'
+              : 'yearly';
+            const purchasedDate = premium.latestPurchaseDate;
 
-          const token = await AsyncStorage.getItem('token');
-          if (premium.isTrial === true) {
-          await handlingNavigations(token, subType, purchasedDate);
-          }  
+            const token = await AsyncStorage.getItem('token');
+            if (premium.isTrial === true) {
+              await handlingNavigations(token, subType, purchasedDate);
+            }
+          }
         }
-      }
-    };
+      };
 
-    Purchases.addCustomerInfoUpdateListener(fetchAndSaveEntitlement);
+      Purchases.addCustomerInfoUpdateListener(fetchAndSaveEntitlement);
 
-    return () => {
-      Purchases.removeCustomerInfoUpdateListener(fetchAndSaveEntitlement);
-    };
-  }
-}, [context.token, isFocused]);
+      return () => {
+        Purchases.removeCustomerInfoUpdateListener(fetchAndSaveEntitlement);
+      };
+    }
+  }, [context.token, isFocused]);
 
-  const handlingNavigations = async (token,subType,purchasedDate) => {
+  const handlingNavigations = async (token, subType, purchasedDate) => {
     // const iosSubType = 'monthly';
-  // const isFreeTrial = await AsyncStorage.getItem('isPremium')  
-  // return console.log('hello world',isFreeTrial)
-    console.log('subtype',subType)
+    // const isFreeTrial = await AsyncStorage.getItem('isPremium')
+    // return console.log('hello world',isFreeTrial)
+    console.log('subtype', subType);
     const formData = new FormData();
     formData.append('sub_type', subType);
 
@@ -575,12 +595,12 @@ function MainApp() {
         // console.log('hello token')
         setLoading(true);
         await AsyncStorage.setItem('isPremium', 'true');
-      //    if (purchasedDate) {
-      //   await AsyncStorage.setItem('subscribed_details', JSON.stringify({
-      //     purchased_date: purchasedDate,
-      //     sub_type: subType,
-      //   }));
-      // }
+        //    if (purchasedDate) {
+        //   await AsyncStorage.setItem('subscribed_details', JSON.stringify({
+        //     purchased_date: purchasedDate,
+        //     sub_type: subType,
+        //   }));
+        // }
         setLoading(false);
       } else {
         // alert('app start with token')
@@ -604,15 +624,17 @@ function MainApp() {
         if (updatedExpiry) {
           await AsyncStorage.setItem('token', token);
           await AsyncStorage.setItem('isVerified', JSON.stringify(true));
-          await AsyncStorage.setItem('user', JSON.stringify(response?.data?.user));
+          await AsyncStorage.setItem(
+            'user',
+            JSON.stringify(response?.data?.user),
+          );
 
-
-        // if (purchasedDate) {
-        //   await AsyncStorage.setItem('subscribed_details', JSON.stringify({
-        //     purchased_date: purchasedDate,
-        //     sub_type: subType,
-        //   }));
-        // }
+          // if (purchasedDate) {
+          //   await AsyncStorage.setItem('subscribed_details', JSON.stringify({
+          //     purchased_date: purchasedDate,
+          //     sub_type: subType,
+          //   }));
+          // }
           // setContext({
           //   ...context,
           //   token: token,
@@ -622,14 +644,14 @@ function MainApp() {
           //   ? { purchased_date: purchasedDate, sub_type: subType }
           //   : context.subscribed_details,
           // });
-             setContext(prev => ({
-              ...prev,
-              user: {
-                ...prev.user,
-                expired_at: updatedExpiry,
-                sub_type: response?.data?.user?.sub_type
-              },
-            }));
+          setContext(prev => ({
+            ...prev,
+            user: {
+              ...prev.user,
+              expired_at: updatedExpiry,
+              sub_type: response?.data?.user?.sub_type,
+            },
+          }));
         }
         setLoading(false); // Stop loader after API + async calls
       }
@@ -639,159 +661,158 @@ function MainApp() {
     }
   };
 
-    useEffect(() => {
+  useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
       setIsConnected(state.isConnected);
     });
     return () => unsubscribe();
   }, []);
 
- useEffect(() => {
+  useEffect(() => {
     Notification.configureFCM();
     return () => {
       Notification.unsubscribeFCM();
     };
   }, []);
 
-     
-
-
   return (
     <>
-        <View style={{flex: 1}}>
-  
-
-      {/* <LoaderOverlay visible={loading} /> */}
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        {/* <Stack.Screen name="Splash" component={Splash} />
+      <View style={{flex: 1}}>
+        {/* <LoaderOverlay visible={loading} /> */}
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          {/* <Stack.Screen name="Splash" component={Splash} />
       <Stack.Screen name="Logout" component={Logout} /> */}
-        <Stack.Screen name="Splash" component={Splash} />
-        <Stack.Screen name="Logout" component={Logout} />
-        {/* <Stack.Screen name="PointToPoint">
+          <Stack.Screen name="Splash" component={Splash} />
+          <Stack.Screen name="Logout" component={Logout} />
+          {/* <Stack.Screen name="PointToPoint">
           {props => <Sus component={<PointToPoint {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="SelectLocation">
+          {/* <Stack.Screen name="SelectLocation">
           {props => <Sus component={<SelectLocation {...props} />} />}
         </Stack.Screen> */}
-        <Stack.Screen name="GetStarted">
-          {props => <Sus component={<GetStarted {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Login">
-          {props => <Sus component={<Login {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Signup">
-          {props => <Sus component={<Signup {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="ForgotPassword">
-          {props => <Sus component={<ForgotPassword {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="CreateProProfile">
-          {props => <Sus component={<CreateProProfile {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="OTP">
-          {props => <Sus component={<OTP {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="ResetPassword">
-          {props => <Sus component={<ResetPassword {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="CreateProfile">
-          {props => <Sus component={<CreateProfile {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="Message">
-          {props => <Sus component={<Message {...props} />} />}
-        </Stack.Screen>
-        {/* <Stack.Screen name="Home">
+          <Stack.Screen name="GetStarted">
+            {props => <Sus component={<GetStarted {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="Login">
+            {props => <Sus component={<Login {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="Signup">
+            {props => <Sus component={<Signup {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="ForgotPassword">
+            {props => <Sus component={<ForgotPassword {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="CreateProProfile">
+            {props => <Sus component={<CreateProProfile {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="OTP">
+            {props => <Sus component={<OTP {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="ResetPassword">
+            {props => <Sus component={<ResetPassword {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="CreateProfile">
+            {props => <Sus component={<CreateProfile {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="Message">
+            {props => <Sus component={<Message {...props} />} />}
+          </Stack.Screen>
+          {/* <Stack.Screen name="Home">
           {props => <Sus component={<Home {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="SideMenu">
+          {/* <Stack.Screen name="SideMenu">
           {props => <Sus component={<SideMenu {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="Map">
+          {/* <Stack.Screen name="Map">
           {props => <Sus component={<Map {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="Map2">
+          {/* <Stack.Screen name="Map2">
           {props => <Sus component={<Map2 {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="RestuarantDetails">
+          {/* <Stack.Screen name="RestuarantDetails">
           {props => <Sus component={<RestuarantDetails {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="Feedback">
+          {/* <Stack.Screen name="Feedback">
           {props => <Sus component={<Feedback {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="Bookmark">
+          {/* <Stack.Screen name="Bookmark">
           {props => <Sus component={<Bookmark {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="Notifications">
+          {/* <Stack.Screen name="Notifications">
           {props => <Sus component={<Notifications {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="Profile">
+          {/* <Stack.Screen name="Profile">
           {props => <Sus component={<Profile {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="AccountSettings">
+          {/* <Stack.Screen name="AccountSettings">
           {props => <Sus component={<AccountSettings {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="ChangePassword">
+          {/* <Stack.Screen name="ChangePassword">
           {props => <Sus component={<ChangePassword {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="Settings">
+          {/* <Stack.Screen name="Settings">
           {props => <Sus component={<Settings {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="About">
+          {/* <Stack.Screen name="About">
           {props => <Sus component={<About {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="Terms">
+          {/* <Stack.Screen name="Terms">
           {props => <Sus component={<Terms {...props} />} />}
         </Stack.Screen> */}
-        {/* <Stack.Screen name="Privacy">
+          {/* <Stack.Screen name="Privacy">
           {props => <Sus component={<Privacy {...props} />} />}
         </Stack.Screen> */}
-        <Stack.Screen name="Verify">
-          {props => <Sus component={<Verify {...props} />} />}
-        </Stack.Screen>
-        <Stack.Screen name="CFISelection">
-          {props => <Sus component={<CFISelection {...props} />} />}
-        </Stack.Screen> 
-        <Stack.Screen name="CFIScreen">
-          {props => <Sus component={<CFIScreen {...props} />} />}
-        </Stack.Screen>
-         <Stack.Screen name="CFiIScreen">
-          {props => <Sus component={<CFiIScreen {...props} />} />}
-        </Stack.Screen>
-        {/* <Stack.Screen name="CFISearch">
+          <Stack.Screen name="Verify">
+            {props => <Sus component={<Verify {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="CFISelection">
+            {props => <Sus component={<CFISelection {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="CFIScreen">
+            {props => <Sus component={<CFIScreen {...props} />} />}
+          </Stack.Screen>
+          <Stack.Screen name="CFiIScreen">
+            {props => <Sus component={<CFiIScreen {...props} />} />}
+          </Stack.Screen>
+          {/* <Stack.Screen name="CFISearch">
           {props => <Sus component={<CFISearch {...props} />} />}
         </Stack.Screen> 
         {/* <Stack.Screen name="CFIDetail">
           {props => <Sus component={<CFIDetail {...props} />} />}
         </Stack.Screen> */}
-        <Stack.Screen name="UserType">
-          {props => <Sus component={<UserType {...props} />} />}
-        </Stack.Screen>
-        {/* <Stack.Screen name="ContactUs">
+          <Stack.Screen name="UserType">
+            {props => <Sus component={<UserType {...props} />} />}
+          </Stack.Screen>
+          {/* <Stack.Screen name="ContactUs">
           {props => <Sus component={<ContactUs {...props} />} />}
           </Stack.Screen> */}
-        <Stack.Screen name='BottomStack' component={BottomStack} />
+          <Stack.Screen name="BottomStack" component={BottomStack} />
           <Stack.Screen name="Packages">
             {props => <Sus component={<Packages {...props} />} />}
           </Stack.Screen>
-              {/* <Stack.Screen name="CFISearch">
+          {/* <Stack.Screen name="CFISearch">
             {props => <Sus component={<CFISearch {...props} />} />}
           </Stack.Screen> */}
           <Stack.Screen name="PackageDetail">
             {props => <Sus component={<PackageDetail {...props} />} />}
           </Stack.Screen>
-        {/* Add the rest of your screens similarly using <Sus component={<Component />} /> */}
-      </Stack.Navigator>
+          {/* Add the rest of your screens similarly using <Sus component={<Component />} /> */}
+        </Stack.Navigator>
         {!isConnected && (
-        <View style={{  position: 'absolute',
-            bottom: 0,
-            width: '100%',
-            backgroundColor: 'red',
-            paddingVertical: 1}}>
-          <Text style={{color: 'white',textAlign: 'center'}}>No Internet Connection</Text>
-        </View>
-      )}
-    </View>
-          
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              width: '100%',
+              backgroundColor: 'red',
+              paddingVertical: 1,
+            }}>
+            <Text style={{color: 'white', textAlign: 'center'}}>
+              No Internet Connection
+            </Text>
+          </View>
+        )}
+      </View>
     </>
   );
 }
